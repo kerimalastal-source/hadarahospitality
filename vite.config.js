@@ -23,6 +23,7 @@ export default defineConfig({
         products: resolve(root, 'products.html'),
         blog: resolve(root, 'blog.html'),
         quote: resolve(root, 'get-a-quote.html'),
+        contact: resolve(root, 'contact.html'),
         ...pageEntries('products', 'product'),
         ...pageEntries('blog', 'article'),
       },

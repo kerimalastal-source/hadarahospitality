@@ -54,7 +54,7 @@ function articlePageHtml(article) {
   <header class="site-header" id="top">
     <a class="brand" href="../index.html" aria-label="HADARA Hospitality home"><span class="brand-mark">H</span><span><strong>HADARA</strong><small>HOSPITALITY</small></span></a>
     <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="navigation"><span></span><span></span><span></span></button>
-    <nav id="navigation" aria-label="Main navigation"><a href="../products.html">Products</a><a href="../index.html#approach">Our approach</a><a href="../about.html">About us</a><a href="../blog.html" aria-current="page">Blog</a><a class="nav-quote" href="../get-a-quote.html">Request a quote <span>↗</span></a></nav>
+    <nav id="navigation" aria-label="Main navigation"><a href="../products.html">Products</a><a href="../index.html#approach">Our approach</a><a href="../about.html">About us</a><a href="../blog.html" aria-current="page">Blog</a><a href="../contact.html">Contact</a><a class="nav-quote" href="../get-a-quote.html">Request a quote <span>↗</span></a></nav>
   </header>
   <main>
     <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href="../blog.html">Blog</a><span>/</span>${esc(article.title)}</p><p class="eyebrow light">${esc(article.category.toUpperCase())}</p><h1>${esc(article.title)}</h1><p class="article-meta-line">${formatDate(article.date)} <span>·</span> ${esc(article.readTime)} <span>·</span> HADARA Hospitality Team</p></div></section>
@@ -63,7 +63,7 @@ function articlePageHtml(article) {
     <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>Ready to talk about<br><em>your property?</em></h2></div><a class="button button-gold" href="../get-a-quote.html">Request a tailored quote <span>↗</span></a></div></section>
     ${relatedHtml(article)}
   </main>
-  <footer><div class="wrap footer-grid"><div><a class="brand footer-brand" href="../index.html"><span class="brand-mark">H</span><span><strong>HADARA</strong><small>HOSPITALITY</small></span></a><p>Hospitality procurement & supply solutions from Türkiye.</p></div><div><h4>EXPLORE</h4><a href="../products.html">Products</a><a href="../blog.html">Blog</a><a href="../about.html">About us</a></div><div><h4>GET IN TOUCH</h4><a href="../get-a-quote.html">Request a quote</a><a href="mailto:partnerships@hadarahospitality.com">Email our team</a><span>Istanbul, Türkiye</span></div></div><div class="wrap footer-bottom"><span>© <span id="year">2026</span> HADARA Hospitality · Part of BYHADARA Group</span><a href="#top">Back to top ↑</a></div></footer>
+  <footer><div class="wrap footer-grid"><div><a class="brand footer-brand" href="../index.html"><span class="brand-mark">H</span><span><strong>HADARA</strong><small>HOSPITALITY</small></span></a><p>Hospitality procurement & supply solutions from Türkiye.</p></div><div><h4>EXPLORE</h4><a href="../products.html">Products</a><a href="../blog.html">Blog</a><a href="../about.html">About us</a></div><div><h4>GET IN TOUCH</h4><a href="../contact.html">Contact us</a><a href="../get-a-quote.html">Request a quote</a><a href="mailto:partnerships@hadarahospitality.com">Email our team</a><span>Istanbul, Türkiye</span></div></div><div class="wrap footer-bottom"><span>© <span id="year">2026</span> HADARA Hospitality · Part of BYHADARA Group</span><a href="#top">Back to top ↑</a></div></footer>
   <script type="module" src="../script.js"></script>
 </body>
 </html>
@@ -91,14 +91,14 @@ function blogListingHtml() {
   <header class="site-header" id="top">
     <a class="brand" href="index.html" aria-label="HADARA Hospitality home"><span class="brand-mark">H</span><span><strong>HADARA</strong><small>HOSPITALITY</small></span></a>
     <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="navigation"><span></span><span></span><span></span></button>
-    <nav id="navigation" aria-label="Main navigation"><a href="products.html">Products</a><a href="index.html#approach">Our approach</a><a href="about.html">About us</a><a href="blog.html" aria-current="page">Blog</a><a class="nav-quote" href="get-a-quote.html">Request a quote <span>↗</span></a></nav>
+    <nav id="navigation" aria-label="Main navigation"><a href="products.html">Products</a><a href="index.html#approach">Our approach</a><a href="about.html">About us</a><a href="blog.html" aria-current="page">Blog</a><a href="contact.html">Contact</a><a class="nav-quote" href="get-a-quote.html">Request a quote <span>↗</span></a></nav>
   </header>
   <main>
     <section class="products-hero"><div class="wrap"><p class="eyebrow light">THE HADARA JOURNAL</p><h1>Notes on <em>hospitality supply.</em></h1><p>Practical guidance on hotel textiles, guest amenities and sourcing, from our team in Istanbul.</p></div></section>
     <section class="blog-list wrap"><div class="blog-grid">${cards}</div></section>
     <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>Have a question for<br><em>our team?</em></h2></div><a class="button button-gold" href="get-a-quote.html">Request a tailored quote <span>↗</span></a></div></section>
   </main>
-  <footer><div class="wrap footer-grid"><div><a class="brand footer-brand" href="index.html"><span class="brand-mark">H</span><span><strong>HADARA</strong><small>HOSPITALITY</small></span></a><p>Hospitality procurement & supply solutions from Türkiye.</p></div><div><h4>EXPLORE</h4><a href="products.html">Products</a><a href="blog.html">Blog</a><a href="about.html">About us</a></div><div><h4>GET IN TOUCH</h4><a href="get-a-quote.html">Request a quote</a><a href="mailto:partnerships@hadarahospitality.com">Email our team</a><span>Istanbul, Türkiye</span></div></div><div class="wrap footer-bottom"><span>© <span id="year">2026</span> HADARA Hospitality · Part of BYHADARA Group</span><a href="#top">Back to top ↑</a></div></footer>
+  <footer><div class="wrap footer-grid"><div><a class="brand footer-brand" href="index.html"><span class="brand-mark">H</span><span><strong>HADARA</strong><small>HOSPITALITY</small></span></a><p>Hospitality procurement & supply solutions from Türkiye.</p></div><div><h4>EXPLORE</h4><a href="products.html">Products</a><a href="blog.html">Blog</a><a href="about.html">About us</a></div><div><h4>GET IN TOUCH</h4><a href="contact.html">Contact us</a><a href="get-a-quote.html">Request a quote</a><a href="mailto:partnerships@hadarahospitality.com">Email our team</a><span>Istanbul, Türkiye</span></div></div><div class="wrap footer-bottom"><span>© <span id="year">2026</span> HADARA Hospitality · Part of BYHADARA Group</span><a href="#top">Back to top ↑</a></div></footer>
   <script type="module" src="script.js"></script>
 </body>
 </html>
