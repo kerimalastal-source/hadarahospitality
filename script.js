@@ -33,3 +33,11 @@ if (quoteForm) {
     quoteForm.querySelector('[name="details"]').value = `Product interest: ${product}\n\n`;
   }
 }
+
+document.querySelector('#contact-form')?.addEventListener('submit', event => {
+  event.preventDefault();
+  const values = Object.fromEntries(new FormData(event.currentTarget));
+  const subject = `HADARA Hospitality contact — ${values.subject}`;
+  const body = `Name: ${values.name}\nEmail: ${values.email}\n\nMessage:\n${values.message}`;
+  window.location.href = `mailto:partnerships@hadarahospitality.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+});
