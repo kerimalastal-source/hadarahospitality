@@ -24,6 +24,7 @@ export default defineConfig({
         blog: resolve(root, 'blog.html'),
         quote: resolve(root, 'get-a-quote.html'),
         contact: resolve(root, 'contact.html'),
+        faq: resolve(root, 'faq.html'),
         ...pageEntries('products', 'product'),
         ...pageEntries('blog', 'article'),
       },

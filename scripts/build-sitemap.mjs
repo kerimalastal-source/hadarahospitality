@@ -19,6 +19,7 @@ const staticPages = [
   { path: '/blog.html', priority: '0.7' },
   { path: '/get-a-quote.html', priority: '0.8' },
   { path: '/contact.html', priority: '0.6' },
+  { path: '/faq.html', priority: '0.6' },
 ];
 
 const urls = [
