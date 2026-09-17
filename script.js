@@ -12,7 +12,7 @@ navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', 
   menuButton.setAttribute('aria-label', 'Open menu');
 }));
 document.querySelector('#year').textContent = new Date().getFullYear();
-document.querySelector('#quote-form').addEventListener('submit', event => {
+document.querySelector('#quote-form')?.addEventListener('submit', event => {
   event.preventDefault();
   const values = Object.fromEntries(new FormData(event.currentTarget));
   const subject = `HADARA Hospitality quotation request — ${values.hotel}`;
