@@ -11,6 +11,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = resolve(ROOT, 'products');
 
 const PRODUCTION_NOTE = 'All products are supplied through trusted Turkish manufacturing partners with hospitality-focused production standards. Customized production, private labeling, and bulk supply solutions are available upon request.';
+const SITE_URL = 'https://hadarahospitality.com';
 
 const esc = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -33,11 +34,11 @@ function quoteLink(product, depth) {
 
 function galleryHtml(product) {
   const main = product.main
-    ? `<div class="pdp-gallery-main" style="background-image:url('${esc(product.main)}')" role="img" aria-label="${esc(product.name)}"></div>`
+    ? `<div class="pdp-gallery-main" data-bg="${esc(product.main)}" role="img" aria-label="${esc(product.name)}"></div>`
     : `<div class="pdp-gallery-main pdp-gallery-placeholder" role="img" aria-label="${esc(product.name)} — photo coming soon"><span>Photo coming soon</span></div>`;
   const extras = product.gallery.filter((url) => url !== product.main);
   if (!extras.length) return `<div class="pdp-gallery">${main}</div>`;
-  const thumbs = extras.slice(0, 4).map((url) => `<span style="background-image:url('${esc(url)}')"></span>`).join('');
+  const thumbs = extras.slice(0, 4).map((url) => `<span data-bg="${esc(url)}"></span>`).join('');
   return `<div class="pdp-gallery">${main}<div class="pdp-gallery-thumbs">${thumbs}</div></div>`;
 }
 
@@ -56,7 +57,7 @@ function relatedHtml(product) {
   const related = PRODUCTS.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 3);
   if (!related.length) return '';
   const cards = related.map((p) => p.main
-    ? `<a class="related-card" href="${p.slug}.html" style="--card-image:url('${esc(p.main)}')"><span>${esc(p.name)}</span></a>`
+    ? `<a class="related-card" href="${p.slug}.html" data-bg="${esc(p.main)}"><span>${esc(p.name)}</span></a>`
     : `<a class="related-card related-card-placeholder" href="${p.slug}.html"><span>${esc(p.name)}</span></a>`).join('');
   return `<section class="pdp-related wrap"><p class="eyebrow">YOU MAY ALSO LIKE</p><h2>More from <em>${esc(CATEGORIES[product.category].label)}.</em></h2><div class="related-grid">${cards}</div></section>`;
 }
@@ -65,6 +66,9 @@ function pageHtml(product) {
   const cat = CATEGORIES[product.category];
   const metaDescription = esc(`${product.overview.slice(0, 145).trim()}… Request a tailored quote from HADARA Hospitality.`);
   const cta = quoteLink(product, 1);
+  const pageUrl = `${SITE_URL}/products/${product.slug}.html`;
+  const ogImage = product.main || `${SITE_URL}/assets/og-image.png`;
+  const pageTitle = esc(`${product.name} | HADARA Hospitality`);
 
   return `<!doctype html>
 <html lang="en">
@@ -73,7 +77,22 @@ function pageHtml(product) {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#1e2a38" />
   <meta name="description" content="${metaDescription}" />
-  <title>${esc(product.name)} | HADARA Hospitality</title>
+  <title>${pageTitle}</title>
+  <link rel="canonical" href="${pageUrl}" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta property="og:type" content="product" />
+  <meta property="og:site_name" content="HADARA Hospitality" />
+  <meta property="og:title" content="${pageTitle}" />
+  <meta property="og:description" content="${metaDescription}" />
+  <meta property="og:url" content="${pageUrl}" />
+  <meta property="og:image" content="${esc(ogImage)}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${pageTitle}" />
+  <meta name="twitter:description" content="${metaDescription}" />
+  <meta name="twitter:image" content="${esc(ogImage)}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />

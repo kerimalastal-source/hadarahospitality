@@ -34,6 +34,26 @@ if (quoteForm) {
   }
 }
 
+const lazyBgEls = document.querySelectorAll('[data-bg]');
+if (lazyBgEls.length && 'IntersectionObserver' in window) {
+  const lazyBgObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const url = `url('${entry.target.dataset.bg}')`;
+      entry.target.style.backgroundImage = url;
+      entry.target.style.setProperty('--card-image', url);
+      observer.unobserve(entry.target);
+    });
+  }, { rootMargin: '250px 0px' });
+  lazyBgEls.forEach(el => lazyBgObserver.observe(el));
+} else {
+  lazyBgEls.forEach(el => {
+    const url = `url('${el.dataset.bg}')`;
+    el.style.backgroundImage = url;
+    el.style.setProperty('--card-image', url);
+  });
+}
+
 document.querySelector('#contact-form')?.addEventListener('submit', event => {
   event.preventDefault();
   const values = Object.fromEntries(new FormData(event.currentTarget));
