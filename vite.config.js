@@ -22,6 +22,7 @@ export default defineConfig({
         about: resolve(root, 'about.html'),
         products: resolve(root, 'products.html'),
         blog: resolve(root, 'blog.html'),
+        quote: resolve(root, 'get-a-quote.html'),
         ...pageEntries('products', 'product'),
         ...pageEntries('blog', 'article'),
       },
