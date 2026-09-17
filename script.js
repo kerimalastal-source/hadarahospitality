@@ -1,17 +1,40 @@
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('#navigation');
-menuButton.addEventListener('click', () => {
-  const open = menuButton.getAttribute('aria-expanded') !== 'true';
-  menuButton.setAttribute('aria-expanded', String(open));
-  menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-  navigation.classList.toggle('open', open);
-});
-navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
-  navigation.classList.remove('open');
-  menuButton.setAttribute('aria-expanded', 'false');
-  menuButton.setAttribute('aria-label', 'Open menu');
-}));
-document.querySelector('#year').textContent = new Date().getFullYear();
+if (menuButton && navigation) {
+  menuButton.addEventListener('click', () => {
+    const open = menuButton.getAttribute('aria-expanded') !== 'true';
+    menuButton.setAttribute('aria-expanded', String(open));
+    menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    navigation.classList.toggle('open', open);
+  });
+  navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+    navigation.classList.remove('open');
+    menuButton.setAttribute('aria-expanded', 'false');
+    menuButton.setAttribute('aria-label', 'Open menu');
+  }));
+}
+const year = document.querySelector('#year');
+if (year) year.textContent = new Date().getFullYear();
+
+// Every generated product page gets a direct, product-specific PDF technical sheet.
+const productMatch = window.location.pathname.match(/\/products\/([^/]+)\.html$/);
+if (productMatch) {
+  const heroWrap = document.querySelector('.pdp-hero .wrap');
+  const quoteButton = heroWrap?.querySelector('.button');
+  if (heroWrap && quoteButton) {
+    const actions = document.createElement('div');
+    actions.className = 'pdp-actions';
+    quoteButton.parentNode.insertBefore(actions, quoteButton);
+    actions.appendChild(quoteButton);
+    const sheet = document.createElement('a');
+    sheet.className = 'button button-gold technical-sheet-download';
+    sheet.href = `/technical-sheets/${productMatch[1]}.pdf`;
+    sheet.download = `${productMatch[1]}-technical-sheet.pdf`;
+    sheet.textContent = 'Download Technical Sheet ↓';
+    actions.appendChild(sheet);
+  }
+}
+
 const quoteForm = document.querySelector('#quote-form');
 quoteForm?.addEventListener('submit', event => {
   event.preventDefault();
@@ -20,20 +43,14 @@ quoteForm?.addEventListener('submit', event => {
   const body = `Name: ${values.name}\nEmail: ${values.email}\nHotel / company: ${values.hotel}\nCountry: ${values.country}\nCollection: ${values.category}\n\nProject details:\n${values.details || 'Not specified'}`;
   window.location.href = `mailto:partnerships@hadarahospitality.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 });
-
 if (quoteForm) {
   const params = new URLSearchParams(window.location.search);
   const product = params.get('product');
   const category = params.get('category');
   const categoryField = quoteForm.querySelector('[name="category"]');
-  if (category && [...categoryField.options].some(option => option.value === category)) {
-    categoryField.value = category;
-  }
-  if (product) {
-    quoteForm.querySelector('[name="details"]').value = `Product interest: ${product}\n\n`;
-  }
+  if (category && categoryField && [...categoryField.options].some(option => option.value === category)) categoryField.value = category;
+  if (product) quoteForm.querySelector('[name="details"]').value = `Product interest: ${product}\n\n`;
 }
-
 const lazyBgEls = document.querySelectorAll('[data-bg]');
 if (lazyBgEls.length && 'IntersectionObserver' in window) {
   const lazyBgObserver = new IntersectionObserver((entries, observer) => {
@@ -53,7 +70,6 @@ if (lazyBgEls.length && 'IntersectionObserver' in window) {
     el.style.setProperty('--card-image', url);
   });
 }
-
 document.querySelector('#contact-form')?.addEventListener('submit', event => {
   event.preventDefault();
   const values = Object.fromEntries(new FormData(event.currentTarget));
