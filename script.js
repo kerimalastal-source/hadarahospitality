@@ -16,6 +16,22 @@ if (menuButton && navigation) {
 const year = document.querySelector('#year');
 if (year) year.textContent = new Date().getFullYear();
 
+// Use the official black HADARA logo in the site header across all pages.
+const headerBrand = document.querySelector('.site-header .brand');
+if (headerBrand) {
+  headerBrand.innerHTML = '<img src="/assets/hadara-logo-black.svg" alt="HADARA Hospitality" class="hadara-header-logo">';
+  headerBrand.style.width = '118px';
+  headerBrand.style.height = '64px';
+  headerBrand.style.display = 'flex';
+  headerBrand.style.alignItems = 'center';
+  headerBrand.style.justifyContent = 'center';
+  const logo = headerBrand.querySelector('.hadara-header-logo');
+  logo.style.display = 'block';
+  logo.style.width = '100%';
+  logo.style.height = '100%';
+  logo.style.objectFit = 'contain';
+}
+
 // Every generated product page gets a direct, product-specific PDF technical sheet.
 const productMatch = window.location.pathname.match(/\/products\/([^/]+)\.html$/);
 if (productMatch) {
