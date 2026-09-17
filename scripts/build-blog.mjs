@@ -10,6 +10,7 @@ import { ARTICLES } from '../data/blog.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = resolve(ROOT, 'blog');
+const SITE_URL = 'https://hadarahospitality.com';
 
 const esc = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -30,12 +31,15 @@ function bodyHtml(article) {
 function relatedHtml(article) {
   const related = ARTICLES.filter((a) => a.category === article.category && a.slug !== article.slug).slice(0, 3);
   const pool = related.length ? related : ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 3);
-  const cards = pool.map((a) => `<a class="related-card" href="${a.slug}.html" style="--card-image:url('${esc(a.hero)}')"><span>${esc(a.title)}</span></a>`).join('');
+  const cards = pool.map((a) => `<a class="related-card" href="${a.slug}.html" data-bg="${esc(a.hero)}"><span>${esc(a.title)}</span></a>`).join('');
   return `<section class="pdp-related wrap"><p class="eyebrow">YOU MAY ALSO LIKE</p><h2>More from the <em>HADARA journal.</em></h2><div class="related-grid">${cards}</div></section>`;
 }
 
 function articlePageHtml(article) {
   const metaDescription = esc(article.excerpt);
+  const pageUrl = `${SITE_URL}/blog/${article.slug}.html`;
+  const ogImage = article.hero || `${SITE_URL}/assets/og-image.png`;
+  const pageTitle = esc(`${article.title} | HADARA Hospitality`);
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -43,7 +47,22 @@ function articlePageHtml(article) {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#1e2a38" />
   <meta name="description" content="${metaDescription}" />
-  <title>${esc(article.title)} | HADARA Hospitality</title>
+  <title>${pageTitle}</title>
+  <link rel="canonical" href="${pageUrl}" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="HADARA Hospitality" />
+  <meta property="og:title" content="${pageTitle}" />
+  <meta property="og:description" content="${metaDescription}" />
+  <meta property="og:url" content="${pageUrl}" />
+  <meta property="og:image" content="${esc(ogImage)}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${pageTitle}" />
+  <meta name="twitter:description" content="${metaDescription}" />
+  <meta name="twitter:image" content="${esc(ogImage)}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -71,7 +90,7 @@ function articlePageHtml(article) {
 }
 
 function blogListingHtml() {
-  const cards = ARTICLES.map((a) => `<a class="blog-card" href="blog/${a.slug}.html"><div class="blog-card-image" style="background-image:url('${esc(a.hero)}')" role="img" aria-label="${esc(a.heroAlt)}"></div><div class="blog-card-body"><span class="blog-tag">${esc(a.category)}</span><h3>${esc(a.title)}</h3><p>${esc(a.excerpt)}</p><span class="blog-meta">${formatDate(a.date)} <span>·</span> ${esc(a.readTime)}</span><span class="text-link">Read article <span>↗</span></span></div></a>`).join('');
+  const cards = ARTICLES.map((a) => `<a class="blog-card" href="blog/${a.slug}.html"><div class="blog-card-image" data-bg="${esc(a.hero)}" role="img" aria-label="${esc(a.heroAlt)}"></div><div class="blog-card-body"><span class="blog-tag">${esc(a.category)}</span><h3>${esc(a.title)}</h3><p>${esc(a.excerpt)}</p><span class="blog-meta">${formatDate(a.date)} <span>·</span> ${esc(a.readTime)}</span><span class="text-link">Read article <span>↗</span></span></div></a>`).join('');
 
   return `<!doctype html>
 <html lang="en">
@@ -81,6 +100,21 @@ function blogListingHtml() {
   <meta name="theme-color" content="#1e2a38" />
   <meta name="description" content="Insights on hotel textiles, guest amenities and hospitality procurement from HADARA Hospitality, hotel textile suppliers based in Istanbul, Türkiye." />
   <title>Blog | HADARA Hospitality</title>
+  <link rel="canonical" href="${SITE_URL}/blog.html" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="HADARA Hospitality" />
+  <meta property="og:title" content="Blog | HADARA Hospitality" />
+  <meta property="og:description" content="Insights on hotel textiles, guest amenities and hospitality procurement from HADARA Hospitality, hotel textile suppliers based in Istanbul, Türkiye." />
+  <meta property="og:url" content="${SITE_URL}/blog.html" />
+  <meta property="og:image" content="${SITE_URL}/assets/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Blog | HADARA Hospitality" />
+  <meta name="twitter:description" content="Insights on hotel textiles, guest amenities and hospitality procurement from HADARA Hospitality, hotel textile suppliers based in Istanbul, Türkiye." />
+  <meta name="twitter:image" content="${SITE_URL}/assets/og-image.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />
