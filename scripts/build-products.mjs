@@ -32,7 +32,9 @@ function quoteLink(product, depth) {
 }
 
 function galleryHtml(product) {
-  const main = `<div class="pdp-gallery-main" style="background-image:url('${esc(product.main)}')" role="img" aria-label="${esc(product.name)}"></div>`;
+  const main = product.main
+    ? `<div class="pdp-gallery-main" style="background-image:url('${esc(product.main)}')" role="img" aria-label="${esc(product.name)}"></div>`
+    : `<div class="pdp-gallery-main pdp-gallery-placeholder" role="img" aria-label="${esc(product.name)} — photo coming soon"><span>Photo coming soon</span></div>`;
   const extras = product.gallery.filter((url) => url !== product.main);
   if (!extras.length) return `<div class="pdp-gallery">${main}</div>`;
   const thumbs = extras.slice(0, 4).map((url) => `<span style="background-image:url('${esc(url)}')"></span>`).join('');
@@ -53,7 +55,9 @@ function specTableHtml(product) {
 function relatedHtml(product) {
   const related = PRODUCTS.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 3);
   if (!related.length) return '';
-  const cards = related.map((p) => `<a class="related-card" href="${p.slug}.html" style="--card-image:url('${esc(p.main)}')"><span>${esc(p.name)}</span></a>`).join('');
+  const cards = related.map((p) => p.main
+    ? `<a class="related-card" href="${p.slug}.html" style="--card-image:url('${esc(p.main)}')"><span>${esc(p.name)}</span></a>`
+    : `<a class="related-card related-card-placeholder" href="${p.slug}.html"><span>${esc(p.name)}</span></a>`).join('');
   return `<section class="pdp-related wrap"><p class="eyebrow">YOU MAY ALSO LIKE</p><h2>More from <em>${esc(CATEGORIES[product.category].label)}.</em></h2><div class="related-grid">${cards}</div></section>`;
 }
 
