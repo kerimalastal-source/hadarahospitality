@@ -102,3 +102,10 @@
 .contact-map{height:440px;border:1px solid #e3dfd6;background:var(--cream)}
 .contact-map iframe{display:block}
 @media(max-width:700px){.contact-map-section{padding-bottom:70px}.contact-map{height:320px}}
+.catalogs{border-bottom:1px solid #e3dfd6}
+.catalogs-inner{display:flex;align-items:center;justify-content:space-between;gap:50px;padding:56px 0}
+.catalogs-inner h2{font-size:clamp(30px,3vw,42px);margin:14px 0 12px}
+.catalogs-inner>div:first-child p{color:var(--muted);font-size:14px;line-height:1.75;max-width:420px;margin:0}
+.catalog-actions{display:flex;gap:16px;flex:none}
+@media(max-width:900px){.catalogs-inner{flex-direction:column;align-items:stretch;gap:26px;padding:44px 0}.catalog-actions{flex-wrap:wrap}}
+@media(max-width:650px){.catalog-actions{flex-direction:column;align-items:stretch}.catalog-actions .button{width:100%}}
