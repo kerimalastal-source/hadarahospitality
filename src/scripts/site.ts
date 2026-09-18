@@ -121,4 +121,61 @@ document.querySelectorAll<HTMLElement>('[data-carousel-track]').forEach((track) 
   track.addEventListener('scroll', updateArrowState);
   window.addEventListener('resize', updateArrowState);
   updateArrowState();
+
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const AUTO_SCROLL_SPEED = 0.35; // px per frame, a gentle drift
+    let direction: 1 | -1 = 1;
+    let paused = false;
+    let resumeTimer: number | undefined;
+
+    const pause = () => {
+      paused = true;
+      window.clearTimeout(resumeTimer);
+    };
+    const scheduleResume = (delay: number) => {
+      window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        paused = false;
+      }, delay);
+    };
+
+    track.addEventListener('mouseenter', pause);
+    track.addEventListener('mouseleave', () => scheduleResume(300));
+    track.addEventListener('touchstart', pause, { passive: true });
+    track.addEventListener('touchend', () => scheduleResume(1500));
+    track.addEventListener('wheel', () => scheduleResume(2000), { passive: true });
+    track.addEventListener('focusin', pause);
+    track.addEventListener('focusout', () => scheduleResume(1000));
+    prevButton.addEventListener('click', () => scheduleResume(2500));
+    nextButton.addEventListener('click', () => scheduleResume(2500));
+
+    // scrollLeft rounds to whole pixels, so a sub-pixel-per-frame drift needs
+    // its own float accumulator or the increments get rounded away to zero.
+    // scrollTo(..., { behavior: 'auto' }) is used instead of a plain
+    // `track.scrollLeft = x` assignment because the track's CSS
+    // scroll-behavior: smooth (kept for the arrow buttons) also applies to
+    // direct property writes per spec — animating every single frame's
+    // near-zero delta queues up and visibly lags instead of drifting.
+    let scrollPos = track.scrollLeft;
+    const step = () => {
+      if (paused) {
+        scrollPos = track.scrollLeft;
+      } else {
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        if (maxScroll > 0) {
+          scrollPos += direction * AUTO_SCROLL_SPEED;
+          if (scrollPos >= maxScroll) {
+            scrollPos = maxScroll;
+            direction = -1;
+          } else if (scrollPos <= 0) {
+            scrollPos = 0;
+            direction = 1;
+          }
+          track.scrollTo({ left: scrollPos, behavior: 'auto' });
+        }
+      }
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
 });
