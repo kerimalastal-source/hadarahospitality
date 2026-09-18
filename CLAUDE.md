@@ -515,8 +515,10 @@ A dedicated explainer page (added 2026-09-19) demystifying the two numbers
 that dominate hospitality-textile buying decisions — **GSM** for towels and
 **thread count** for bed linen — with a visual scale plus a 5-tier (GSM) /
 4-tier (thread count) breakdown of what each range means in practice.
-Fully static and fully translated-with-fallback from day one, same
-English-first pattern as Hotel Opening Package above.
+Fully static. Shipped English-first, then fully translated into ar/fr/ru
+the same day (`fabricGuide.*` in each of
+`src/i18n/dictionaries/{ar,fr,ru}.ts`) — unlike Hotel Opening Package
+above, which is still English-only.
 
 - **"HADARA's range" bracket is computed from live catalog data, never
   hardcoded** — `src/views/FabricQualityGuideView.astro`'s `numbersFrom()`
