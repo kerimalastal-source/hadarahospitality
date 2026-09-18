@@ -71,6 +71,19 @@ if (form) {
   }
   applyProductFromUrl();
 
+  // Lets a page like /hotel-opening-package pre-select "Project Type"
+  // without going through the product hand-off above — independent of
+  // whether a `product` param is also present.
+  function applyProjectTypeFromUrl() {
+    const projectType = new URLSearchParams(window.location.search).get('projectType');
+    if (!projectType) return;
+    const select = form?.querySelector<HTMLSelectElement>('select[name="projectType"]');
+    if (!select) return;
+    const option = Array.from(select.options).find((o) => o.value === projectType);
+    if (option) select.value = projectType;
+  }
+  applyProjectTypeFromUrl();
+
   removeProductButton?.addEventListener('click', () => {
     if (selectedProductBanner) selectedProductBanner.hidden = true;
     if (productMetaField) productMetaField.value = '';

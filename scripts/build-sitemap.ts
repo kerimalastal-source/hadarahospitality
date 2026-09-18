@@ -20,6 +20,7 @@ const staticPages = [
   { path: '/products', priority: '0.9' },
   { path: '/blog', priority: '0.7' },
   { path: '/get-a-quote', priority: '0.8' },
+  { path: '/hotel-opening-package', priority: '0.8' },
   { path: '/contact', priority: '0.6' },
   { path: '/faq', priority: '0.6' },
   { path: '/privacy-policy', priority: '0.3' },

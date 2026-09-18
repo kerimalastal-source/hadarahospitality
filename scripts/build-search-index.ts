@@ -17,6 +17,7 @@ const staticPages = [
   { type: 'Page', title: 'Products & Collections', url: '/products', excerpt: 'Explore HADARA Hospitality collections: bed linen, towels, bathrobes, slippers, pillows, duvets, mattress protectors and guest amenities.' },
   { type: 'Page', title: 'Blog', url: '/blog', excerpt: 'Insights on hotel textiles, guest amenities and hospitality procurement.' },
   { type: 'Page', title: 'Get a Quote', url: '/get-a-quote', excerpt: 'Request a tailored quote for hotel textiles and guest essentials.' },
+  { type: 'Page', title: 'Hotel Opening Package', url: '/hotel-opening-package', excerpt: 'Every guest textile category for a new hotel opening — bed linen, towels, robes, pillows, mattress protection and amenities — through one request.' },
   { type: 'Page', title: 'Contact', url: '/contact', excerpt: 'Contact HADARA Hospitality in Beylikdüzü, Istanbul, Türkiye.' },
   { type: 'Page', title: 'FAQ', url: '/faq', excerpt: 'Common questions about minimum order quantities, samples, customization, shipping and payment.' },
 ];
