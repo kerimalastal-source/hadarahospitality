@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ChevronIcon from '../components/icons/ChevronIcon.astro';
 ---
 <BaseLayout
   title="HADARA Hospitality | Hotel Textile Supply from Türkiye"
@@ -81,17 +82,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </div>
           <p>A sample from our full hospitality product range.</p>
         </div>
-        <div class="featured-grid">
-          <a class="featured-card" href="/products/hotel-quality-bath-towel-600-gsm.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_383c86f602ab4db3a9aa1a04ed0fe7f9~mv2.jpg"></div><div class="featured-card-body"><strong>Hotel Quality Bath Towel – 600 GSM</strong><span>100% hospitality-grade cotton</span></div></a>
-          <a class="featured-card" href="/products/luxury-spa-towel-700-gsm.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_9408505de6554d6ab16b78b7ae8fc02d~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Spa Towel</strong><span>100% hospitality-grade cotton</span></div></a>
-          <a class="featured-card" href="/products/luxury-terry-bathrobe.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_c149a939b7cd40ddb717033660ab0a5c~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Terry Bathrobe</strong><span>Premium terry cotton</span></div></a>
-          <a class="featured-card" href="/products/luxury-hotel-slippers.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_956e8bf269e44a6d809c7d5ca0f88039~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Slippers</strong><span>Premium hospitality-grade materials</span></div></a>
-          <a class="featured-card" href="/products/luxury-duvet-cover-300-tc.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_b8f104a0ec244582bbaefcba949370ad~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Duvet Cover – 300 TC</strong><span>Premium hospitality-grade fabric</span></div></a>
-          <a class="featured-card" href="/products/luxury-hotel-bedsheet-250-tc.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_4928cbc2283e42138f3bcf999e3c4faf~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Bedsheet – 250 TC</strong><span>Premium hospitality-grade fabric</span></div></a>
-          <a class="featured-card" href="/products/luxury-hotel-pillowcase-250-tc.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_2e20426e9db2480691f32aac420443da~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Pillowcase – 250 TC</strong><span>Premium hospitality-grade fabric</span></div></a>
-          <a class="featured-card" href="/products/luxury-hotel-duvet-microfiber.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_57f05d28565b47d9a1e67129e0e8196e~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Duvet – Microfiber</strong><span>Premium microfiber filling</span></div></a>
-          <a class="featured-card" href="/products/luxury-hotel-pillow-microfiber.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_aed304b1825d48ae8bcef3e2da00b4f3~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Pillow – Microfiber</strong><span>Premium microfiber filling</span></div></a>
-          <a class="featured-card" href="/products/waterproof-mattress-protector.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_1b16cf4752f548279969376473721ab3~mv2.jpg"></div><div class="featured-card-body"><strong>Waterproof Mattress Protector</strong><span>Waterproof &amp; breathable structure</span></div></a>
+        <div class="featured-carousel">
+          <button class="carousel-arrow carousel-arrow-prev" type="button" aria-label="Previous products" data-carousel-prev><ChevronIcon /></button>
+          <div class="featured-track" data-carousel-track>
+            <a class="featured-card" href="/products/hotel-quality-bath-towel-600-gsm.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_383c86f602ab4db3a9aa1a04ed0fe7f9~mv2.jpg"></div><div class="featured-card-body"><strong>Hotel Quality Bath Towel – 600 GSM</strong><span>100% hospitality-grade cotton</span></div></a>
+            <a class="featured-card" href="/products/luxury-spa-towel-700-gsm.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_9408505de6554d6ab16b78b7ae8fc02d~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Spa Towel</strong><span>100% hospitality-grade cotton</span></div></a>
+            <a class="featured-card" href="/products/luxury-terry-bathrobe.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_c149a939b7cd40ddb717033660ab0a5c~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Terry Bathrobe</strong><span>Premium terry cotton</span></div></a>
+            <a class="featured-card" href="/products/luxury-hotel-slippers.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_956e8bf269e44a6d809c7d5ca0f88039~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Slippers</strong><span>Premium hospitality-grade materials</span></div></a>
+            <a class="featured-card" href="/products/luxury-duvet-cover-300-tc.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_b8f104a0ec244582bbaefcba949370ad~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Duvet Cover – 300 TC</strong><span>Premium hospitality-grade fabric</span></div></a>
+            <a class="featured-card" href="/products/luxury-hotel-bedsheet-250-tc.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_4928cbc2283e42138f3bcf999e3c4faf~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Bedsheet – 250 TC</strong><span>Premium hospitality-grade fabric</span></div></a>
+            <a class="featured-card" href="/products/luxury-hotel-pillowcase-250-tc.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_2e20426e9db2480691f32aac420443da~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Pillowcase – 250 TC</strong><span>Premium hospitality-grade fabric</span></div></a>
+            <a class="featured-card" href="/products/luxury-hotel-duvet-microfiber.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_57f05d28565b47d9a1e67129e0e8196e~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Duvet – Microfiber</strong><span>Premium microfiber filling</span></div></a>
+            <a class="featured-card" href="/products/luxury-hotel-pillow-microfiber.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_aed304b1825d48ae8bcef3e2da00b4f3~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Pillow – Microfiber</strong><span>Premium microfiber filling</span></div></a>
+            <a class="featured-card" href="/products/waterproof-mattress-protector.html"><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_1b16cf4752f548279969376473721ab3~mv2.jpg"></div><div class="featured-card-body"><strong>Waterproof Mattress Protector</strong><span>Waterproof &amp; breathable structure</span></div></a>
+          </div>
+          <button class="carousel-arrow carousel-arrow-next" type="button" aria-label="Next products" data-carousel-next><ChevronIcon /></button>
         </div>
         <div class="featured-more"><a class="button button-dark" href="/products.html">Click here for more <span>↗</span></a></div>
       </div>
