@@ -39,7 +39,11 @@ const { base: heroBase, suffix: heroSuffix } = splitName(name);
 // The quote link and mailto body always use the canonical English product
 // name/category so the resulting email stays consistent for the owner,
 // regardless of which language the visitor's page was in.
-const quoteParams = new URLSearchParams({ product: product.name, category: category.formCategory });
+// Generic product metadata handed off to the RFQ form — new fields (thread
+// count, size, SKU, ...) can be added here later without the form needing
+// any changes, since it just reads whichever params are present.
+const quoteParams = new URLSearchParams({ product: product.name, category: category.formCategory, slug: product.slug, material: product.material });
+if (product.specLabel === 'GSM' && product.specValues.length) quoteParams.set('gsm', product.specValues.join(' / '));
 const quoteLink = `${p('/get-a-quote.html')}?${quoteParams.toString()}`;
 
 const description = `${overview} ${material}. Suitable for ${suitableFor}. Request hospitality supply specifications and a tailored quote from HADARA Hospitality.`;
