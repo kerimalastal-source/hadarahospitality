@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '../../../db/client';
 import { portalUsers } from '../../../db/schema';
 import { requireStaff } from '../../../lib/portal-auth';
+import { notifyAccountApproved } from '../../../lib/portal-email';
 
 export const prerender = false;
 
@@ -17,6 +18,9 @@ export const POST: APIRoute = async (context) => {
     return new Response('Bad request', { status: 400 });
   }
 
-  await db.update(portalUsers).set({ status: decision }).where(eq(portalUsers.id, userId));
+  const [updated] = await db.update(portalUsers).set({ status: decision }).where(eq(portalUsers.id, userId)).returning();
+  if (decision === 'approved' && updated) {
+    notifyAccountApproved(updated.email, updated.fullName).catch((error) => console.error('[portal] notifyAccountApproved failed', error));
+  }
   return context.redirect('/portal/admin/customers');
 };

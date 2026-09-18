@@ -12,6 +12,7 @@ export const prerender = false;
 const result = await requireApprovedPortalUser(Astro);
 if (result instanceof Response) return result;
 const identity = result;
+if (identity.role === 'staff') return Astro.redirect('/portal/admin');
 
 const [company] = identity.companyId ? await db.select().from(companies).where(eq(companies.id, identity.companyId)).limit(1) : [];
 ---

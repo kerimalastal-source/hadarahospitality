@@ -12,6 +12,7 @@ export const prerender = false;
 const result = await requireApprovedPortalUser(Astro);
 if (result instanceof Response) return result;
 const identity = result;
+if (identity.role === 'staff') return Astro.redirect('/portal/admin');
 
 const companyOrders = identity.companyId
   ? await db.select().from(orders).where(eq(orders.companyId, identity.companyId)).orderBy(desc(orders.updatedAt))
@@ -26,6 +27,7 @@ const latestQuotes = latestOrderIds.length
   <PortalShell identity={identity} active="dashboard">
     <div class="portal-page-head">
       <h1>Welcome back, {identity.fullName.split(' ')[0]}</h1>
+      <a class="button button-gold" href="/get-a-quote">Request a new quote <span>→</span></a>
     </div>
 
     <div class="portal-card">

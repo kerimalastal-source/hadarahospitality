@@ -522,13 +522,38 @@ member approves it.
   `src/pages/api/portal/*.ts` instead (e.g. `/api/portal/create-order`) —
   same URL namespace in principle, but no path collision as long as new
   Astro API routes don't reuse `submit-quote`/`blob-upload` as names.
+- **Email notifications** (`src/lib/portal-email.ts`) go out through the
+  same Resend setup as the RFQ system — `sendEmail()`/`escapeHtml()` were
+  pulled out of `api/submit-quote.ts` into a shared `src/lib/email.ts` so
+  both features use one implementation. Three triggers, all
+  fire-and-forget (`.catch(console.error)`, never awaited before the
+  response — a failed email must never fail the action that triggered it):
+  account approved (`approve-customer.ts`), order status changed
+  (`add-status-event.ts`, to every approved customer at that order's
+  company), new quote attached (`attach-quote.ts`, same audience). Same
+  `RESEND_API_KEY`/`RESEND_FROM_EMAIL` env vars as the RFQ system — no
+  separate configuration needed, and these start working the moment that
+  domain verification (see the RFQ section above) completes.
+- **Staff land on `/portal/admin`** (KPI overview: pending approvals,
+  active orders, companies, recent orders), not the customer dashboard —
+  `dashboard.astro` and every other customer-only page redirect a
+  `role: 'staff'` identity there, since staff have no `companyId` and
+  those pages are company-scoped. `PortalShell.astro` shows either the
+  staff nav or the customer nav, never both.
+- **Bootstrapping the first staff account**: there's no UI for it by
+  design (self-signup only ever creates `role: 'customer'` rows, and only
+  an existing staff member can reach anything that would promote someone).
+  Sign up normally once, then flip that one row's `role` to `'staff'`
+  directly in the database (Neon's SQL editor, or `npm run db:migrate`
+  tooling) — a one-time step per new staff member until/unless an invite
+  flow is built.
 - **What's deferred out of Phase 1**: portal i18n (English-only for now,
-  same precedent as the RFQ form shipping English-first); email
-  notifications on status change (once Resend's domain verification is
-  confirmed working — see the RFQ section above); any ERP/shipping-carrier
-  integration (owner confirmed manual updates only); a dedicated "catalog"
-  document type (product technical sheets are already downloadable from
-  each product page, linked from `/portal/documents` instead of duplicated).
+  same precedent as the RFQ form shipping English-first); any
+  ERP/shipping-carrier integration (owner confirmed manual updates only);
+  a dedicated "catalog" document type (product technical sheets are
+  already downloadable from each product page, linked from
+  `/portal/documents` instead of duplicated); multi-user-per-company
+  invites (one Clerk user = one `portal_users` row today).
 - **Not verified against a live Vercel deployment yet** — same caveat as the
   i18n middleware: this sandbox has no real Clerk keys or Postgres database,
   so only structural checks were possible (`npm run build` producing the

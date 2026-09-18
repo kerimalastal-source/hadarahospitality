@@ -12,6 +12,7 @@ export const prerender = false;
 const result = await requireApprovedPortalUser(Astro);
 if (result instanceof Response) return result;
 const identity = result;
+if (identity.role === 'staff') return Astro.redirect('/portal/admin/orders');
 
 const companyOrders = identity.companyId
   ? await db.select().from(orders).where(eq(orders.companyId, identity.companyId)).orderBy(desc(orders.updatedAt))
