@@ -139,6 +139,8 @@ export interface Dictionary {
       country: string;
       countryPlaceholder: string;
       city: string;
+      cityPlaceholderLocked: string;
+      cityPlaceholderReady: string;
       preferredContact: string;
       preferredContactOptions: string[];
 

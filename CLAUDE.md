@@ -287,6 +287,21 @@ form. Added 2026-09-18.
   locales (no per-locale translation), same convention as product category
   values, so the value stays a stable canonical string in the owner's
   internal notification email regardless of visitor language.
+- **City fields cascade from Country** (2026-09-18): *City* and *Required
+  Delivery City* are `<select>` dropdowns too now, not free text — each
+  starts `disabled` with a "select a country first" placeholder, and
+  `src/scripts/rfq-form.ts`'s `wireCountryCity()` repopulates and enables
+  it on the matching Country/`deliveryCountry` select's `change` event,
+  showing only that country's cities. `src/data/cities.ts` is the
+  `CITIES_BY_COUNTRY: Record<string, string[]>` data behind this — top
+  ~40 cities per country by population, generated from the
+  GeoNames-derived `all-the-cities` npm package (not a runtime
+  dependency — used once to generate this file, keyed by the exact
+  `WORLD_COUNTRIES` name strings so the two files can't drift silently).
+  Same English-names-everywhere convention as `WORLD_COUNTRIES`. Both
+  city selects stay optional (`deliveryCountry` is still the only
+  required field in that pair) — a disabled `<select>` is simply excluded
+  from `FormData` on submit, so nothing extra was needed server-side.
 - **Product hand-off**: any page can pre-fill the form via query params —
   `?product=<name>&slug=<slug>&category=<legacy formCategory>&material=<...>&gsm=<...>`
   (see `ProductView.astro`'s `quoteParams`). The parsing side

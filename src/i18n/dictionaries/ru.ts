@@ -246,6 +246,8 @@ export const ru: DeepPartial<Dictionary> = {
       country: 'Страна',
       countryPlaceholder: 'Выберите страну',
       city: 'Город',
+      cityPlaceholderLocked: 'Сначала выберите страну',
+      cityPlaceholderReady: 'Выберите город',
       preferredContact: 'Предпочтительный способ связи',
       preferredContactOptions: ['Email', 'WhatsApp', 'Телефон'],
 

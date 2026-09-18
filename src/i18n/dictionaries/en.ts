@@ -246,6 +246,8 @@ export const en: Dictionary = {
       country: 'Country',
       countryPlaceholder: 'Select country',
       city: 'City',
+      cityPlaceholderLocked: 'Select a country first',
+      cityPlaceholderReady: 'Select city',
       preferredContact: 'Preferred Contact Method',
       preferredContactOptions: ['Email', 'WhatsApp', 'Phone'],
 
