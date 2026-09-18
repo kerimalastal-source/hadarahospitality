@@ -74,3 +74,29 @@ document.querySelector<HTMLFormElement>('#contact-form')?.addEventListener('subm
   const body = `Name: ${values.name}\nEmail: ${values.email}\n\nMessage:\n${values.message}`;
   window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 });
+
+document.querySelectorAll<HTMLElement>('[data-carousel-track]').forEach((track) => {
+  const wrapper = track.parentElement;
+  const prevButton = wrapper?.querySelector<HTMLButtonElement>('[data-carousel-prev]');
+  const nextButton = wrapper?.querySelector<HTMLButtonElement>('[data-carousel-next]');
+  if (!prevButton || !nextButton) return;
+
+  const scrollByOneCard = (direction: 1 | -1) => {
+    const card = track.querySelector<HTMLElement>(':scope > *');
+    if (!card) return;
+    const gap = parseFloat(getComputedStyle(track).columnGap || '0');
+    track.scrollBy({ left: direction * (card.getBoundingClientRect().width + gap), behavior: 'smooth' });
+  };
+
+  const updateArrowState = () => {
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    prevButton.disabled = track.scrollLeft <= 1;
+    nextButton.disabled = track.scrollLeft >= maxScroll - 1;
+  };
+
+  prevButton.addEventListener('click', () => scrollByOneCard(-1));
+  nextButton.addEventListener('click', () => scrollByOneCard(1));
+  track.addEventListener('scroll', updateArrowState);
+  window.addEventListener('resize', updateArrowState);
+  updateArrowState();
+});
