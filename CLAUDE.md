@@ -64,17 +64,21 @@ infrastructure) is done, Phase 2/3 (content translation) is in progress**:
   anywhere), RTL layout for Arabic, the language switcher, hreflang tags,
   the auto-detect-and-redirect middleware, and *fully translated* content
   for: the shared chrome (nav/footer/WhatsApp label), the homepage, the
-  About page, and the generic UI strings on product/article detail pages
-  (labels like "Overview", "Specifications", "Download Technical Sheet").
-- **Not yet translated** (renders in English inside the localized nav/RTL
-  shell until done): the body copy of products.html, blog.html,
-  get-a-quote.html, contact.html, faq.html, privacy-policy.html and
-  search.html, plus all 23 products' and all 10 articles' actual content
-  (name/overview/features/specs, and article bodies). The dictionary keys
-  and page templates for all of these already exist and are wired up —
-  finishing this is purely a translation-content task, no more structural
-  work needed. See `src/i18n/dictionaries/{ar,fr,ru}.ts` for what's filled
-  in vs. falling back to English.
+  About page, the generic UI strings on product/article detail pages
+  (labels like "Overview", "Specifications", "Download Technical Sheet"),
+  the body copy of every other static page (products.html, blog.html,
+  get-a-quote.html, contact.html, faq.html, privacy-policy.html,
+  search.html), the 6 product category names (`common.categoryLabels`),
+  and — **Arabic only so far** — all 23 products' and all 10 articles'
+  actual content (name/overview/features/specs, and full article bodies).
+- **Not yet translated** (falls back to English inside the localized
+  nav/RTL shell): all 23 products' and all 10 articles' content, for
+  **French and Russian only** (`src/data/products.i18n.ts` and
+  `src/data/blog.i18n.ts` currently only have an `ar` key). The overlay
+  interfaces, page wiring and fallback logic already handle any locale —
+  adding `fr`/`ru` keys to those two files is purely a translation-content
+  task, no more structural work needed. See `src/i18n/dictionaries/{ar,fr,ru}.ts`
+  for the static-page dictionary status (all complete as of this writing).
 
 **How it's built:**
 - `src/i18n/locales.ts` — `LOCALES`, `DEFAULT_LOCALE` ('en', never prefixed
@@ -98,6 +102,18 @@ infrastructure) is done, Phase 2/3 (content translation) is in progress**:
   thin wrappers that just call the matching View with a different locale.
   When translating a page's content next, edit the dictionary values, not
   the View — the View should already be reading from `t.<page>.*`.
+- `src/data/products.i18n.ts` and `src/data/blog.i18n.ts` — per-locale
+  translation overlays for the two large data files (`products.ts`,
+  `blog.ts`) that would otherwise have to be duplicated 4× to translate.
+  Each is `{ [locale]: { [slug]: Partial<Translation> } }`; a
+  `getProductTranslation(locale, slug)` / `getArticleTranslation(locale,
+  slug)` helper looks up the overlay, and `ProductView`/`ArticleView`/
+  `ProductsListView`/`BlogListView` do `tr?.field ?? baseData.field` for
+  every translatable field — so a slug with no entry yet, or a field not
+  yet filled in for one locale, harmlessly falls back to English rather
+  than breaking the build. Add a new product/article's translation by
+  adding its slug under the right locale key in these two files — no
+  other wiring needed.
 - The quote form's category `<option>` values are the stable English
   strings from `CATEGORIES[key].formCategory` (not the translated display
   text) — this keeps a product page's prefilled category, and the resulting
@@ -196,10 +212,11 @@ markup to fall out of sync.
   files. Do not fabricate trademarked logos or invent partnership claims.
 - **4-language site (EN/AR/FR/RU)** — owner decided the URL structure
   (locale-prefixed paths, e.g. `/ar/about.html`, auto-detected via
-  `Accept-Language`, English default unprefixed) on 2026-09-18. Phase 1
-  (routing/RTL/switcher/middleware) is done; translating the remaining page
-  bodies, all 23 products and all 10 articles is in progress — see
-  "Internationalization (i18n)" above for exactly what's left.
+  `Accept-Language`, English default unprefixed) on 2026-09-18. Routing,
+  RTL/switcher/middleware, and all static-page copy (ar/fr/ru) are done.
+  Remaining: translating all 23 products and all 10 articles into French
+  and Russian (Arabic is done for both) — see "Internationalization
+  (i18n)" above for exactly what's left.
 - **Google Analytics** — deferred ("خليها مرحلة اخرى"), no GA4 ID yet.
 - **Certifications / testimonials sections** — owner confirmed no real
   content exists yet; do not fabricate.

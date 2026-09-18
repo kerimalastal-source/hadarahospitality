@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { ARTICLES } from '../data/blog';
+import { getArticleTranslation } from '../data/blog.i18n';
 import { getDictionary, localizePath, type Locale } from '../i18n';
 
 interface Props {
@@ -22,18 +23,21 @@ function formatDate(iso: string) {
     <section class="products-hero"><div class="wrap"><p class="eyebrow light">{bp.hero.eyebrow}</p><h1>{bp.hero.heading1} <em>{bp.hero.heading2}</em></h1><p>{bp.hero.body}</p></div></section>
     <section class="blog-list wrap">
       <div class="blog-grid">
-        {ARTICLES.map((article) => (
-          <a class="blog-card" href={p(`/blog/${article.slug}.html`)}>
-            <div class="blog-card-image" data-bg={article.hero} role="img" aria-label={article.heroAlt}></div>
-            <div class="blog-card-body">
-              <span class="blog-tag">{article.category}</span>
-              <h3>{article.title}</h3>
-              <p>{article.excerpt}</p>
-              <span class="blog-meta">{formatDate(article.date)} <span>·</span> {article.readTime}</span>
-              <span class="text-link">{t.common.readArticle} <span>↗</span></span>
-            </div>
-          </a>
-        ))}
+        {ARTICLES.map((article) => {
+          const tr = getArticleTranslation(locale, article.slug);
+          return (
+            <a class="blog-card" href={p(`/blog/${article.slug}.html`)}>
+              <div class="blog-card-image" data-bg={article.hero} role="img" aria-label={tr?.heroAlt ?? article.heroAlt}></div>
+              <div class="blog-card-body">
+                <span class="blog-tag">{tr?.category ?? article.category}</span>
+                <h3>{tr?.title ?? article.title}</h3>
+                <p>{tr?.excerpt ?? article.excerpt}</p>
+                <span class="blog-meta">{formatDate(article.date)} <span>·</span> {tr?.readTime ?? article.readTime}</span>
+                <span class="text-link">{t.common.readArticle} <span>↗</span></span>
+              </div>
+            </a>
+          );
+        })}
       </div>
     </section>
     <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>{bp.questionHeading1}<br /><em>{bp.questionHeading2}</em></h2></div><a class="button button-gold" href={p('/get-a-quote.html')}>{t.common.requestTailoredQuote} <span>↗</span></a></div></section>
