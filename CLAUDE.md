@@ -242,19 +242,33 @@ form. Added 2026-09-18.
   file type/size checks, honeypot + minimum-time-on-form anti-spam gate (a
   submission that trips either one gets a fake-success response so a bot
   gets no feedback signal — see the code comment in `api/submit-quote.ts`
-  before "fixing" this if it looks like a bug), and a generated
+  before "fixing" this if it looks like a bug), a generated
   `RFQ-<year>-<6 chars>` reference number (via `crypto.randomUUID()`,
-  server-side only — never generate this client-side).
-- **What's stubbed, and the env vars to wire each one up**: all three live
-  in `api/submit-quote.ts` as clearly-named no-op functions that log what
-  they'd do and return early when their env var is unset —
-  `notifyHadaraTeam`/`confirmToCustomer` need `RESEND_API_KEY` (or swap for
-  another provider), `syncToHubSpot` needs `HUBSPOT_ACCESS_TOKEN`, and
-  `persistUploadedFile` needs `BLOB_READ_WRITE_TOKEN` (Vercel Blob) or
-  equivalent — **until one of these is set, an uploaded file is validated
-  but its bytes are discarded after the request; only its name/size/type
-  are kept**. Set these in the Vercel project's environment variables, not
-  in code.
+  server-side only — never generate this client-side), and **email
+  notifications** (added 2026-09-18, see below).
+- **Email**: `notifyHadaraTeam()` sends the internal "New RFQ — ..." email to
+  `CONTACT_EMAIL` (`partnerships@hadarahospitality.com`, from
+  `src/config.ts` — override with `RFQ_NOTIFY_EMAIL` if it should ever go
+  elsewhere) with every submitted field in a readable table;
+  `confirmToCustomer()` sends a short thank-you + reference number to the
+  submitter's own work email. Both go through Resend
+  (`api.resend.com/emails` via plain `fetch`, no SDK dependency) and are
+  genuinely wired up in code — the only thing missing is the credential:
+  **set `RESEND_API_KEY` in the Vercel project's environment variables**
+  (Project → Settings → Environment Variables) and both emails start
+  working on the next deploy, no code change needed. Until then both
+  functions no-op (log and return). The sender defaults to Resend's
+  sandbox address (`onboarding@resend.dev`), which works immediately but
+  isn't a great long-term look — once `hadarahospitality.com` is verified
+  as a sending domain in Resend, set `RESEND_FROM_EMAIL` (e.g. `HADARA
+  Hospitality <rfq@hadarahospitality.com>`) to send from the real domain.
+- **What's still stubbed, and the env vars to wire each one up**: `syncToHubSpot`
+  needs `HUBSPOT_ACCESS_TOKEN`, and `persistUploadedFile` needs
+  `BLOB_READ_WRITE_TOKEN` (Vercel Blob) or equivalent — **until the latter
+  is set, an uploaded file is validated but its bytes are discarded after
+  the request; only its name/size/type are kept** (and are included in the
+  internal notification email once `RESEND_API_KEY` is set, so the team at
+  least knows a file was attached and can follow up for it directly).
 - **A CSS gotcha that bit this feature twice**: an element toggled with the
   plain `hidden` **attribute** stays visible if any author stylesheet rule
   also sets `display` on it (e.g. `.foo{display:flex}` beats the browser's
