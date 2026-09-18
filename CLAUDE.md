@@ -509,6 +509,40 @@ underneath reading "Indicative — confirmed as part of your quotation...".
 - Dictionary keys: `productDetail.moq`, `.leadTime`, `.moqNote` (English
   only so far — same fallback-to-English pattern as everything else).
 
+## Fabric Quality Guide (`/fabric-quality-guide`)
+
+A dedicated explainer page (added 2026-09-19) demystifying the two numbers
+that dominate hospitality-textile buying decisions — **GSM** for towels and
+**thread count** for bed linen — with a visual scale plus a 5-tier (GSM) /
+4-tier (thread count) breakdown of what each range means in practice.
+Fully static and fully translated-with-fallback from day one, same
+English-first pattern as Hotel Opening Package above.
+
+- **"HADARA's range" bracket is computed from live catalog data, never
+  hardcoded** — `src/views/FabricQualityGuideView.astro`'s `numbersFrom()`
+  scans `PRODUCTS` for every `specValues` entry matching `specLabel: 'GSM'`
+  or `specLabel: 'Fabric Quality'` (the thread-count products' actual
+  `specLabel`), so the highlighted bracket on each scale can't drift out of
+  sync with what's really in the catalog as products are added/changed.
+  `GSM_SCALE`/`TC_SCALE` (the fixed axis endpoints the bracket is
+  positioned against) are the only hand-set numbers on the page.
+- Linked from every product page's spec table (`ProductView.astro`) next to
+  the GSM/Fabric Quality spec row — only for products where that field
+  applies (`product.specLabel === 'GSM' || 'Fabric Quality'`) — and from the
+  footer's Explore column; registered in `scripts/build-sitemap.ts` and
+  `scripts/build-search-index.ts`'s hardcoded static-page lists, same
+  by-hand step every new static marketing page needs (see Hotel Opening
+  Package above).
+- **RTL-verified**: `document.documentElement.scrollWidth` matches
+  `innerWidth` on the Arabic version at a few viewport widths (no sideways
+  overflow), and `[dir="rtl"] .quality-scale-wrap{direction:ltr}` keeps the
+  gradient scale itself reading low→high in a fixed visual direction
+  regardless of page direction (only the surrounding text/labels flip),
+  matching the same "keep a scale/track LTR inside an RTL page" precedent
+  as `.featured-track`.
+- New CSS in `global.css`: `.quality-section`/`.quality-intro`/
+  `.quality-scale-*`/`.quality-tiers`/`.quality-tier`.
+
 ## Pending / deferred (owner-blocked, don't guess)
 
 - **"شركاء النجاح" (Partners of Success) homepage section** — 10 hotel-chain

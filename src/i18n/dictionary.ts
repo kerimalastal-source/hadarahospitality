@@ -218,6 +218,32 @@ export interface Dictionary {
     process: { eyebrow: string; heading1: string; heading2: string; body: string; steps: { title: string; body: string }[] };
     cta: { eyebrow: string; heading1: string; heading2: string; button: string };
   };
+  fabricGuide: {
+    title: string;
+    description: string;
+    hero: { label: string; eyebrow: string; heading1: string; heading2: string; body: string };
+    gsm: {
+      eyebrow: string;
+      heading1: string;
+      heading2: string;
+      body: string;
+      ourRange: string;
+      scaleMin: string;
+      scaleMax: string;
+      tiers: { title: string; range: string; body: string }[];
+    };
+    tc: {
+      eyebrow: string;
+      heading1: string;
+      heading2: string;
+      body: string;
+      ourRange: string;
+      scaleMin: string;
+      scaleMax: string;
+      tiers: { title: string; range: string; body: string }[];
+    };
+    cta: { eyebrow: string; heading1: string; heading2: string; button: string };
+  };
   notFound: {
     title: string;
     description: string;

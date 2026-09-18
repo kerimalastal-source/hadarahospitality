@@ -1,0 +1,105 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getDictionary, localizePath, type Locale } from '../i18n';
+import { PRODUCTS } from '../data/products';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const g = t.fabricGuide;
+const p = (path: string) => localizePath(locale, path);
+const quoteLink = p('/get-a-quote');
+
+// "Our range" brackets are computed from the actual catalog data (never
+// hardcoded), so they can't drift out of sync with what's really sold —
+// see src/data/products.ts's specLabel/specValues per product.
+function numbersFrom(specLabel: string): number[] {
+  return PRODUCTS.filter((product) => product.specLabel === specLabel).flatMap((product) =>
+    product.specValues.map((value) => Number(value.match(/\d+/)?.[0])).filter((n) => !Number.isNaN(n)),
+  );
+}
+function rangeOf(nums: number[]): { min: number; max: number } {
+  return { min: Math.min(...nums), max: Math.max(...nums) };
+}
+function bracketStyle(range: { min: number; max: number }, scaleMin: number, scaleMax: number): string {
+  const left = ((range.min - scaleMin) / (scaleMax - scaleMin)) * 100;
+  const width = ((range.max - range.min) / (scaleMax - scaleMin)) * 100;
+  return `left:${left}%;width:${width}%`;
+}
+
+const GSM_SCALE = { min: 300, max: 850 };
+const gsmRange = rangeOf(numbersFrom('GSM'));
+const TC_SCALE = { min: 150, max: 400 };
+const tcRange = rangeOf(numbersFrom('Fabric Quality'));
+---
+<BaseLayout title={g.title} description={g.description} path="/fabric-quality-guide" locale={locale}>
+  <main>
+    <section class="pdp-hero">
+      <div class="wrap">
+        <p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>{g.hero.label}</p>
+        <p class="eyebrow light">{g.hero.eyebrow}</p>
+        <h1>{g.hero.heading1} <em>{g.hero.heading2}</em></h1>
+        <p class="pdp-tagline">{g.hero.body}</p>
+      </div>
+    </section>
+
+    <section class="quality-section">
+      <div class="wrap">
+        <div class="quality-intro">
+          <p class="eyebrow">{g.gsm.eyebrow}</p>
+          <h2>{g.gsm.heading1} <em>{g.gsm.heading2}</em></h2>
+          <p>{g.gsm.body}</p>
+        </div>
+        <div class="quality-scale-wrap">
+          <div class="quality-scale-track">
+            <div class="quality-scale-range" style={bracketStyle(gsmRange, GSM_SCALE.min, GSM_SCALE.max)}>
+              <span class="quality-scale-range-label">{g.gsm.ourRange}: {gsmRange.min}–{gsmRange.max} GSM</span>
+            </div>
+          </div>
+          <div class="quality-scale-endpoints"><span>{GSM_SCALE.min} GSM · {g.gsm.scaleMin}</span><span>{GSM_SCALE.max}+ GSM · {g.gsm.scaleMax}</span></div>
+        </div>
+        <div class="quality-tiers">
+          {g.gsm.tiers.map((tier) => (
+            <div class="quality-tier"><span>{tier.range}</span><h4>{tier.title}</h4><p>{tier.body}</p></div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="quality-section">
+      <div class="wrap">
+        <div class="quality-intro">
+          <p class="eyebrow">{g.tc.eyebrow}</p>
+          <h2>{g.tc.heading1} <em>{g.tc.heading2}</em></h2>
+          <p>{g.tc.body}</p>
+        </div>
+        <div class="quality-scale-wrap">
+          <div class="quality-scale-track">
+            <div class="quality-scale-range" style={bracketStyle(tcRange, TC_SCALE.min, TC_SCALE.max)}>
+              <span class="quality-scale-range-label">{g.tc.ourRange}: {tcRange.min}–{tcRange.max} TC</span>
+            </div>
+          </div>
+          <div class="quality-scale-endpoints"><span>{TC_SCALE.min} TC · {g.tc.scaleMin}</span><span>{TC_SCALE.max}+ TC · {g.tc.scaleMax}</span></div>
+        </div>
+        <div class="quality-tiers" style="grid-template-columns:repeat(4,1fr)">
+          {g.tc.tiers.map((tier) => (
+            <div class="quality-tier"><span>{tier.range}</span><h4>{tier.title}</h4><p>{tier.body}</p></div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="products-cta">
+      <div class="wrap">
+        <div>
+          <p class="eyebrow light">{g.cta.eyebrow}</p>
+          <h2>{g.cta.heading1}<br /><em>{g.cta.heading2}</em></h2>
+        </div>
+        <a class="button button-gold" href={quoteLink}>{g.cta.button} <span>↗</span></a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

@@ -21,6 +21,7 @@ const staticPages = [
   { path: '/blog', priority: '0.7' },
   { path: '/get-a-quote', priority: '0.8' },
   { path: '/hotel-opening-package', priority: '0.8' },
+  { path: '/fabric-quality-guide', priority: '0.6' },
   { path: '/contact', priority: '0.6' },
   { path: '/faq', priority: '0.6' },
   { path: '/privacy-policy', priority: '0.3' },
