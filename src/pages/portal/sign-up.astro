@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SignUp } from '@clerk/astro/components';
+
+export const prerender = false;
+---
+<BaseLayout title="Sign up | HADARA Partner Portal" description="Create a partner portal account." path="/portal/sign-up" noindex>
+  <main class="portal-auth-page">
+    <div class="portal-auth-card">
+      <SignUp forceRedirectUrl="/portal/onboarding" signInUrl="/portal/sign-in" />
+    </div>
+  </main>
+</BaseLayout>

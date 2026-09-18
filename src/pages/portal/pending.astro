@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPortalIdentity } from '../../lib/portal-auth';
+
+export const prerender = false;
+
+const { userId } = Astro.locals.auth();
+if (!userId) return Astro.redirect('/portal/sign-in');
+
+const identity = await getPortalIdentity(Astro);
+if (!identity) return Astro.redirect('/portal/onboarding');
+if (identity.status === 'approved') return Astro.redirect('/portal/dashboard');
+---
+<BaseLayout title="Account pending review | HADARA Partner Portal" description="Your partner portal account is awaiting approval." path="/portal/pending" noindex>
+  <main class="portal-pending">
+    <h1>Thanks, {identity.fullName.split(' ')[0]}.</h1>
+    {identity.status === 'rejected' ? (
+      <p>We weren't able to approve this account. If you think this is a mistake, reach out to <a href="mailto:partnerships@hadarahospitality.com">partnerships@hadarahospitality.com</a>.</p>
+    ) : (
+      <p>Your account is waiting for review by our team. We'll email you as soon as it's approved — usually within one business day.</p>
+    )}
+  </main>
+</BaseLayout>

@@ -1,0 +1,41 @@
+---
+// Shown once, right after Clerk sign-up: collects the company name/country
+// needed to create the company + portal_users (status "pending") rows,
+// since Clerk itself only knows the person, not which hotel/company they
+// represent. See /api/portal/complete-onboarding for the write.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { WORLD_COUNTRIES } from '../../data/countries';
+import { getPortalIdentity } from '../../lib/portal-auth';
+
+export const prerender = false;
+
+const identity = await getPortalIdentity(Astro);
+if (identity) {
+  return Astro.redirect(identity.status === 'approved' ? '/portal/dashboard' : '/portal/pending');
+}
+
+const { userId } = Astro.locals.auth();
+if (!userId) return Astro.redirect('/portal/sign-in');
+
+const user = await Astro.locals.currentUser();
+const defaultName = user ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() : '';
+const defaultEmail = user?.emailAddresses?.[0]?.emailAddress ?? '';
+---
+<BaseLayout title="Complete your account | HADARA Partner Portal" description="Tell us about your company to finish setting up your partner portal account." path="/portal/onboarding" noindex>
+  <main class="portal-auth-page">
+    <div class="portal-auth-card portal-card" style="background:#fff">
+      <h2 style="font:26px 'Playfair Display','Markazi Text',serif;margin:0 0 8px">One more step</h2>
+      <p style="color:var(--muted);font-size:13px;margin:0 0 24px">Tell us about your company — our team will review and approve your account.</p>
+      <form class="portal-form" method="post" action="/api/portal/complete-onboarding">
+        <label>Full name<input name="fullName" required value={defaultName} /></label>
+        <label>Work email<input name="email" type="email" required value={defaultEmail} /></label>
+        <label>Company / hotel name<input name="companyName" required /></label>
+        <label>Country<select name="country" required>
+          <option value="">Select a country</option>
+          {WORLD_COUNTRIES.map((country) => <option value={country}>{country}</option>)}
+        </select></label>
+        <button class="button button-gold" type="submit" style="width:100%">Submit for review <span>→</span></button>
+      </form>
+    </div>
+  </main>
+</BaseLayout>

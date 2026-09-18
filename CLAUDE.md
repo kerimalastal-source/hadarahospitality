@@ -13,12 +13,18 @@ prose in English so it stays easy to scan.
   are generated from). `https://hadarahospitality.vercel.app` still works
   and auto-deploys `main` on every push, same as before — it's just no
   longer the canonical URL for SEO purposes.
-- **Stack**: [Astro](https://astro.build) + TypeScript, static output. No
-  framework runtime shipped to the browser, effectively no backend — the one
-  exception is a single-purpose Vercel Edge Middleware for language
-  auto-detection, see "Internationalization (i18n)" below. (Converted from a
-  hand-authored Vite/HTML/JS site on 2026-09-18 — see git history if you
-  need the old structure for reference.)
+- **Stack**: [Astro](https://astro.build) + TypeScript. The marketing site
+  (everything outside `/portal/*`) is still fully static output with no
+  framework runtime shipped to the browser — the only exception there is a
+  single-purpose Vercel Edge Middleware for language auto-detection, see
+  "Internationalization (i18n)" below. As of 2026-09-18 the site does have a
+  real backend, but it's scoped tightly to `/portal/*` (the Partner Portal —
+  see that section): server-rendered Astro pages via `@astrojs/vercel`, a
+  Postgres database, and Clerk auth. `output: 'static'` is still the
+  project-wide default; only portal pages opt into
+  `export const prerender = false`, so every other page keeps prerendering
+  exactly as before. (Converted from a hand-authored Vite/HTML/JS site on
+  2026-09-18 — see git history if you need the old structure for reference.)
 
 ## Architecture
 
@@ -448,6 +454,90 @@ form. Added 2026-09-18.
   `document.documentElement.scrollWidth` at a few viewport widths, not
   just eyeballing a screenshot (a `fullPage` Playwright screenshot only
   happens to visually reveal this exact bug by accident).
+
+## Partner Portal (`/portal/*`)
+
+A members-only area (Phase 1, added 2026-09-19) for the site's B2B customers —
+hotel procurement / hospitality managers — to sign in and track their own
+orders: status timeline, quotes received, document uploads. Order status is
+updated **manually by the HADARA team** (owner confirmed no ERP/shipping
+integration), so the portal has a small staff side too. Customer accounts are
+**self-signup with approval** — a new account sits `pending` until a staff
+member approves it.
+
+- **This is the one part of the site that isn't static.** Everything under
+  `src/pages/portal/**/*.astro` and `src/pages/api/portal/**/*.ts` has
+  `export const prerender = false` and runs as a real Vercel Function via the
+  `@astrojs/vercel` adapter (`adapter: vercel()` in `astro.config.mjs`,
+  `integrations: [clerk()]`). Every other page is untouched and still
+  prerenders at build time — verified by checking `.vercel/output/static`
+  still has exactly 169 HTML files and `.vercel/output/functions/_render.func`
+  is the only Function after adding this.
+- **Auth**: `@clerk/astro`, wired through `src/middleware.ts` — a **new**
+  file, and a different system from the root-level `middleware.ts` (that one
+  is a raw Vercel Edge Middleware for i18n redirects; the two run at
+  different layers and don't conflict). `src/middleware.ts` only gates
+  `/portal/*`: any path there other than `/portal/sign-in`/`/portal/sign-up`
+  requires a signed-in Clerk session, else redirects to sign-in. Needs
+  `PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` in Vercel's env vars
+  (create a Clerk application at clerk.com — same "create the account,
+  Claude wires the code" pattern as Resend/Blob).
+- **Approval-status / role checks** happen per-page, not in the middleware —
+  `src/lib/portal-auth.ts`'s `requireApprovedPortalUser()` /
+  `requireStaff()` look up the signed-in Clerk user's `portal_users` row and
+  redirect to `/portal/pending` (not approved yet) or `/portal/onboarding`
+  (no row at all — see below) as needed. Every portal page and API route
+  calls one of these first.
+- **Sign-up flow**: Clerk's own `<SignUp />`/`<SignIn />` components
+  (`src/pages/portal/sign-up.astro` / `sign-in.astro`) only create the
+  *person*. Right after, `src/pages/portal/onboarding.astro` collects the
+  company name/country and `POST /api/portal/complete-onboarding` creates
+  the `companies` + `portal_users` (`status: 'pending'`) rows — a signed-in
+  user with no `portal_users` row yet always lands here first.
+- **Database**: Postgres via Neon (`@neondatabase/serverless` +
+  `drizzle-orm/neon-http`, schema in `src/db/schema.ts`, client in
+  `src/db/client.ts`). Deliberately **not** `@vercel/postgres` — that
+  package is deprecated (Vercel migrated Postgres to a native Neon
+  integration), so a new database today should be created as Neon from the
+  Storage tab, which auto-injects `POSTGRES_URL` (same pattern as
+  `BLOB_READ_WRITE_TOKEN`). Tables: `companies`, `portal_users` (role
+  `customer`/`staff`, status `pending`/`approved`/`rejected`), `orders`,
+  `order_status_events` (the timeline), `quotes`, `portal_documents`. Run
+  `npm run db:generate` after changing `src/db/schema.ts`, `npm run
+  db:migrate` to apply — both need `POSTGRES_URL` set locally too.
+- **Order status stages** (`src/lib/portal.ts`'s `ORDER_STATUS_STAGES`, a
+  single array — edit there to add/reorder stages): `quote_requested →
+  quoted → confirmed → in_production → shipped → delivered`.
+- **File uploads** reuse the exact RFQ pattern (`@vercel/blob/client`
+  `upload()` straight from the browser, token issued by `api/blob-upload.ts`)
+  rather than a second upload endpoint — that function now checks a
+  pathname's prefix against *either* `RFQ_BLOB_PATH_PREFIX` ('rfq/') or the
+  new `PORTAL_BLOB_PATH_PREFIX` ('portal/', in `src/lib/portal.ts`) and
+  applies that prefix's own size/type limits. `src/scripts/portal-
+  documents.ts` (customer document upload) and `src/scripts/portal-admin-
+  quote.ts` (staff quote-PDF attach) both follow it.
+- **Route namespacing**: root `/api/*.ts` (outside `src/`, `submit-quote.ts`
+  and `blob-upload.ts`) is Vercel's own zero-config Functions folder,
+  unrelated to Astro. Portal API endpoints live under
+  `src/pages/api/portal/*.ts` instead (e.g. `/api/portal/create-order`) —
+  same URL namespace in principle, but no path collision as long as new
+  Astro API routes don't reuse `submit-quote`/`blob-upload` as names.
+- **What's deferred out of Phase 1**: portal i18n (English-only for now,
+  same precedent as the RFQ form shipping English-first); email
+  notifications on status change (once Resend's domain verification is
+  confirmed working — see the RFQ section above); any ERP/shipping-carrier
+  integration (owner confirmed manual updates only); a dedicated "catalog"
+  document type (product technical sheets are already downloadable from
+  each product page, linked from `/portal/documents` instead of duplicated).
+- **Not verified against a live Vercel deployment yet** — same caveat as the
+  i18n middleware: this sandbox has no real Clerk keys or Postgres database,
+  so only structural checks were possible (`npm run build` producing the
+  same 169 static pages + one Function, `npm run check` clean, and
+  `astro dev` with dummy env vars confirming the auth-gate redirects fire
+  correctly on every `/portal/*` route). After the owner creates the Clerk
+  app and Neon database and sets the three env vars above, walk the real
+  flow once end-to-end (sign up → approve → staff creates an order → add a
+  status event → customer sees it) before calling this done.
 
 ## Pending / deferred (owner-blocked, don't guess)
 
