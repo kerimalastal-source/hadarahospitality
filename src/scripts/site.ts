@@ -97,6 +97,14 @@ document.querySelector<HTMLFormElement>('#contact-form')?.addEventListener('subm
   window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 });
 
+const backToTopButton = document.querySelector<HTMLButtonElement>('[data-back-to-top]');
+if (backToTopButton) {
+  const toggleVisibility = () => backToTopButton.classList.toggle('visible', window.scrollY > 500);
+  window.addEventListener('scroll', toggleVisibility, { passive: true });
+  toggleVisibility();
+  backToTopButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+}
+
 document.querySelectorAll<HTMLElement>('[data-carousel-track]').forEach((track) => {
   const wrapper = track.parentElement;
   const prevButton = wrapper?.querySelector<HTMLButtonElement>('[data-carousel-prev]');
