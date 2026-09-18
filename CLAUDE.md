@@ -262,13 +262,21 @@ form. Added 2026-09-18.
   isn't a great long-term look — once `hadarahospitality.com` is verified
   as a sending domain in Resend, set `RESEND_FROM_EMAIL` (e.g. `HADARA
   Hospitality <rfq@hadarahospitality.com>`) to send from the real domain.
-- **What's still stubbed, and the env vars to wire each one up**: `syncToHubSpot`
-  needs `HUBSPOT_ACCESS_TOKEN`, and `persistUploadedFile` needs
-  `BLOB_READ_WRITE_TOKEN` (Vercel Blob) or equivalent — **until the latter
-  is set, an uploaded file is validated but its bytes are discarded after
-  the request; only its name/size/type are kept** (and are included in the
-  internal notification email once `RESEND_API_KEY` is set, so the team at
-  least knows a file was attached and can follow up for it directly).
+- **File storage**: `persistUploadedFile()` uploads via `@vercel/blob`'s
+  `put()` once `BLOB_READ_WRITE_TOKEN` is set — a no-op until then (file
+  validated, bytes discarded after the request, only name/size/type kept).
+  This is a native Vercel product, so setup needs **no external account**:
+  in the Vercel dashboard, go to the project's **Storage** tab → **Create
+  Database** → **Blob** → connect it to this project, and Vercel
+  auto-injects `BLOB_READ_WRITE_TOKEN` (no copy-pasting a key needed,
+  unlike Resend). Files are stored `access: 'public'` with a random
+  suffix — not listed or guessable anywhere, so it's reasonably private in
+  practice, and it means the download link can go straight in the internal
+  notification email (see `fileRow()` in `api/submit-quote.ts`) rather than
+  needing a signed-URL step or a separate dashboard login. If these
+  documents ever need real access control, switch to `access: 'private'`
+  and fetch via the Blob SDK's authenticated `get()` instead.
+- **What's still stubbed**: `syncToHubSpot` needs `HUBSPOT_ACCESS_TOKEN`.
 - **A CSS gotcha that bit this feature twice**: an element toggled with the
   plain `hidden` **attribute** stays visible if any author stylesheet rule
   also sets `display` on it (e.g. `.foo{display:flex}` beats the browser's
