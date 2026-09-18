@@ -1,0 +1,11 @@
+---
+import ArrowUpIcon from './icons/ArrowUpIcon.astro';
+import type { Dictionary } from '../i18n';
+
+interface Props {
+  t: Dictionary;
+}
+
+const { t } = Astro.props;
+---
+<button type="button" class="back-to-top" aria-label={t.common.footer.backToTop} data-back-to-top><ArrowUpIcon /></button>

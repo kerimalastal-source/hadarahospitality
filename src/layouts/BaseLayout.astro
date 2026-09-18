@@ -2,6 +2,7 @@
 import Header, { type NavKey } from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+import BackToTop from '../components/BackToTop.astro';
 import TurkeyFlagIcon from '../components/icons/TurkeyFlagIcon.astro';
 import '../styles/global.css';
 import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '../config';
@@ -78,6 +79,7 @@ const absoluteOgImage = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogI
   <slot />
   <Footer locale={locale} t={t} />
   {showWhatsApp && <WhatsAppFloat t={t} />}
+  <BackToTop t={t} />
   <script>
     import '../scripts/site';
   </script>
