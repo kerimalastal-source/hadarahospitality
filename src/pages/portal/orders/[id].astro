@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PortalShell from '../../../components/PortalShell.astro';
+import { requireApprovedPortalUser } from '../../../lib/portal-auth';
+import { db } from '../../../db/client';
+import { orders, orderStatusEvents, quotes } from '../../../db/schema';
+import { eq, asc, desc } from 'drizzle-orm';
+import { ORDER_STATUS_LABELS } from '../../../lib/portal';
+
+export const prerender = false;
+
+const result = await requireApprovedPortalUser(Astro);
+if (result instanceof Response) return result;
+const identity = result;
+
+const { id } = Astro.params;
+const [order] = id ? await db.select().from(orders).where(eq(orders.id, id)).limit(1) : [];
+if (!order || order.companyId !== identity.companyId) {
+  return Astro.redirect('/portal/orders');
+}
+
+const events = await db.select().from(orderStatusEvents).where(eq(orderStatusEvents.orderId, order.id)).orderBy(asc(orderStatusEvents.createdAt));
+const orderQuotes = await db.select().from(quotes).where(eq(quotes.orderId, order.id)).orderBy(desc(quotes.sentAt));
+---
+<BaseLayout title={`${order.reference} | HADARA Partner Portal`} description="Order status and timeline." path={`/portal/orders/${order.id}`} noindex>
+  <PortalShell identity={identity} active="orders">
+    <div class="portal-page-head">
+      <h1>{order.reference}</h1>
+      <span class="portal-status" class:list={{ 'portal-status-delivered': order.status === 'delivered' }}>{ORDER_STATUS_LABELS[order.status]}</span>
+    </div>
+
+    {order.notes && <div class="portal-card"><p class="eyebrow">Notes</p><p>{order.notes}</p></div>}
+
+    <div class="portal-card">
+      <p class="eyebrow">Status timeline</p>
+      {events.length === 0 ? (
+        <p class="portal-empty">No status updates yet.</p>
+      ) : (
+        <ul class="portal-timeline">
+          {events.map((e) => (
+            <li>
+              <time>{new Date(e.createdAt).toLocaleString()}</time>
+              <strong>{ORDER_STATUS_LABELS[e.status]}</strong>
+              {e.note && <p style="margin:4px 0 0;color:var(--muted);font-size:13px">{e.note}</p>}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Quotes for this order</p>
+      {orderQuotes.length === 0 ? (
+        <p class="portal-empty">No quotes attached yet.</p>
+      ) : (
+        <ul style="list-style:none;padding:0;margin:0">
+          {orderQuotes.map((q) => (
+            <li style="padding:10px 0;border-bottom:1px solid #f1ebe4">
+              <a class="text-link" href={q.fileUrl} target="_blank" rel="noopener">Quote — {new Date(q.sentAt).toLocaleDateString()}</a>
+              {q.amount && <span style="color:var(--muted);margin-left:10px">{q.amount} {q.currency}</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </PortalShell>
+</BaseLayout>

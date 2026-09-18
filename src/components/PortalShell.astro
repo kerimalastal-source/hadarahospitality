@@ -1,0 +1,56 @@
+---
+import { UserButton } from '@clerk/astro/components';
+import type { PortalIdentity } from '../lib/portal-auth';
+
+interface Props {
+  identity: PortalIdentity;
+  active: string;
+}
+
+const { identity, active } = Astro.props;
+
+const customerLinks = [
+  { href: '/portal/dashboard', key: 'dashboard', label: 'Dashboard' },
+  { href: '/portal/orders', key: 'orders', label: 'Orders' },
+  { href: '/portal/quotes', key: 'quotes', label: 'Quotes' },
+  { href: '/portal/documents', key: 'documents', label: 'Documents' },
+  { href: '/portal/profile', key: 'profile', label: 'Company profile' },
+];
+
+const staffLinks = [
+  { href: '/portal/admin', key: 'admin-overview', label: 'Overview' },
+  { href: '/portal/admin/customers', key: 'admin-customers', label: 'Customer approvals' },
+  { href: '/portal/admin/orders', key: 'admin-orders', label: 'Manage orders' },
+];
+const isStaff = identity.role === 'staff';
+---
+<div class="portal-shell">
+  <aside class="portal-sidebar">
+    <div class="brand"><span><strong>HADARA</strong><small>PARTNER PORTAL</small></span></div>
+    {isStaff ? (
+      <>
+        <p class="portal-sidebar-heading">Staff</p>
+        <nav class="portal-nav">
+          {staffLinks.map((link) => (
+            <a href={link.href} aria-current={active === link.key ? 'page' : undefined}>{link.label}</a>
+          ))}
+        </nav>
+      </>
+    ) : (
+      <>
+        <p class="portal-sidebar-heading">Account</p>
+        <nav class="portal-nav">
+          {customerLinks.map((link) => (
+            <a href={link.href} aria-current={active === link.key ? 'page' : undefined}>{link.label}</a>
+          ))}
+        </nav>
+      </>
+    )}
+    <p class="portal-sidebar-heading">Signed in as</p>
+    <p style="font-size:13px;color:#d3d9df;margin:0 0 14px">{identity.fullName}</p>
+    <UserButton />
+  </aside>
+  <div class="portal-main">
+    <slot />
+  </div>
+</div>

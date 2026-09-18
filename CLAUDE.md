@@ -13,12 +13,18 @@ prose in English so it stays easy to scan.
   are generated from). `https://hadarahospitality.vercel.app` still works
   and auto-deploys `main` on every push, same as before — it's just no
   longer the canonical URL for SEO purposes.
-- **Stack**: [Astro](https://astro.build) + TypeScript, static output. No
-  framework runtime shipped to the browser, effectively no backend — the one
-  exception is a single-purpose Vercel Edge Middleware for language
-  auto-detection, see "Internationalization (i18n)" below. (Converted from a
-  hand-authored Vite/HTML/JS site on 2026-09-18 — see git history if you
-  need the old structure for reference.)
+- **Stack**: [Astro](https://astro.build) + TypeScript. The marketing site
+  (everything outside `/portal/*`) is still fully static output with no
+  framework runtime shipped to the browser — the only exception there is a
+  single-purpose Vercel Edge Middleware for language auto-detection, see
+  "Internationalization (i18n)" below. As of 2026-09-18 the site does have a
+  real backend, but it's scoped tightly to `/portal/*` (the Partner Portal —
+  see that section): server-rendered Astro pages via `@astrojs/vercel`, a
+  Postgres database, and Clerk auth. `output: 'static'` is still the
+  project-wide default; only portal pages opt into
+  `export const prerender = false`, so every other page keeps prerendering
+  exactly as before. (Converted from a hand-authored Vite/HTML/JS site on
+  2026-09-18 — see git history if you need the old structure for reference.)
 
 ## Architecture
 
@@ -371,21 +377,24 @@ form. Added 2026-09-18.
   happens to be the account email — confirmed via a live test submission
   (`RFQ-2026-2BBB56`) whose customer-confirmation happened to succeed only
   because the test used that exact address, while the internal
-  notification failed. **Domain verification in progress**: the 4 DNS
-  records Resend's dashboard (resend.com/domains) asks for — a
-  `resend._domainkey` TXT (DKIM), `rsend`/`send` CNAMEs, and an optional
-  `_dmarc` TXT — were added in Natro's (the domain registrar) DNS panel,
-  but as of the last check (direct query against
-  `ns1.natrohost.com`/`ns2.natrohost.com`, the domain's actual
-  authoritative nameservers) they hadn't propagated yet, and oddly didn't
-  match what Natro's own panel displayed as the existing SPF record
-  either (the live root TXT is `v=spf1 include:_spf.google.com ~all` +
-  a Google site-verification TXT, not the `_spfcls.natrohost.com` one
-  the panel showed) — worth re-querying before assuming it's just normal
-  propagation delay if it still hasn't shown up after an hour or so.
-  Once verified, also set `RESEND_FROM_EMAIL` (e.g. `HADARA Hospitality
-  <rfq@hadarahospitality.com>`) to send from the real domain instead of
-  Resend's sandbox address (`onboarding@resend.dev`).
+  notification failed. **Domain verification resolved 2026-09-18**: the
+  real root cause wasn't propagation delay — `hadarahospitality.com`'s
+  actual authoritative nameservers turned out to be `ns8.wixdns.net` /
+  `ns9.wixdns.net` (Wix), not Natro (the registrar, which only controls
+  which nameservers are delegated — editing DNS records in Natro's own
+  panel silently did nothing, since Natro was never the authoritative
+  zone). The 4 Resend records (`resend._domainkey` TXT/DKIM, `rsend`/
+  `send` CNAMEs, `_dmarc` TXT) were instead added directly to the real
+  DNS zone via the Wix API (`PATCH
+  https://www.wixapis.com/domains/v1/dns-zones/hadarahospitality.com`) —
+  propagated within minutes, and Resend's dashboard now shows **Verified**.
+  If a future domain/DNS issue looks like a propagation problem, verify
+  the actual authoritative nameservers first (`dns.resolveNs()`) before
+  assuming a registrar's own panel is the right place to edit records —
+  it wasn't, here. **Still to do**: set `RESEND_FROM_EMAIL` (e.g. `HADARA
+  Hospitality <rfq@hadarahospitality.com>`) in Vercel's env vars to send
+  from the real domain instead of Resend's sandbox address
+  (`onboarding@resend.dev`) — not yet done as of this writing.
 - **File storage — client uploads, resolved 2026-09-18**: a first attempt
   (same day, briefly merged as PR #26) called `@vercel/blob`'s `put()`
   directly from `api/submit-quote.ts` and broke the production deployment
@@ -484,6 +493,121 @@ form. Added 2026-09-18.
   `document.documentElement.scrollWidth` at a few viewport widths, not
   just eyeballing a screenshot (a `fullPage` Playwright screenshot only
   happens to visually reveal this exact bug by accident).
+
+## Partner Portal (`/portal/*`)
+
+A members-only area (Phase 1, added 2026-09-19) for the site's B2B customers —
+hotel procurement / hospitality managers — to sign in and track their own
+orders: status timeline, quotes received, document uploads. Order status is
+updated **manually by the HADARA team** (owner confirmed no ERP/shipping
+integration), so the portal has a small staff side too. Customer accounts are
+**self-signup with approval** — a new account sits `pending` until a staff
+member approves it.
+
+- **This is the one part of the site that isn't static.** Everything under
+  `src/pages/portal/**/*.astro` and `src/pages/api/portal/**/*.ts` has
+  `export const prerender = false` and runs as a real Vercel Function via the
+  `@astrojs/vercel` adapter (`adapter: vercel()` in `astro.config.mjs`,
+  `integrations: [clerk()]`). Every other page is untouched and still
+  prerenders at build time — verified by checking `.vercel/output/static`
+  still has exactly 169 HTML files and `.vercel/output/functions/_render.func`
+  is the only Function after adding this.
+- **Auth**: `@clerk/astro`, wired through `src/middleware.ts` — a **new**
+  file, and a different system from the root-level `middleware.ts` (that one
+  is a raw Vercel Edge Middleware for i18n redirects; the two run at
+  different layers and don't conflict). `src/middleware.ts` only gates
+  `/portal/*`: any path there other than `/portal/sign-in`/`/portal/sign-up`
+  requires a signed-in Clerk session, else redirects to sign-in. Needs
+  `PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` in Vercel's env vars
+  (create a Clerk application at clerk.com — same "create the account,
+  Claude wires the code" pattern as Resend/Blob).
+- **Approval-status / role checks** happen per-page, not in the middleware —
+  `src/lib/portal-auth.ts`'s `requireApprovedPortalUser()` /
+  `requireStaff()` look up the signed-in Clerk user's `portal_users` row and
+  redirect to `/portal/pending` (not approved yet) or `/portal/onboarding`
+  (no row at all — see below) as needed. Every portal page and API route
+  calls one of these first.
+- **Sign-up flow**: Clerk's own `<SignUp />`/`<SignIn />` components
+  (`src/pages/portal/sign-up.astro` / `sign-in.astro`) only create the
+  *person*. Right after, `src/pages/portal/onboarding.astro` collects the
+  company name/country and `POST /api/portal/complete-onboarding` creates
+  the `companies` + `portal_users` (`status: 'pending'`) rows — a signed-in
+  user with no `portal_users` row yet always lands here first.
+- **Database**: Postgres via Neon (`@neondatabase/serverless` +
+  `drizzle-orm/neon-http`, schema in `src/db/schema.ts`, client in
+  `src/db/client.ts`). Deliberately **not** `@vercel/postgres` — that
+  package is deprecated (Vercel migrated Postgres to a native Neon
+  integration), so a new database today should be created as Neon from the
+  Storage tab, which auto-injects `POSTGRES_URL` (same pattern as
+  `BLOB_READ_WRITE_TOKEN`). Tables: `companies`, `portal_users` (role
+  `customer`/`staff`, status `pending`/`approved`/`rejected`), `orders`,
+  `order_status_events` (the timeline), `quotes`, `portal_documents`. Run
+  `npm run db:generate` after changing `src/db/schema.ts`, `npm run
+  db:migrate` to apply — both need `POSTGRES_URL` set locally too.
+- **Order status stages** (`src/lib/portal.ts`'s `ORDER_STATUS_STAGES`, a
+  single array — edit there to add/reorder stages): `quote_requested →
+  quoted → confirmed → in_production → shipped → delivered`.
+- **File uploads** reuse the exact RFQ pattern (`@vercel/blob/client`
+  `upload()` straight from the browser, token issued by `api/blob-upload.ts`)
+  rather than a second upload endpoint — that function now checks a
+  pathname's prefix against *either* `RFQ_BLOB_PATH_PREFIX` ('rfq/') or the
+  new `PORTAL_BLOB_PATH_PREFIX` ('portal/', in `src/lib/portal.ts`) and
+  applies that prefix's own size/type limits. `src/scripts/portal-
+  documents.ts` (customer document upload) and `src/scripts/portal-admin-
+  quote.ts` (staff quote-PDF attach) both follow it.
+- **Route namespacing**: root `/api/*.ts` (outside `src/`, `submit-quote.ts`
+  and `blob-upload.ts`) is Vercel's own zero-config Functions folder,
+  unrelated to Astro. Portal API endpoints live under
+  `src/pages/api/portal/*.ts` instead (e.g. `/api/portal/create-order`) —
+  same URL namespace in principle, but no path collision as long as new
+  Astro API routes don't reuse `submit-quote`/`blob-upload` as names.
+- **Email notifications** (`src/lib/portal-email.ts`) go out through the
+  same Resend setup as the RFQ system — `sendEmail()`/`escapeHtml()` were
+  pulled out of `api/submit-quote.ts` into a shared `src/lib/email.ts` so
+  both features use one implementation. Three triggers, all
+  fire-and-forget (`.catch(console.error)`, never awaited before the
+  response — a failed email must never fail the action that triggered it):
+  account approved (`approve-customer.ts`), order status changed
+  (`add-status-event.ts`, to every approved customer at that order's
+  company), new quote attached (`attach-quote.ts`, same audience). Same
+  `RESEND_API_KEY`/`RESEND_FROM_EMAIL` env vars as the RFQ system — no
+  separate configuration needed, and these start working the moment that
+  domain verification (see the RFQ section above) completes.
+- **Staff land on `/portal/admin`** (KPI overview: pending approvals,
+  active orders, companies, recent orders), not the customer dashboard —
+  `dashboard.astro` and every other customer-only page redirect a
+  `role: 'staff'` identity there, since staff have no `companyId` and
+  those pages are company-scoped. `PortalShell.astro` shows either the
+  staff nav or the customer nav, never both.
+- **Bootstrapping the first staff account**: there's no UI for it by
+  design (self-signup only ever creates `role: 'customer'` rows, and only
+  an existing staff member can reach anything that would promote someone).
+  Sign up normally once, then flip that one row's `role` to `'staff'`
+  directly in the database (Neon's SQL editor, or `npm run db:migrate`
+  tooling) — a one-time step per new staff member until/unless an invite
+  flow is built.
+- **What's deferred out of Phase 1**: portal i18n (English-only for now,
+  same precedent as the RFQ form shipping English-first); any
+  ERP/shipping-carrier integration (owner confirmed manual updates only);
+  a dedicated "catalog" document type (product technical sheets are
+  already downloadable from each product page, linked from
+  `/portal/documents` instead of duplicated); multi-user-per-company
+  invites (one Clerk user = one `portal_users` row today).
+- **Not verified end-to-end yet** — this sandbox has no real Clerk keys or
+  Postgres database, so only structural checks were possible: `npm run
+  build`, `npm run check`, and `astro dev` with dummy env vars confirming
+  the auth-gate redirects fire correctly on every `/portal/*` route. Once
+  rebased onto `main` (2026-09-19), the branch's actual Vercel preview
+  deployment was checked too (via the Vercel MCP tools) — build succeeded,
+  the static/Function split held (Astro still emits one `_render.func` and
+  every other route stayed static), and hitting `/portal/sign-in` on that
+  preview returned a 500 whose runtime log is exactly Clerk's "Publishable
+  key is missing" error — i.e. the code path is wired correctly and the
+  *only* thing blocking it is the still-unset env vars below, not a bug.
+  After the owner creates the Clerk app and Neon database and sets the
+  three env vars, walk the real flow once end-to-end (sign up → approve →
+  staff creates an order → add a status event → customer sees it) before
+  calling this done.
 
 ## Hotel Opening Package (`/hotel-opening-package`)
 

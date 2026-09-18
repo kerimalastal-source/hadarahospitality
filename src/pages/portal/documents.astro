@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PortalShell from '../../components/PortalShell.astro';
+import { requireApprovedPortalUser } from '../../lib/portal-auth';
+import { db } from '../../db/client';
+import { portalDocuments } from '../../db/schema';
+import { eq, desc } from 'drizzle-orm';
+
+export const prerender = false;
+
+const result = await requireApprovedPortalUser(Astro);
+if (result instanceof Response) return result;
+const identity = result;
+if (identity.role === 'staff') return Astro.redirect('/portal/admin');
+
+const documents = identity.companyId
+  ? await db.select().from(portalDocuments).where(eq(portalDocuments.companyId, identity.companyId)).orderBy(desc(portalDocuments.uploadedAt))
+  : [];
+---
+<BaseLayout title="Documents | HADARA Partner Portal" description="Upload and manage documents shared with HADARA Hospitality." path="/portal/documents" noindex>
+  <PortalShell identity={identity} active="documents">
+    <div class="portal-page-head"><h1>Documents</h1></div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Upload a document</p>
+      <p style="color:var(--muted);font-size:13px;margin:6px 0 18px">Share a PO, spec sheet, or branding file with our team (PDF, Word, Excel or image, up to 10MB).</p>
+      <form id="portal-upload-form" class="portal-form">
+        <input type="file" name="file" id="portal-upload-input" accept=".pdf,.xls,.xlsx,.doc,.docx,.png,.jpg,.jpeg" required />
+        <button class="button button-gold" type="submit" id="portal-upload-submit">Upload <span>→</span></button>
+        <p id="portal-upload-error" role="alert" style="color:#a3703a;font-size:12px;display:none;margin-top:10px"></p>
+      </form>
+    </div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Your documents</p>
+      {documents.length === 0 ? (
+        <p class="portal-empty">No documents uploaded yet.</p>
+      ) : (
+        <ul style="list-style:none;padding:0;margin:12px 0 0">
+          {documents.map((d) => (
+            <li style="padding:10px 0;border-bottom:1px solid #f1ebe4">
+              <a class="text-link" href={d.fileUrl} target="_blank" rel="noopener">{d.fileName}</a>
+              <span style="color:var(--muted);font-size:12px;margin-left:10px">{new Date(d.uploadedAt).toLocaleDateString()}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Product catalog</p>
+      <p style="color:var(--muted);font-size:13px">Technical sheets are available for download on every <a class="text-link" href="/products">product page</a>.</p>
+    </div>
+  </PortalShell>
+  <script>
+    import '../../scripts/portal-documents';
+  </script>
+</BaseLayout>

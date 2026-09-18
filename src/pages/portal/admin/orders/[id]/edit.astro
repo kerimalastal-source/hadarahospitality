@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+import PortalShell from '../../../../../components/PortalShell.astro';
+import { requireStaff } from '../../../../../lib/portal-auth';
+import { db } from '../../../../../db/client';
+import { orders, orderStatusEvents, quotes, companies } from '../../../../../db/schema';
+import { eq, asc, desc } from 'drizzle-orm';
+import { ORDER_STATUS_STAGES, ORDER_STATUS_LABELS } from '../../../../../lib/portal';
+
+export const prerender = false;
+
+const result = await requireStaff(Astro);
+if (result instanceof Response) return result;
+const identity = result;
+
+const { id } = Astro.params;
+const [row] = id
+  ? await db.select({ order: orders, company: companies }).from(orders).leftJoin(companies, eq(orders.companyId, companies.id)).where(eq(orders.id, id)).limit(1)
+  : [];
+if (!row) return Astro.redirect('/portal/admin/orders');
+const { order, company } = row;
+
+const events = await db.select().from(orderStatusEvents).where(eq(orderStatusEvents.orderId, order.id)).orderBy(asc(orderStatusEvents.createdAt));
+const orderQuotes = await db.select().from(quotes).where(eq(quotes.orderId, order.id)).orderBy(desc(quotes.sentAt));
+---
+<BaseLayout title={`Manage ${order.reference} | HADARA Partner Portal`} description="Update order status and attach quotes." path={`/portal/admin/orders/${order.id}/edit`} noindex>
+  <PortalShell identity={identity} active="admin-orders">
+    <div class="portal-page-head">
+      <h1>{order.reference}</h1>
+      <span style="color:var(--muted)">{company?.name}</span>
+    </div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Add a status update</p>
+      <form class="portal-form" method="post" action="/api/portal/add-status-event">
+        <input type="hidden" name="orderId" value={order.id} />
+        <label>Status<select name="status">
+          {ORDER_STATUS_STAGES.map((s) => <option value={s} selected={s === order.status}>{ORDER_STATUS_LABELS[s]}</option>)}
+        </select></label>
+        <label>Note (optional, visible to the customer)<textarea name="note" rows="3"></textarea></label>
+        <button class="button button-gold" type="submit">Add update <span>→</span></button>
+      </form>
+    </div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Timeline</p>
+      <ul class="portal-timeline">
+        {events.map((e) => (
+          <li>
+            <time>{new Date(e.createdAt).toLocaleString()}</time>
+            <strong>{ORDER_STATUS_LABELS[e.status]}</strong>
+            {e.note && <p style="margin:4px 0 0;color:var(--muted);font-size:13px">{e.note}</p>}
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Attach a quote</p>
+      <form id="portal-quote-form" class="portal-form">
+        <input type="hidden" id="portal-quote-order-id" value={order.id} />
+        <input type="file" name="file" id="portal-quote-input" accept=".pdf" required />
+        <label>Amount (optional)<input name="amount" id="portal-quote-amount" placeholder="e.g. 12,400" /></label>
+        <label>Currency<input name="currency" id="portal-quote-currency" placeholder="e.g. USD" /></label>
+        <button class="button button-gold" type="submit" id="portal-quote-submit">Attach quote <span>→</span></button>
+        <p id="portal-quote-error" role="alert" style="color:#a3703a;font-size:12px;display:none;margin-top:10px"></p>
+      </form>
+      {orderQuotes.length > 0 && (
+        <ul style="list-style:none;padding:0;margin:18px 0 0">
+          {orderQuotes.map((q) => (
+            <li style="padding:10px 0;border-bottom:1px solid #f1ebe4">
+              <a class="text-link" href={q.fileUrl} target="_blank" rel="noopener">Quote — {new Date(q.sentAt).toLocaleDateString()}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </PortalShell>
+  <script>
+    import '../../../../../scripts/portal-admin-quote';
+  </script>
+</BaseLayout>

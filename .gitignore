@@ -2,6 +2,9 @@ node_modules/
 dist/
 .DS_Store
 .astro/
+.vercel/
+.env
+.env.local
 
 # Generated at build time by `npm run generate` (see scripts/build-*.ts) —
 # never hand-edit, never commit.

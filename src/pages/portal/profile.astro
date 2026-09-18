@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PortalShell from '../../components/PortalShell.astro';
+import { requireApprovedPortalUser } from '../../lib/portal-auth';
+import { db } from '../../db/client';
+import { companies } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+import { WORLD_COUNTRIES } from '../../data/countries';
+
+export const prerender = false;
+
+const result = await requireApprovedPortalUser(Astro);
+if (result instanceof Response) return result;
+const identity = result;
+if (identity.role === 'staff') return Astro.redirect('/portal/admin');
+
+const [company] = identity.companyId ? await db.select().from(companies).where(eq(companies.id, identity.companyId)).limit(1) : [];
+---
+<BaseLayout title="Company profile | HADARA Partner Portal" description="Your company's profile in the HADARA partner portal." path="/portal/profile" noindex>
+  <PortalShell identity={identity} active="profile">
+    <div class="portal-page-head"><h1>Company profile</h1></div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Contact</p>
+      <p><strong>{identity.fullName}</strong><br /><span style="color:var(--muted)">{identity.email}</span></p>
+    </div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Company</p>
+      <form class="portal-form" method="post" action="/api/portal/update-company">
+        <label>Company name<input name="name" required value={company?.name ?? ''} /></label>
+        <label>Country<select name="country">
+          <option value="">Select a country</option>
+          {WORLD_COUNTRIES.map((c) => <option value={c} selected={c === company?.country}>{c}</option>)}
+        </select></label>
+        <button class="button button-gold" type="submit">Save changes <span>→</span></button>
+      </form>
+    </div>
+  </PortalShell>
+</BaseLayout>

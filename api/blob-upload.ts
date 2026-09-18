@@ -26,7 +26,16 @@
 
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { RFQ_BLOB_PATH_PREFIX, RFQ_FILE_MAX_BYTES, RFQ_FILE_MIME_TYPES } from '../src/lib/rfq.js';
+import { PORTAL_BLOB_PATH_PREFIX, PORTAL_FILE_MAX_BYTES, PORTAL_FILE_MIME_TYPES } from '../src/lib/portal.js';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+
+// This endpoint is shared by two unrelated upload flows (RFQ attachments and
+// Partner Portal documents) rather than duplicating the token-issuing logic —
+// each pathname prefix maps to its own size/type limits.
+const UPLOAD_PREFIXES = [
+  { prefix: RFQ_BLOB_PATH_PREFIX, maxBytes: RFQ_FILE_MAX_BYTES, mimeTypes: RFQ_FILE_MIME_TYPES },
+  { prefix: PORTAL_BLOB_PATH_PREFIX, maxBytes: PORTAL_FILE_MAX_BYTES, mimeTypes: PORTAL_FILE_MIME_TYPES },
+];
 
 interface VercelRequest extends IncomingMessage {
   body: HandleUploadBody;
@@ -51,14 +60,15 @@ export default async function handler(request: VercelRequest, response: VercelRe
       request,
       body: request.body,
       onBeforeGenerateToken: async (pathname) => {
-        if (!pathname.startsWith(RFQ_BLOB_PATH_PREFIX)) {
+        const match = UPLOAD_PREFIXES.find(({ prefix }) => pathname.startsWith(prefix));
+        if (!match) {
           throw new Error('Invalid upload path.');
         }
         return {
           access: 'public',
           addRandomSuffix: true,
-          allowedContentTypes: RFQ_FILE_MIME_TYPES,
-          maximumSizeInBytes: RFQ_FILE_MAX_BYTES,
+          allowedContentTypes: match.mimeTypes,
+          maximumSizeInBytes: match.maxBytes,
         };
       },
     });

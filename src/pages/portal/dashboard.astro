@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PortalShell from '../../components/PortalShell.astro';
+import { requireApprovedPortalUser } from '../../lib/portal-auth';
+import { db } from '../../db/client';
+import { orders, quotes } from '../../db/schema';
+import { eq, desc, inArray } from 'drizzle-orm';
+import { ORDER_STATUS_LABELS } from '../../lib/portal';
+
+export const prerender = false;
+
+const result = await requireApprovedPortalUser(Astro);
+if (result instanceof Response) return result;
+const identity = result;
+if (identity.role === 'staff') return Astro.redirect('/portal/admin');
+
+const companyOrders = identity.companyId
+  ? await db.select().from(orders).where(eq(orders.companyId, identity.companyId)).orderBy(desc(orders.updatedAt))
+  : [];
+const activeOrders = companyOrders.filter((o) => o.status !== 'delivered');
+const latestOrderIds = companyOrders.slice(0, 5).map((o) => o.id);
+const latestQuotes = latestOrderIds.length
+  ? await db.select().from(quotes).where(inArray(quotes.orderId, latestOrderIds)).orderBy(desc(quotes.sentAt)).limit(3)
+  : [];
+---
+<BaseLayout title="Dashboard | HADARA Partner Portal" description="Your HADARA Hospitality partner portal dashboard." path="/portal/dashboard" noindex>
+  <PortalShell identity={identity} active="dashboard">
+    <div class="portal-page-head">
+      <h1>Welcome back, {identity.fullName.split(' ')[0]}</h1>
+      <a class="button button-gold" href="/get-a-quote">Request a new quote <span>→</span></a>
+    </div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Orders</p>
+      <p style="font-size:36px;font-family:'Playfair Display','Markazi Text',serif;margin:6px 0 4px">{activeOrders.length}</p>
+      <p class="portal-empty" style="padding:0">active order{activeOrders.length === 1 ? '' : 's'} out of {companyOrders.length} total</p>
+      <p style="margin-top:16px"><a class="text-link" href="/portal/orders">View all orders →</a></p>
+    </div>
+
+    <div class="portal-card">
+      <p class="eyebrow">Latest quotes</p>
+      {latestQuotes.length === 0 ? (
+        <p class="portal-empty">No quotes yet.</p>
+      ) : (
+        <ul style="list-style:none;padding:0;margin:12px 0 0">
+          {latestQuotes.map((q) => (
+            <li style="padding:10px 0;border-bottom:1px solid #f1ebe4">
+              <a class="text-link" href={q.fileUrl} target="_blank" rel="noopener">Quote from {new Date(q.sentAt).toLocaleDateString()}</a>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p style="margin-top:16px"><a class="text-link" href="/portal/quotes">View all quotes →</a></p>
+    </div>
+
+    {companyOrders.length > 0 && (
+      <div class="portal-card">
+        <p class="eyebrow">Recent activity</p>
+        <table class="portal-table">
+          <thead><tr><th>Reference</th><th>Status</th><th>Updated</th></tr></thead>
+          <tbody>
+            {companyOrders.slice(0, 5).map((o) => (
+              <tr>
+                <td><a class="text-link" href={`/portal/orders/${o.id}`}>{o.reference}</a></td>
+                <td><span class="portal-status" class:list={{ 'portal-status-delivered': o.status === 'delivered' }}>{ORDER_STATUS_LABELS[o.status]}</span></td>
+                <td>{new Date(o.updatedAt).toLocaleDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </PortalShell>
+</BaseLayout>

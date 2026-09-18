@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PortalShell from '../../components/PortalShell.astro';
+import { requireApprovedPortalUser } from '../../lib/portal-auth';
+import { db } from '../../db/client';
+import { orders, quotes } from '../../db/schema';
+import { eq, desc } from 'drizzle-orm';
+
+export const prerender = false;
+
+const result = await requireApprovedPortalUser(Astro);
+if (result instanceof Response) return result;
+const identity = result;
+if (identity.role === 'staff') return Astro.redirect('/portal/admin');
+
+const rows = identity.companyId
+  ? await db
+      .select({ quote: quotes, order: orders })
+      .from(quotes)
+      .innerJoin(orders, eq(quotes.orderId, orders.id))
+      .where(eq(orders.companyId, identity.companyId))
+      .orderBy(desc(quotes.sentAt))
+  : [];
+---
+<BaseLayout title="Quotes | HADARA Partner Portal" description="Pricing and quotes received from HADARA Hospitality." path="/portal/quotes" noindex>
+  <PortalShell identity={identity} active="quotes">
+    <div class="portal-page-head"><h1>Quotes</h1></div>
+    {rows.length === 0 ? (
+      <p class="portal-empty">No quotes received yet.</p>
+    ) : (
+      <div class="portal-card">
+        <table class="portal-table">
+          <thead><tr><th>Order</th><th>Sent</th><th>Amount</th><th></th></tr></thead>
+          <tbody>
+            {rows.map(({ quote, order }) => (
+              <tr>
+                <td><a class="text-link" href={`/portal/orders/${order.id}`}>{order.reference}</a></td>
+                <td>{new Date(quote.sentAt).toLocaleDateString()}</td>
+                <td>{quote.amount ? `${quote.amount} ${quote.currency ?? ''}` : '—'}</td>
+                <td><a class="text-link" href={quote.fileUrl} target="_blank" rel="noopener">Download</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </PortalShell>
+</BaseLayout>

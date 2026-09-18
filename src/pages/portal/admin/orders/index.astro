@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import PortalShell from '../../../../components/PortalShell.astro';
+import { requireStaff } from '../../../../lib/portal-auth';
+import { db } from '../../../../db/client';
+import { orders, companies } from '../../../../db/schema';
+import { eq, desc } from 'drizzle-orm';
+import { ORDER_STATUS_LABELS } from '../../../../lib/portal';
+
+export const prerender = false;
+
+const result = await requireStaff(Astro);
+if (result instanceof Response) return result;
+const identity = result;
+
+const rows = await db
+  .select({ order: orders, company: companies })
+  .from(orders)
+  .leftJoin(companies, eq(orders.companyId, companies.id))
+  .orderBy(desc(orders.updatedAt));
+---
+<BaseLayout title="Manage orders | HADARA Partner Portal" description="Create and update partner portal orders." path="/portal/admin/orders" noindex>
+  <PortalShell identity={identity} active="admin-orders">
+    <div class="portal-page-head">
+      <h1>Orders</h1>
+      <a class="button button-gold" href="/portal/admin/orders/new">New order <span>→</span></a>
+    </div>
+    {rows.length === 0 ? (
+      <p class="portal-empty">No orders yet.</p>
+    ) : (
+      <div class="portal-card">
+        <table class="portal-table">
+          <thead><tr><th>Reference</th><th>Company</th><th>Status</th><th>Updated</th><th></th></tr></thead>
+          <tbody>
+            {rows.map(({ order, company }) => (
+              <tr>
+                <td>{order.reference}</td>
+                <td>{company?.name ?? '—'}</td>
+                <td><span class="portal-status" class:list={{ 'portal-status-delivered': order.status === 'delivered' }}>{ORDER_STATUS_LABELS[order.status]}</span></td>
+                <td>{new Date(order.updatedAt).toLocaleDateString()}</td>
+                <td><a class="text-link" href={`/portal/admin/orders/${order.id}/edit`}>Manage →</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </PortalShell>
+</BaseLayout>

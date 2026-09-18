@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import PortalShell from '../../../../components/PortalShell.astro';
+import { requireStaff } from '../../../../lib/portal-auth';
+import { db } from '../../../../db/client';
+import { companies } from '../../../../db/schema';
+import { asc } from 'drizzle-orm';
+import { ORDER_STATUS_STAGES, ORDER_STATUS_LABELS } from '../../../../lib/portal';
+
+export const prerender = false;
+
+const result = await requireStaff(Astro);
+if (result instanceof Response) return result;
+const identity = result;
+
+const allCompanies = await db.select().from(companies).orderBy(asc(companies.name));
+---
+<BaseLayout title="New order | HADARA Partner Portal" description="Create a new partner portal order." path="/portal/admin/orders/new" noindex>
+  <PortalShell identity={identity} active="admin-orders">
+    <div class="portal-page-head"><h1>New order</h1></div>
+    <div class="portal-card">
+      <form class="portal-form" method="post" action="/api/portal/create-order">
+        <label>Company<select name="companyId" required>
+          <option value="">Select a company</option>
+          {allCompanies.map((c) => <option value={c.id}>{c.name}</option>)}
+        </select></label>
+        <label>Reference<input name="reference" required placeholder="e.g. ORD-2026-0042" /></label>
+        <label>Initial status<select name="status">
+          {ORDER_STATUS_STAGES.map((s) => <option value={s}>{ORDER_STATUS_LABELS[s]}</option>)}
+        </select></label>
+        <label>Notes<textarea name="notes" rows="4"></textarea></label>
+        <button class="button button-gold" type="submit">Create order <span>→</span></button>
+      </form>
+    </div>
+  </PortalShell>
+</BaseLayout>

@@ -24,6 +24,7 @@
 
 import { isValidRfqBlobUrl, isValidWorkEmail, type RfqProductMeta, type RfqSubmission } from '../src/lib/rfq.js';
 import { CONTACT_EMAIL } from '../src/config.js';
+import { sendEmail, escapeHtml, hasResendConfigured } from '../src/lib/email.js';
 
 export const config = { runtime: 'edge' };
 
@@ -33,27 +34,6 @@ const MAX_SHORT_LENGTH = 200;
 
 function json(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), { status, headers: JSON_HEADERS });
-}
-
-function escapeHtml(value: string): string {
-  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-/** Sends via the Resend API (https://resend.com). Throws on failure so the
- * caller's try/catch can log it — a failed email must never fail the RFQ
- * submission itself, since the submission was already validated. */
-async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return;
-  const from = process.env.RESEND_FROM_EMAIL || 'HADARA Hospitality <onboarding@resend.dev>';
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to, subject, html }),
-  });
-  if (!response.ok) {
-    throw new Error(`Resend API error ${response.status}: ${await response.text().catch(() => '')}`);
-  }
 }
 
 function row(label: string, value?: string): string {
@@ -126,7 +106,7 @@ function generateReference(): string {
 /** Sends the internal "New RFQ" notification to partnerships@hadarahospitality.com
  * (CONTACT_EMAIL) once RESEND_API_KEY is configured; a no-op until then. */
 async function notifyHadaraTeam(submission: RfqSubmission): Promise<void> {
-  if (!process.env.RESEND_API_KEY) {
+  if (!hasResendConfigured()) {
     console.info('[rfq] notifyHadaraTeam: RESEND_API_KEY not set, skipping internal email', submission.system.reference);
     return;
   }
@@ -136,7 +116,7 @@ async function notifyHadaraTeam(submission: RfqSubmission): Promise<void> {
 
 /** Sends the customer-facing confirmation email once RESEND_API_KEY is configured. */
 async function confirmToCustomer(submission: RfqSubmission): Promise<void> {
-  if (!process.env.RESEND_API_KEY) {
+  if (!hasResendConfigured()) {
     console.info('[rfq] confirmToCustomer: RESEND_API_KEY not set, skipping', submission.system.reference);
     return;
   }
