@@ -260,6 +260,7 @@ export const en: Dictionary = {
       projectTypePlaceholder: 'Select project type',
       projectTypeOptions: ['New Hotel Opening', 'Renovation', 'Replenishment', 'New Hospitality Project', 'Sample / Product Evaluation', 'Other'],
       deliveryCountry: 'Required Delivery Country',
+      deliveryCountryPlaceholder: 'Select delivery country',
       deliveryCity: 'Required Delivery City',
       targetDeliveryDate: 'Target Delivery Date',
       customBranding: 'Custom Logo / Branding',

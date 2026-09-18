@@ -260,6 +260,7 @@ export const fr: DeepPartial<Dictionary> = {
       projectTypePlaceholder: 'Sélectionnez le type de projet',
       projectTypeOptions: ["Ouverture d'un nouvel hôtel", 'Rénovation', 'Réapprovisionnement', 'Nouveau projet hôtelier', 'Échantillon / Évaluation produit', 'Autre'],
       deliveryCountry: 'Pays de livraison requis',
+      deliveryCountryPlaceholder: 'Sélectionnez le pays de livraison',
       deliveryCity: 'Ville de livraison requise',
       targetDeliveryDate: 'Date de livraison souhaitée',
       customBranding: 'Logo / Marquage personnalisé',

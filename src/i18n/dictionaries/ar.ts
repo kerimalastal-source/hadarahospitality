@@ -260,6 +260,7 @@ export const ar: DeepPartial<Dictionary> = {
       projectTypePlaceholder: 'اختر نوع المشروع',
       projectTypeOptions: ['افتتاح فندق جديد', 'تجديد', 'تجديد مخزون', 'مشروع ضيافة جديد', 'عينة / تقييم منتج', 'أخرى'],
       deliveryCountry: 'دولة التسليم المطلوبة',
+      deliveryCountryPlaceholder: 'اختر دولة التسليم',
       deliveryCity: 'مدينة التسليم المطلوبة',
       targetDeliveryDate: 'تاريخ التسليم المستهدف',
       customBranding: 'شعار / علامة تجارية مخصصة',

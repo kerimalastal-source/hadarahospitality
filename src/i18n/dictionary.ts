@@ -153,6 +153,7 @@ export interface Dictionary {
       projectTypePlaceholder: string;
       projectTypeOptions: string[];
       deliveryCountry: string;
+      deliveryCountryPlaceholder: string;
       deliveryCity: string;
       targetDeliveryDate: string;
       customBranding: string;

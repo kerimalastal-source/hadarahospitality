@@ -231,16 +231,15 @@ form. Added 2026-09-18.
   `?category=` value to the new form's product-category checkboxes).
   Imported by both the client script and the Edge function, so validation
   rules can't drift between the two.
-- **Country field** (`src/data/countries.ts`'s `WORLD_COUNTRIES`, ~197
-  entries): a `<select>`, not free text, and **optional** — per the owner
-  (2026-09-18). Same convention as the product category values: kept in
-  English across all locales (no per-locale translation of country names)
-  so the value stays a stable, canonical string in the owner's internal
-  notification email regardless of the visitor's language, matching how
-  `formCategory` already works. Note this is only the property's *Country*
-  field (section 01) — *Required Delivery Country* (section 03) is a
-  separate field that's intentionally still a required free-text input;
-  ask before changing that one too if it comes up.
+- **Country fields** (`src/data/countries.ts`'s `WORLD_COUNTRIES`, ~197
+  entries): both *Country* (section 01, optional) and *Required Delivery
+  Country* (section 03, still required) are `<select>` dropdowns using the
+  same list — made consistent 2026-09-18 after the owner pointed out having
+  one as a dropdown and the other as required free text read as
+  inconsistent/unpolished. Country names are kept in English across all
+  locales (no per-locale translation), same convention as product category
+  values, so the value stays a stable canonical string in the owner's
+  internal notification email regardless of visitor language.
 - **Product hand-off**: any page can pre-fill the form via query params —
   `?product=<name>&slug=<slug>&category=<legacy formCategory>&material=<...>&gsm=<...>`
   (see `ProductView.astro`'s `quoteParams`). The parsing side
