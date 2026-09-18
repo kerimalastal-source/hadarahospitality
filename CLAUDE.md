@@ -200,8 +200,83 @@ The icons themselves are shared components (`src/components/icons/`) used
 by every page, so there's also no more per-generator-script copy of the SVG
 markup to fall out of sync.
 
+## RFQ ("Request a Quote") system
+
+`/get-a-quote.html` (`src/views/GetAQuoteView.astro`) is a full B2B RFQ form
+(4 sections: Contact & Property, Products Required, Project & Delivery,
+Specifications & Documents), replacing the old single mailto-only quote
+form. Added 2026-09-18.
+
+- **Submission**: `api/submit-quote.ts` — a Vercel Edge Function at the
+  project root, **outside `src/`** on purpose: the site itself stays a
+  fully static Astro build (see "Stack" above), and Vercel deploys any file
+  under `/api` as a serverless/edge function independently of that, with
+  zero framework config. Edge runtime (not Node) was chosen specifically to
+  get the standard Web `Request`/`Response`/`FormData` APIs for free, so
+  multipart parsing needs no extra dependency. `src/scripts/rfq-form.ts` is
+  the client side: URL-param product pre-selection, drag-and-drop file
+  upload with client validation, native `checkValidity()`/`reportValidity()`
+  for required/email fields plus a manual check for "at least one product
+  category", fetch submission with loading/success/error states and
+  duplicate-submit prevention, and `window.dispatchEvent(new
+  CustomEvent(...))` analytics hooks (`quote_form_started`,
+  `product_selected`, `rfq_file_uploaded`, `quote_form_submitted`,
+  `quote_form_success`) — no analytics provider is wired up, per the
+  existing "no analytics yet" convention; hook a listener to these events
+  once one is.
+- **Data model**: `src/lib/rfq.ts` — `RfqSubmission`/`RfqProductMeta` types,
+  file validation constants (`RFQ_FILE_MAX_BYTES` = 10 MB,
+  `RFQ_FILE_EXTENSIONS`), `isValidWorkEmail`, and
+  `LEGACY_CATEGORY_TO_RFQ_CATEGORY` (maps a product page's existing
+  `?category=` value to the new form's product-category checkboxes).
+  Imported by both the client script and the Edge function, so validation
+  rules can't drift between the two.
+- **Product hand-off**: any page can pre-fill the form via query params —
+  `?product=<name>&slug=<slug>&category=<legacy formCategory>&material=<...>&gsm=<...>`
+  (see `ProductView.astro`'s `quoteParams`). The parsing side
+  (`applyProductFromUrl()` in `rfq-form.ts`) reads whichever params are
+  present into a generic `RfqProductMeta` object — add a new param (thread
+  count, size, SKU, ...) on the producer side and it flows through
+  automatically, no form changes needed.
+- **What's fully functional now**: end-to-end client + server validation,
+  file type/size checks, honeypot + minimum-time-on-form anti-spam gate (a
+  submission that trips either one gets a fake-success response so a bot
+  gets no feedback signal — see the code comment in `api/submit-quote.ts`
+  before "fixing" this if it looks like a bug), and a generated
+  `RFQ-<year>-<6 chars>` reference number (via `crypto.randomUUID()`,
+  server-side only — never generate this client-side).
+- **What's stubbed, and the env vars to wire each one up**: all three live
+  in `api/submit-quote.ts` as clearly-named no-op functions that log what
+  they'd do and return early when their env var is unset —
+  `notifyHadaraTeam`/`confirmToCustomer` need `RESEND_API_KEY` (or swap for
+  another provider), `syncToHubSpot` needs `HUBSPOT_ACCESS_TOKEN`, and
+  `persistUploadedFile` needs `BLOB_READ_WRITE_TOKEN` (Vercel Blob) or
+  equivalent — **until one of these is set, an uploaded file is validated
+  but its bytes are discarded after the request; only its name/size/type
+  are kept**. Set these in the Vercel project's environment variables, not
+  in code.
+- **A CSS gotcha that bit this feature twice**: an element toggled with the
+  plain `hidden` **attribute** stays visible if any author stylesheet rule
+  also sets `display` on it (e.g. `.foo{display:flex}` beats the browser's
+  own `[hidden]{display:none}`, because author-origin CSS always wins over
+  user-agent CSS regardless of specificity). Every `.rfq-*` class that sets
+  its own `display` and is also toggled via `.hidden = true/false` in
+  `rfq-form.ts` needs an explicit `.foo[hidden]{display:none}` override
+  next to it (see `global.css` around `.rfq-selected-product[hidden]`,
+  `.rfq-file-chip[hidden]`, `.rfq-form input[type="file"]`). `type="hidden"`
+  inputs don't have this problem (`display:none !important` in the browser's
+  own UA stylesheet) — only the boolean `hidden` attribute does. Watch for
+  this pattern anywhere else `hidden` gets toggled on a flex/grid element.
+- **i18n**: the dictionary's new granular field labels/placeholders/option
+  lists under `getAQuote.form` are English-only for now (fall back per the
+  usual mechanism) — only the hero, trust bullets, section intro copy,
+  submit button and success-state copy were translated into ar/fr/ru. Fill
+  in the rest incrementally the same way as everything else in this file.
+
 ## Pending / deferred (owner-blocked, don't guess)
 
+- **RFQ field label translations** (ar/fr/ru) — see "RFQ system" above;
+  currently English-only, falls back gracefully, not blocking.
 - **"شركاء النجاح" (Partners of Success) homepage section** — 10 hotel-chain
   logos. Explicitly deferred by the owner ("خلص سيبك منه بنعمله بعدين").
   Blocked on: (a) the exact names of the specific hotel properties they

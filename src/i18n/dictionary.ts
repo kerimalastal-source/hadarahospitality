@@ -120,17 +120,73 @@ export interface Dictionary {
       heading2: string;
       body: string;
       title: string;
-      name: string;
-      email: string;
-      hotel: string;
+      selectedProductLabel: string;
+      removeProduct: string;
+
+      section1: string;
+      fullName: string;
+      workEmail: string;
+      phone: string;
+      companyName: string;
+      propertyType: string;
+      propertyTypePlaceholder: string;
+      propertyTypeOptions: string[];
+      hotelCategory: string;
+      hotelCategoryPlaceholder: string;
+      hotelCategoryOptions: string[];
+      rooms: string;
+      roomsHelp: string;
       country: string;
-      category: string;
-      categoryPlaceholder: string;
-      categoryOptions: string[];
-      details: string;
-      detailsPlaceholder: string;
+      city: string;
+      preferredContact: string;
+      preferredContactOptions: string[];
+
+      section2: string;
+      productsRequired: string;
+      productCategories: string[];
+      estimatedQuantity: string;
+      estimatedQuantityPlaceholder: string;
+
+      section3: string;
+      projectType: string;
+      projectTypePlaceholder: string;
+      projectTypeOptions: string[];
+      deliveryCountry: string;
+      deliveryCity: string;
+      targetDeliveryDate: string;
+      customBranding: string;
+      customBrandingOptions: string[];
+      sampleRequired: string;
+      sampleRequiredOptions: string[];
+
+      section4: string;
+      notes: string;
+      notesPlaceholder: string;
+      uploadHeading: string;
+      uploadHelp: string;
+      uploadDrag: string;
+      uploadBrowse: string;
+      uploadAccepted: string;
+      uploadRemove: string;
+      uploadErrorType: string;
+      uploadErrorSize: string;
+      additionalMessage: string;
+      additionalMessagePlaceholder: string;
+
       submit: string;
+      submitting: string;
       note: string;
+      errorRequired: string;
+      errorEmail: string;
+      errorProducts: string;
+      errorGeneric: string;
+
+      successHeading: string;
+      successMessage: string;
+      successReferenceLabel: string;
+      successNote: string;
+      backToProducts: string;
+      returnHome: string;
     };
   };
   contact: {
