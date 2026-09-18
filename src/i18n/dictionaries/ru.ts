@@ -244,6 +244,7 @@ export const ru: DeepPartial<Dictionary> = {
       rooms: 'Количество номеров / ключей',
       roomsHelp: 'Примерное количество номеров или ключей.',
       country: 'Страна',
+      countryPlaceholder: 'Выберите страну',
       city: 'Город',
       preferredContact: 'Предпочтительный способ связи',
       preferredContactOptions: ['Email', 'WhatsApp', 'Телефон'],

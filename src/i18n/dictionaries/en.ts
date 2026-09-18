@@ -244,6 +244,7 @@ export const en: Dictionary = {
       rooms: 'Number of Rooms / Keys',
       roomsHelp: 'Approximate number of guest rooms or keys.',
       country: 'Country',
+      countryPlaceholder: 'Select country',
       city: 'City',
       preferredContact: 'Preferred Contact Method',
       preferredContactOptions: ['Email', 'WhatsApp', 'Phone'],
