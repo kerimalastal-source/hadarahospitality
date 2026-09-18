@@ -32,10 +32,18 @@ prose in English so it stays easy to scan.
   (`ARTICLES`) at build time via `getStaticPaths()`. To change a product or
   article, edit the data file — there is no separate generator script and
   nothing to regenerate or hand-edit; the page is built fresh every time.
-- `astro.config.mjs` sets `build.format: 'file'` so output paths match the
-  original URL scheme exactly (`/about.html`, `/products/<slug>.html`,
-  `/blog/<slug>.html`, etc.) — this preserves every link, the sitemap, and
-  SEO URLs from the pre-conversion site.
+- `astro.config.mjs` sets `build.format: 'directory'` — every route builds
+  to `<path>/index.html`, served at a clean, extension-less URL
+  (`/about`, `/products/<slug>`, `/blog/<slug>`, etc.) by Vercel's standard
+  directory-index-file serving convention, with zero extra Vercel config
+  needed. Changed 2026-09-18 from the original conversion's `format: 'file'`
+  (which matched the old Wix-era `.html`-suffixed URLs) at the owner's
+  request — they confirmed no `.html` links are shared anywhere, so no
+  redirect safety net was added for the old URLs; they now 404. The one
+  exception is `404.astro` itself, which Astro always builds to
+  `dist/404.html` regardless of `build.format` — this is unrelated to the
+  URL scheme (it's Astro's fixed convention for the root error page) and
+  needs no special handling elsewhere in the codebase.
 - Shared UI lives in `src/components/` (`Header.astro`, `Footer.astro`,
   `WhatsAppFloat.astro`, `icons/`) and `src/layouts/BaseLayout.astro` (head
   boilerplate, OG/Twitter tags, canonical link, JSON-LD slot).
@@ -131,11 +139,11 @@ than breaking anything, so translation work can always ship incrementally.
 - `scripts/build-sitemap.ts` emits every page × every locale with
   `<xhtml:link rel="alternate" hreflang="...">` annotations, so each
   language version can be indexed and ranked in its own market.
-- The homepage is the one special case in the URL scheme: because of how
-  Astro's `build.format: 'file'` handles a nested index route, the
-  localized homepage is a flat `/ar.html` / `/fr.html` / `/ru.html` (not
-  `/ar/index.html`) — `localizePath()` already special-cases this, but
-  don't hand-build a homepage URL any other way.
+- The localized homepage is just `/ar`, `/fr`, `/ru` (Astro's
+  `build.format: 'directory'` output makes these ordinary directory-index
+  routes, `/ar/index.html` etc., same as any other page) —
+  `localizePath()` handles this with no special-casing needed; still go
+  through it rather than hand-building a homepage URL.
 - Fonts: the Google Fonts link in `BaseLayout.astro` also loads Cairo +
   Markazi Text (Arabic) and Manrope (Cyrillic fallback) alongside DM
   Sans/Playfair Display, so glyphs render correctly without any per-locale
@@ -202,7 +210,7 @@ markup to fall out of sync.
 
 ## RFQ ("Request a Quote") system
 
-`/get-a-quote.html` (`src/views/GetAQuoteView.astro`) is a full B2B RFQ form
+`/get-a-quote` (`src/views/GetAQuoteView.astro`) is a full B2B RFQ form
 (4 sections: Contact & Property, Products Required, Project & Delivery,
 Specifications & Documents), replacing the old single mailto-only quote
 form. Added 2026-09-18.

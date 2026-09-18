@@ -11,7 +11,7 @@ const t = getDictionary(locale);
 const a = t.about;
 const p = (path: string) => localizePath(locale, path);
 ---
-<BaseLayout title={a.title} description={a.description} path="/about.html" locale={locale} active="about">
+<BaseLayout title={a.title} description={a.description} path="/about" locale={locale} active="about">
   <main>
     <section class="about-hero"><div class="wrap"><p class="eyebrow light">{a.hero.eyebrow}</p><h1>{a.hero.headingLead} <em>{a.hero.headingEmphasis}</em></h1></div></section>
     <section class="about-intro wrap">
@@ -32,7 +32,7 @@ const p = (path: string) => localizePath(locale, path);
       <div><p class="eyebrow">{a.outro.eyebrow}</p><h2>{a.outro.heading1}<br /><em>{a.outro.heading2}</em></h2></div>
       <div>
         <p>{a.outro.paragraph}</p>
-        <a class="button button-gold" href={p('/get-a-quote.html')}>{a.outro.cta} <span>↗</span></a>
+        <a class="button button-gold" href={p('/get-a-quote')}>{a.outro.cta} <span>↗</span></a>
       </div>
     </section>
   </main>

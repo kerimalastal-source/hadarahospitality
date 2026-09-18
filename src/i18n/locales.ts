@@ -22,13 +22,14 @@ export const LOCALE_TAGS: Record<Locale, string> = {
 };
 
 /**
- * Prefixes a site-root path with the locale, e.g. localizePath('ar', '/about.html') -> '/ar/about.html'.
- * The default locale (en) is never prefixed. The homepage ("/") is special-cased to
- * "/<locale>.html" to match Astro's actual `build.format: 'file'` output for a nested
- * index route (it does not get the root's special "index.html" treatment).
+ * Prefixes a site-root path with the locale, e.g. localizePath('ar', '/about') -> '/ar/about'.
+ * The default locale (en) is never prefixed. The homepage ("/") just gets the
+ * locale prefix like any other path (Astro's `build.format: 'directory'`
+ * output already has clean directory-index URLs, so no special-casing is
+ * needed here — unlike the old `format: 'file'` setup).
  */
 export function localizePath(locale: Locale, path: string): string {
   if (locale === DEFAULT_LOCALE) return path;
-  if (path === '/') return `/${locale}.html`;
+  if (path === '/') return `/${locale}`;
   return `/${locale}${path}`;
 }

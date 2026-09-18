@@ -1,4 +1,4 @@
-// Client-side behavior for the RFQ form on /get-a-quote.html: product
+// Client-side behavior for the RFQ form on /get-a-quote: product
 // pre-selection from URL params, drag-and-drop file upload, submission via
 // fetch (no more mailto:), and analytics event hooks. Guarded so this is a
 // no-op import on every other page.

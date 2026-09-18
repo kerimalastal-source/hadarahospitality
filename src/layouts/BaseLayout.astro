@@ -9,7 +9,7 @@ import { getDictionary, LOCALES, LOCALE_TAGS, DEFAULT_LOCALE, isRtl, localizePat
 interface Props {
   title: string;
   description: string;
-  /** Site-root, locale-agnostic path, e.g. "/about.html" or "/" for the homepage. Used for the canonical link, hreflang alternates and the language switcher. */
+  /** Site-root, locale-agnostic path, e.g. "/about" or "/" for the homepage. Used for the canonical link, hreflang alternates and the language switcher. */
   path: string;
   locale?: Locale;
   ogType?: 'website' | 'product' | 'article';
