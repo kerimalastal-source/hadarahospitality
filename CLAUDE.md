@@ -164,6 +164,22 @@ than breaking anything, so translation work can always ship incrementally.
 - Nav search icon and WhatsApp float icon are shared inline-SVG components
   (`src/components/icons/`), used consistently everywhere — see the
   resolved known issue note below.
+- `public/assets/hadara-logo-black.png` (2026-09-18) is the real "HE"
+  calligraphic monogram, supplied by the owner via Google Drive and cropped/
+  background-removed here. The original conversion's
+  `hadara-logo-black.svg` was a hand-traced approximation done without the
+  source file (thinner strokes, visibly different from the real mark) —
+  the owner flagged it as wrong; that file is now deleted. The real source
+  is icon-only (no "HADARA" wordmark baked in, unlike the old SVG), so the
+  header (`Header.astro`) now renders the icon image plus real
+  `<strong>HADARA</strong><small>HOSPITALITY</small>` text next to it,
+  matching the pattern the footer's brand mark already used — better for
+  accessibility/SEO than text baked into an image, too. Still referenced
+  from `Organization.logo` in the `HomeView`/`ArticleView` JSON-LD.
+  **Not yet updated to match**: `favicon-*.png`, `apple-touch-icon.png`
+  and `og-image.png` under `public/assets/` all use an unrelated generic
+  serif "H" placeholder (not derived from either the old or new mark) —
+  flagged to the owner, do it in a follow-up if asked.
 
 ## Git workflow for this repo
 
