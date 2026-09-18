@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { PRODUCTS, CATEGORIES, type Product } from '../data/products';
+import { getProductTranslation } from '../data/products.i18n';
 import { SITE_URL } from '../config';
 import { getDictionary, localizePath, type Locale } from '../i18n';
 
@@ -13,19 +14,35 @@ const { product, locale } = Astro.props;
 const t = getDictionary(locale);
 const pd = t.productDetail;
 const category = CATEGORIES[product.category];
+const categoryLabel = t.common.categoryLabels[product.category] ?? category.label;
 const pageUrl = `${SITE_URL}${localizePath(locale, `/products/${product.slug}.html`)}`;
 const p = (path: string) => localizePath(locale, path);
 
-function splitName(name: string) {
-  const parts = name.split(' – ');
-  return parts.length === 2 ? { base: parts[0], suffix: parts[1] } : { base: name, suffix: '' };
-}
-const { base: heroBase, suffix: heroSuffix } = splitName(product.name);
+// Localized text falls back to the English data whenever a translation
+// hasn't been filled in yet for this product/locale/field.
+const tr = getProductTranslation(locale, product.slug);
+const name = tr?.name ?? product.name;
+const overview = tr?.overview ?? product.overview;
+const material = tr?.material ?? product.material;
+const suitableFor = tr?.suitableFor ?? product.suitableFor;
+const specLabel = tr?.specLabel ?? product.specLabel;
+const specValues = tr?.specValues ?? product.specValues;
+const customization = tr?.customization ?? product.customization;
+const features = tr?.features ?? product.features;
 
+function splitName(productName: string) {
+  const parts = productName.split(' – ');
+  return parts.length === 2 ? { base: parts[0], suffix: parts[1] } : { base: productName, suffix: '' };
+}
+const { base: heroBase, suffix: heroSuffix } = splitName(name);
+
+// The quote link and mailto body always use the canonical English product
+// name/category so the resulting email stays consistent for the owner,
+// regardless of which language the visitor's page was in.
 const quoteParams = new URLSearchParams({ product: product.name, category: category.formCategory });
 const quoteLink = `${p('/get-a-quote.html')}?${quoteParams.toString()}`;
 
-const description = `${product.overview} ${product.material}. Suitable for ${product.suitableFor}. Request hospitality supply specifications and a tailored quote from HADARA Hospitality.`;
+const description = `${overview} ${material}. Suitable for ${suitableFor}. Request hospitality supply specifications and a tailored quote from HADARA Hospitality.`;
 const metaDescription = description.length > 158 ? `${description.slice(0, 158).replace(/\s+\S*$/, '')}…` : description;
 const ogImage = product.main || undefined;
 
@@ -36,18 +53,18 @@ const related = PRODUCTS.filter((pr) => pr.category === product.category && pr.s
 const productSchema = {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: product.name,
-  description: product.overview,
+  name,
+  description: overview,
   image: product.gallery.length ? product.gallery : product.main ? [product.main] : undefined,
-  category: category.label,
-  material: product.material,
+  category: categoryLabel,
+  material,
   url: pageUrl,
   brand: { '@type': 'Brand', name: 'HADARA Hospitality' },
   manufacturer: { '@type': 'Organization', name: 'HADARA Hospitality', url: SITE_URL },
   additionalProperty: [
-    { '@type': 'PropertyValue', name: product.specLabel, value: product.specValues.join(' / ') },
-    { '@type': 'PropertyValue', name: 'Suitable For', value: product.suitableFor },
-    { '@type': 'PropertyValue', name: 'Customization', value: product.customization.join(', ') },
+    { '@type': 'PropertyValue', name: specLabel, value: specValues.join(' / ') },
+    { '@type': 'PropertyValue', name: 'Suitable For', value: suitableFor },
+    { '@type': 'PropertyValue', name: 'Customization', value: customization.join(', ') },
   ],
 };
 
@@ -57,13 +74,15 @@ const breadcrumbSchema = {
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: t.common.home, item: `${SITE_URL}${p('/')}` },
     { '@type': 'ListItem', position: 2, name: t.common.nav.products, item: `${SITE_URL}${p('/products.html')}` },
-    { '@type': 'ListItem', position: 3, name: category.label, item: `${SITE_URL}${p('/products.html')}#${product.category}` },
-    { '@type': 'ListItem', position: 4, name: product.name, item: pageUrl },
+    { '@type': 'ListItem', position: 3, name: categoryLabel, item: `${SITE_URL}${p('/products.html')}#${product.category}` },
+    { '@type': 'ListItem', position: 4, name, item: pageUrl },
   ],
 };
+
+const relatedLocalized = related.map((pr) => ({ ...pr, name: getProductTranslation(locale, pr.slug)?.name ?? pr.name }));
 ---
 <BaseLayout
-  title={`${product.name} | HADARA Hospitality`}
+  title={`${name} | HADARA Hospitality`}
   description={metaDescription}
   path={`/products/${product.slug}.html`}
   locale={locale}
@@ -78,10 +97,10 @@ const breadcrumbSchema = {
   <main>
     <section class="pdp-hero">
       <div class="wrap">
-        <p class="breadcrumb"><a href={p('/products.html')}>{t.common.nav.products}</a><span>/</span><a href={`${p('/products.html')}#${product.category}`}>{category.label}</a><span>/</span>{product.name}</p>
-        <p class="eyebrow light">{category.label.toUpperCase()}</p>
+        <p class="breadcrumb"><a href={p('/products.html')}>{t.common.nav.products}</a><span>/</span><a href={`${p('/products.html')}#${product.category}`}>{categoryLabel}</a><span>/</span>{name}</p>
+        <p class="eyebrow light">{categoryLabel.toUpperCase()}</p>
         <h1>{heroSuffix ? <>{heroBase} <em>{heroSuffix}</em></> : heroBase}</h1>
-        <p class="pdp-tagline">{product.overview}</p>
+        <p class="pdp-tagline">{overview}</p>
         <div class="pdp-actions">
           <a class="button button-gold" href={quoteLink}>{pd.requestQuoteFor} <span>↗</span></a>
           <a class="button button-gold technical-sheet-download" href={`/technical-sheets/${product.slug}.pdf`} download={`${product.slug}-technical-sheet.pdf`}>{pd.downloadSheet}</a>
@@ -91,9 +110,9 @@ const breadcrumbSchema = {
     <section class="pdp-main wrap">
       <div class="pdp-gallery">
         {product.main ? (
-          <div class="pdp-gallery-main" data-bg={product.main} role="img" aria-label={product.name}></div>
+          <div class="pdp-gallery-main" data-bg={product.main} role="img" aria-label={name}></div>
         ) : (
-          <div class="pdp-gallery-main pdp-gallery-placeholder" role="img" aria-label={`${product.name} — photo coming soon`}><span>Photo coming soon</span></div>
+          <div class="pdp-gallery-main pdp-gallery-placeholder" role="img" aria-label={`${name} — photo coming soon`}><span>Photo coming soon</span></div>
         )}
         {galleryExtras.length > 0 && (
           <div class="pdp-gallery-thumbs">
@@ -105,12 +124,12 @@ const breadcrumbSchema = {
         <p class="eyebrow">{pd.overview}</p>
         <h2>{pd.builtFor1} <em>{pd.builtFor2}</em></h2>
         <div class="pdp-quickfacts">
-          <span><strong>{pd.material}</strong>{product.material}</span>
-          <span><strong>{pd.category}</strong>{category.label}</span>
-          <span><strong>{pd.suitableFor}</strong>{product.suitableFor}</span>
+          <span><strong>{pd.material}</strong>{material}</span>
+          <span><strong>{pd.category}</strong>{categoryLabel}</span>
+          <span><strong>{pd.suitableFor}</strong>{suitableFor}</span>
         </div>
         <ul class="pdp-features">
-          {product.features.map((f) => <li>{f}</li>)}
+          {features.map((f) => <li>{f}</li>)}
         </ul>
         <a class="text-link" href={quoteLink}>{pd.requestQuoteFor} <span>↗</span></a>
       </div>
@@ -120,21 +139,21 @@ const breadcrumbSchema = {
         <p class="eyebrow">{pd.specifications}</p>
         <h2>{pd.technicalDetails1} <em>{pd.technicalDetails2}</em></h2>
         <dl class="spec-table">
-          <div class="spec-row"><dt>{pd.category}</dt><dd>{category.label}</dd></div>
-          <div class="spec-row"><dt>{pd.material}</dt><dd>{product.material}</dd></div>
-          <div class="spec-row"><dt>{product.specLabel}</dt><dd>{product.specValues.join(' / ')}</dd></div>
-          <div class="spec-row"><dt>{pd.suitableFor}</dt><dd>{product.suitableFor}</dd></div>
-          <div class="spec-row"><dt>{pd.customization}</dt><dd><ul class="chip-list">{product.customization.map((c) => <li>{c}</li>)}</ul></dd></div>
+          <div class="spec-row"><dt>{pd.category}</dt><dd>{categoryLabel}</dd></div>
+          <div class="spec-row"><dt>{pd.material}</dt><dd>{material}</dd></div>
+          <div class="spec-row"><dt>{specLabel}</dt><dd>{specValues.join(' / ')}</dd></div>
+          <div class="spec-row"><dt>{pd.suitableFor}</dt><dd>{suitableFor}</dd></div>
+          <div class="spec-row"><dt>{pd.customization}</dt><dd><ul class="chip-list">{customization.map((c) => <li>{c}</li>)}</ul></dd></div>
         </dl>
         <div class="info-box"><strong>{pd.productionSupply}</strong>{pd.productionSupplyBody}</div>
       </div>
     </section>
-    {related.length > 0 && (
+    {relatedLocalized.length > 0 && (
       <section class="pdp-related wrap">
         <p class="eyebrow">{pd.youMayAlsoLike}</p>
-        <h2>{pd.moreFrom} <em>{category.label}.</em></h2>
+        <h2>{pd.moreFrom} <em>{categoryLabel}.</em></h2>
         <div class="related-grid">
-          {related.map((pr) =>
+          {relatedLocalized.map((pr) =>
             pr.main ? (
               <a class="related-card" href={p(`/products/${pr.slug}.html`)} data-bg={pr.main}><span>{pr.name}</span></a>
             ) : (
