@@ -326,6 +326,25 @@ form. Added 2026-09-18.
   present into a generic `RfqProductMeta` object — add a new param (thread
   count, size, SKU, ...) on the producer side and it flows through
   automatically, no form changes needed.
+- **Bug found and fixed 2026-09-19, non-English-only (an English-only check
+  couldn't have caught it)**: `applyProductFromUrl()` pre-checks the
+  matching "Products Required" checkbox by looking up
+  `input[name="categories"][value="<English string>"]` (via
+  `LEGACY_CATEGORY_TO_RFQ_CATEGORY` in `src/lib/rfq.ts`). But
+  `GetAQuoteView.astro` used to render each checkbox's `value` from the
+  *locale's own translated* `f.productCategories` array — so on `/ar`,
+  `/fr`, `/ru` the checkbox `value` was Arabic/French/Russian text, never
+  matched the English lookup string, and arriving from a product page
+  silently pre-checked nothing. Fixed by zipping
+  `en.getAQuote.form.productCategories` (imported directly, always
+  English) as each checkbox's stable `value` with the current locale's
+  `f.productCategories` (same array, translated) as the visible `<span>`
+  label — same "stable English value, translated display text" pattern
+  CLAUDE.md's i18n section already documents for the country/category
+  `<select>` values elsewhere on the site, just not yet applied here.
+  Verified the fix pre-checks correctly in all 4 locales while each
+  locale's submitted category value stays the same stable English string
+  the owner's notification email already expects.
 - **What's fully functional now**: end-to-end client + server validation,
   file type/size checks, honeypot + minimum-time-on-form anti-spam gate (a
   submission that trips either one gets a fake-success response so a bot
