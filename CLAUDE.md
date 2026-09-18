@@ -573,7 +573,24 @@ above, which is still English-only.
   content exists yet; do not fabricate.
 - **Self-hosting product/blog images off the Wix account** — flagged as a
   real business risk (single point of failure), not yet resolved; this
-  sandbox can't fetch `static.wixstatic.com` to re-host the files locally.
+  sandbox can't fetch `static.wixstatic.com` to re-host the files locally,
+  or even `curl` a single URL to check it's still alive — confirmed this
+  the hard way 2026-09-19, when the owner reported the homepage's
+  "Robes & Slippers" collection card (`HomeView.astro`) showing no image.
+  Its `data-bg` pointed at a Wix media ID referenced nowhere else in the
+  codebase — almost certainly a bad copy from the original conversion —
+  and couldn't be fetched or inspected from here to confirm, only worked
+  around by pointing it at the "Luxury Waffle Bathrobe" product's own
+  `main` image instead — an ID already proven live elsewhere (its own
+  product page, a blog article's inline image), and deliberately *not*
+  any image already shown elsewhere on the homepage itself (the
+  "Luxury Terry Bathrobe" one in the featured-products carousel was the
+  first instinct, but reused it verbatim, so the same photo would've
+  shown twice on one page). If another card/image ever looks blank
+  again, check whether its exact media ID is referenced anywhere else in
+  `src/` first — an orphaned one-off ID is the likely culprit, same as
+  this one, since this sandbox still can't verify a Wix URL directly —
+  and prefer a replacement not already used elsewhere on the *same page*.
 - **Real MOQ / lead-time figures per category** — see "MOQ & lead time on
   product pages" above; every product page currently shows placeholder
   numbers the owner hasn't confirmed yet.
