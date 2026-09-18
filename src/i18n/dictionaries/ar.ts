@@ -246,6 +246,8 @@ export const ar: DeepPartial<Dictionary> = {
       country: 'الدولة',
       countryPlaceholder: 'اختر الدولة',
       city: 'المدينة',
+      cityPlaceholderLocked: 'اختر الدولة أولاً',
+      cityPlaceholderReady: 'اختر المدينة',
       preferredContact: 'طريقة التواصل المفضلة',
       preferredContactOptions: ['البريد الإلكتروني', 'واتساب', 'الهاتف'],
 

@@ -3,6 +3,7 @@
 // fetch (no more mailto:), and analytics event hooks. Guarded so this is a
 // no-op import on every other page.
 import { isValidRfqFile, RFQ_FILE_MAX_BYTES, RFQ_BLOB_PATH_PREFIX, LEGACY_CATEGORY_TO_RFQ_CATEGORY, type RfqProductMeta } from '../lib/rfq';
+import { CITIES_BY_COUNTRY } from '../data/cities';
 import { upload } from '@vercel/blob/client';
 
 const form = document.querySelector<HTMLFormElement>('#rfq-form');
@@ -78,6 +79,35 @@ if (form) {
       autoCheckedCategory = null;
     }
   });
+
+  // --- Country -> City cascading dropdowns --------------------------------
+  // The City select starts disabled with a "select a country first" option;
+  // choosing a country repopulates it with just that country's cities (from
+  // CITIES_BY_COUNTRY) and enables it. Applies to both the Country/City pair
+  // (section 1) and the Required Delivery Country/City pair (section 3).
+  function wireCountryCity(countrySelect: HTMLSelectElement | null, citySelect: HTMLSelectElement | null) {
+    if (!countrySelect || !citySelect) return;
+    const lockedPlaceholder = citySelect.querySelector<HTMLOptionElement>('option[value=""]')?.textContent ?? '';
+    const readyPlaceholder = citySelect.dataset.readyPlaceholder ?? lockedPlaceholder;
+
+    countrySelect.addEventListener('change', () => {
+      const cities = CITIES_BY_COUNTRY[countrySelect.value] ?? [];
+      citySelect.innerHTML = '';
+      const placeholderOption = document.createElement('option');
+      placeholderOption.value = '';
+      placeholderOption.textContent = cities.length ? readyPlaceholder : lockedPlaceholder;
+      citySelect.appendChild(placeholderOption);
+      for (const city of cities) {
+        const option = document.createElement('option');
+        option.value = city;
+        option.textContent = city;
+        citySelect.appendChild(option);
+      }
+      citySelect.disabled = cities.length === 0;
+    });
+  }
+  wireCountryCity(form.querySelector<HTMLSelectElement>('#rfq-country'), form.querySelector<HTMLSelectElement>('#rfq-city'));
+  wireCountryCity(form.querySelector<HTMLSelectElement>('#rfq-delivery-country'), form.querySelector<HTMLSelectElement>('#rfq-delivery-city'));
 
   // --- File upload: drag-and-drop + validation ----------------------------
   const dropzone = form.querySelector<HTMLElement>('#rfq-dropzone');

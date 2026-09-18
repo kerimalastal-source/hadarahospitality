@@ -58,11 +58,13 @@ const p = (path: string) => localizePath(locale, path);
               {f.hotelCategoryOptions.map((option) => <option value={option}>{option}</option>)}
             </select></label>
             <label>{f.rooms}<input name="roomsKeys" type="number" min="0" step="1" inputmode="numeric" /><small class="rfq-help">{f.roomsHelp}</small></label>
-            <label>{f.country}<select name="country" autocomplete="country-name">
+            <label>{f.country}<select name="country" id="rfq-country" autocomplete="country-name">
               <option value="">{f.countryPlaceholder}</option>
               {WORLD_COUNTRIES.map((country) => <option value={country}>{country}</option>)}
             </select></label>
-            <label>{f.city}<input name="city" autocomplete="address-level2" /></label>
+            <label>{f.city}<select name="city" id="rfq-city" autocomplete="address-level2" disabled data-ready-placeholder={f.cityPlaceholderReady}>
+              <option value="">{f.cityPlaceholderLocked}</option>
+            </select></label>
           </div>
           <div class="rfq-field-block">
             <span class="rfq-label">{f.preferredContact}</span>
@@ -95,11 +97,13 @@ const p = (path: string) => localizePath(locale, path);
               <option value="">{f.projectTypePlaceholder}</option>
               {f.projectTypeOptions.map((option) => <option value={option}>{option}</option>)}
             </select></label>
-            <label class="rfq-required">{f.deliveryCountry}<select name="deliveryCountry" required autocomplete="country-name">
+            <label class="rfq-required">{f.deliveryCountry}<select name="deliveryCountry" id="rfq-delivery-country" required autocomplete="country-name">
               <option value="">{f.deliveryCountryPlaceholder}</option>
               {WORLD_COUNTRIES.map((country) => <option value={country}>{country}</option>)}
             </select></label>
-            <label>{f.deliveryCity}<input name="deliveryCity" /></label>
+            <label>{f.deliveryCity}<select name="deliveryCity" id="rfq-delivery-city" disabled data-ready-placeholder={f.cityPlaceholderReady}>
+              <option value="">{f.cityPlaceholderLocked}</option>
+            </select></label>
             <label>{f.targetDeliveryDate}<input name="targetDeliveryDate" type="date" /></label>
           </div>
           <div class="rfq-field-row-2">

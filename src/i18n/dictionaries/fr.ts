@@ -246,6 +246,8 @@ export const fr: DeepPartial<Dictionary> = {
       country: 'Pays',
       countryPlaceholder: 'Sélectionnez le pays',
       city: 'Ville',
+      cityPlaceholderLocked: "Sélectionnez d'abord un pays",
+      cityPlaceholderReady: 'Sélectionnez une ville',
       preferredContact: 'Moyen de contact préféré',
       preferredContactOptions: ['E-mail', 'WhatsApp', 'Téléphone'],
 
