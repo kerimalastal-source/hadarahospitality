@@ -16,13 +16,15 @@ const today = new Date().toISOString().slice(0, 10);
 
 const staticPages = [
   { path: '/', priority: '1.0' },
-  { path: '/about.html', priority: '0.7' },
-  { path: '/products.html', priority: '0.9' },
-  { path: '/blog.html', priority: '0.7' },
-  { path: '/get-a-quote.html', priority: '0.8' },
-  { path: '/contact.html', priority: '0.6' },
-  { path: '/faq.html', priority: '0.6' },
-  { path: '/privacy-policy.html', priority: '0.3' },
+  { path: '/about', priority: '0.7' },
+  { path: '/products', priority: '0.9' },
+  { path: '/blog', priority: '0.7' },
+  { path: '/get-a-quote', priority: '0.8' },
+  { path: '/hotel-opening-package', priority: '0.8' },
+  { path: '/fabric-quality-guide', priority: '0.6' },
+  { path: '/contact', priority: '0.6' },
+  { path: '/faq', priority: '0.6' },
+  { path: '/privacy-policy', priority: '0.3' },
 ];
 
 interface Entry {
@@ -33,8 +35,8 @@ interface Entry {
 
 const entries: Entry[] = [
   ...staticPages,
-  ...PRODUCTS.map((p) => ({ path: `/products/${p.slug}.html`, priority: '0.6' })),
-  ...ARTICLES.map((a) => ({ path: `/blog/${a.slug}.html`, priority: '0.5', lastmod: a.date })),
+  ...PRODUCTS.map((p) => ({ path: `/products/${p.slug}`, priority: '0.6' })),
+  ...ARTICLES.map((a) => ({ path: `/blog/${a.slug}`, priority: '0.5', lastmod: a.date })),
 ];
 
 function alternateLinks(path: string): string {

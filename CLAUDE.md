@@ -32,10 +32,18 @@ prose in English so it stays easy to scan.
   (`ARTICLES`) at build time via `getStaticPaths()`. To change a product or
   article, edit the data file — there is no separate generator script and
   nothing to regenerate or hand-edit; the page is built fresh every time.
-- `astro.config.mjs` sets `build.format: 'file'` so output paths match the
-  original URL scheme exactly (`/about.html`, `/products/<slug>.html`,
-  `/blog/<slug>.html`, etc.) — this preserves every link, the sitemap, and
-  SEO URLs from the pre-conversion site.
+- `astro.config.mjs` sets `build.format: 'directory'` — every route builds
+  to `<path>/index.html`, served at a clean, extension-less URL
+  (`/about`, `/products/<slug>`, `/blog/<slug>`, etc.) by Vercel's standard
+  directory-index-file serving convention, with zero extra Vercel config
+  needed. Changed 2026-09-18 from the original conversion's `format: 'file'`
+  (which matched the old Wix-era `.html`-suffixed URLs) at the owner's
+  request — they confirmed no `.html` links are shared anywhere, so no
+  redirect safety net was added for the old URLs; they now 404. The one
+  exception is `404.astro` itself, which Astro always builds to
+  `dist/404.html` regardless of `build.format` — this is unrelated to the
+  URL scheme (it's Astro's fixed convention for the root error page) and
+  needs no special handling elsewhere in the codebase.
 - Shared UI lives in `src/components/` (`Header.astro`, `Footer.astro`,
   `WhatsAppFloat.astro`, `BackToTop.astro`, `icons/`) and
   `src/layouts/BaseLayout.astro` (head
@@ -51,11 +59,28 @@ prose in English so it stays easy to scan.
   anything under `public/technical-sheets/`, `public/sitemap.xml` or
   `public/search-index.json` — they're ignored on purpose.
 - Client-side only: `src/scripts/site.ts` builds the quote/contact
-  `mailto:` links, handles the mobile nav toggle and lazy-loads `data-bg`
-  images via `IntersectionObserver` — nothing is sent to or stored on a
+  `mailto:` links, handles the mobile nav toggle, lazy-loads `data-bg`
+  images via `IntersectionObserver`, and drives the `[data-carousel-track]`
+  featured-products carousel (arrow buttons + a gentle auto-scrolling
+  ping-pong drift, added 2026-09-18, pauses on hover/touch/focus, skipped
+  under `prefers-reduced-motion`) — nothing is sent to or stored on a
   server. `src/scripts/search.ts` does client-side substring search over
   `search-index.json`. No cookies, no analytics (Google Analytics is
   explicitly deferred, no GA4 ID supplied).
+  **Two scroll-animation gotchas from building the auto-scroll**, worth
+  knowing before touching any `overflow-x:auto` track again: (1) a
+  per-frame delta under 1px written via `el.scrollLeft += x` gets rounded
+  away by the property setter and never accumulates — keep the running
+  position in a JS float variable instead of reading it back from the DOM;
+  (2) `scroll-behavior: smooth` in CSS applies to *any* write to
+  `scrollLeft`, not just `scrollTo`/`scrollBy` calls, so animating a
+  near-zero delta every frame queues up and visibly lags — use
+  `el.scrollTo({ left, behavior: 'auto' })` to force an instant write
+  regardless of the element's CSS. Also, `scroll-snap-type: mandatory` on
+  a track snaps the position back after *every* programmatic write, not
+  just after a user gesture ends — it was removed from `.featured-track`
+  for this reason (the arrow buttons already scroll by an exact card
+  width and never relied on snap-correction).
 - `npm run check` runs `astro check` (TypeScript + template diagnostics) —
   run it after editing `.astro` files or `src/data/*.ts`.
 
@@ -67,7 +92,7 @@ manual switch required. **All content is now fully translated in all 4
 languages**: full routing for every page (zero 404s anywhere), RTL layout
 for Arabic, the language switcher, hreflang tags, the auto-detect-and-
 redirect middleware, every static page's body copy, the 6 product category
-names (`common.categoryLabels`), and all 23 products' and all 10 articles'
+names (`common.categoryLabels`), and all 29 products' and all 10 articles'
 actual content (name/overview/features/specs, and full article bodies) —
 see `src/i18n/dictionaries/{ar,fr,ru}.ts`, `src/data/products.i18n.ts` and
 `src/data/blog.i18n.ts`.
@@ -132,11 +157,11 @@ than breaking anything, so translation work can always ship incrementally.
 - `scripts/build-sitemap.ts` emits every page × every locale with
   `<xhtml:link rel="alternate" hreflang="...">` annotations, so each
   language version can be indexed and ranked in its own market.
-- The homepage is the one special case in the URL scheme: because of how
-  Astro's `build.format: 'file'` handles a nested index route, the
-  localized homepage is a flat `/ar.html` / `/fr.html` / `/ru.html` (not
-  `/ar/index.html`) — `localizePath()` already special-cases this, but
-  don't hand-build a homepage URL any other way.
+- The localized homepage is just `/ar`, `/fr`, `/ru` (Astro's
+  `build.format: 'directory'` output makes these ordinary directory-index
+  routes, `/ar/index.html` etc., same as any other page) —
+  `localizePath()` handles this with no special-casing needed; still go
+  through it rather than hand-building a homepage URL.
 - Fonts: the Google Fonts link in `BaseLayout.astro` also loads Cairo +
   Markazi Text (Arabic) and Manrope (Cyrillic fallback) alongside DM
   Sans/Playfair Display, so glyphs render correctly without any per-locale
@@ -157,6 +182,44 @@ than breaking anything, so translation work can always ship incrementally.
 - Nav search icon and WhatsApp float icon are shared inline-SVG components
   (`src/components/icons/`), used consistently everywhere — see the
   resolved known issue note below.
+- `src/components/icons/TurkeyFlagIcon.astro` (added 2026-09-19, owner's
+  request) is a small inline-SVG Turkish flag, hand-drawn (not a raster
+  asset) so it stays crisp at any size and needs no external file. Sits in
+  the top announcement bar (`BaseLayout.astro`, every page) right next to
+  the "ISTANBUL, TÜRKIYE" text, with a 1px translucent gold `outline`
+  (`.flag-icon` in `global.css`) so the flag's own red/white reads as a
+  deliberate badge against the navy bar rather than a clashing color, in
+  keeping with the site's navy/gold/cream palette. Positioned via a
+  same-line `.announcement-location` wrapper span (not raw flex-gap on the
+  bar's three top-level chunks) so its spacing to the location text is
+  independent of the existing gap between the location/star/tagline
+  groups. Verified RTL: `document.documentElement.scrollWidth` still
+  equals `innerWidth` on `/ar` with the flag in place, and it lands at the
+  visual start of the bar (the right edge in `dir="rtl"`) the same way it
+  lands at the start (the left edge) in LTR, since it's the first child of
+  a `display:flex` container that already respects `dir`.
+- `public/assets/hadara-logo-black.png` (2026-09-18) is the real "HE"
+  calligraphic monogram, supplied by the owner via Google Drive and cropped/
+  background-removed here. The original conversion's
+  `hadara-logo-black.svg` was a hand-traced approximation done without the
+  source file (thinner strokes, visibly different from the real mark) —
+  the owner flagged it as wrong; that file is now deleted. The real source
+  is icon-only (no "HADARA" wordmark baked in, unlike the old SVG), so the
+  header (`Header.astro`) now renders the icon image plus real
+  `<strong>HADARA</strong><small>HOSPITALITY</small>` text next to it,
+  matching the pattern the footer's brand mark already used — better for
+  accessibility/SEO than text baked into an image, too. Still referenced
+  from `Organization.logo` in the `HomeView`/`ArticleView` JSON-LD.
+  `public/assets/hadara-logo-gold.png` is the same mark recolored gold
+  (`#c5a059`), for the navy-background contexts the black version has no
+  contrast on — the footer's brand link (`Footer.astro`, previously a
+  plain lettered "H" in a bordered box) and every favicon size,
+  `apple-touch-icon.png`, and the logo badge inside `og-image.png` (all
+  under `public/assets/`, generated by compositing the gold mark onto a
+  navy square/patching it into the existing OG banner — see git history
+  for the exact script if regenerating) now use it too, replacing what
+  had been an unrelated generic serif "H" placeholder never derived from
+  either mark.
 
 ## Git workflow for this repo
 
@@ -201,6 +264,304 @@ The icons themselves are shared components (`src/components/icons/`) used
 by every page, so there's also no more per-generator-script copy of the SVG
 markup to fall out of sync.
 
+## RFQ ("Request a Quote") system
+
+`/get-a-quote` (`src/views/GetAQuoteView.astro`) is a full B2B RFQ form
+(4 sections: Contact & Property, Products Required, Project & Delivery,
+Specifications & Documents), replacing the old single mailto-only quote
+form. Added 2026-09-18.
+
+- **Submission**: `api/submit-quote.ts` — a Vercel Edge Function at the
+  project root, **outside `src/`** on purpose: the site itself stays a
+  fully static Astro build (see "Stack" above), and Vercel deploys any file
+  under `/api` as a serverless/edge function independently of that, with
+  zero framework config. Edge runtime (not Node) was chosen specifically to
+  get the standard Web `Request`/`Response`/`FormData` APIs for free, so
+  multipart parsing needs no extra dependency. `src/scripts/rfq-form.ts` is
+  the client side: URL-param product pre-selection, drag-and-drop file
+  upload with client validation, native `checkValidity()`/`reportValidity()`
+  for required/email fields plus a manual check for "at least one product
+  category", fetch submission with loading/success/error states and
+  duplicate-submit prevention, and `window.dispatchEvent(new
+  CustomEvent(...))` analytics hooks (`quote_form_started`,
+  `product_selected`, `rfq_file_uploaded`, `quote_form_submitted`,
+  `quote_form_success`) — no analytics provider is wired up, per the
+  existing "no analytics yet" convention; hook a listener to these events
+  once one is.
+- **Data model**: `src/lib/rfq.ts` — `RfqSubmission`/`RfqProductMeta` types,
+  file validation constants (`RFQ_FILE_MAX_BYTES` = 10 MB,
+  `RFQ_FILE_EXTENSIONS`), `isValidWorkEmail`, and
+  `LEGACY_CATEGORY_TO_RFQ_CATEGORY` (maps a product page's existing
+  `?category=` value to the new form's product-category checkboxes).
+  Imported by both the client script and the Edge function, so validation
+  rules can't drift between the two.
+- **Country fields** (`src/data/countries.ts`'s `WORLD_COUNTRIES`, ~197
+  entries): both *Country* (section 01, optional) and *Required Delivery
+  Country* (section 03, still required) are `<select>` dropdowns using the
+  same list — made consistent 2026-09-18 after the owner pointed out having
+  one as a dropdown and the other as required free text read as
+  inconsistent/unpolished. Country names are kept in English across all
+  locales (no per-locale translation), same convention as product category
+  values, so the value stays a stable canonical string in the owner's
+  internal notification email regardless of visitor language.
+- **City fields cascade from Country** (2026-09-18): *City* and *Required
+  Delivery City* are `<select>` dropdowns too now, not free text — each
+  starts `disabled` with a "select a country first" placeholder, and
+  `src/scripts/rfq-form.ts`'s `wireCountryCity()` repopulates and enables
+  it on the matching Country/`deliveryCountry` select's `change` event,
+  showing only that country's cities. `src/data/cities.ts` is the
+  `CITIES_BY_COUNTRY: Record<string, string[]>` data behind this — top
+  ~40 cities per country by population, generated from the
+  GeoNames-derived `all-the-cities` npm package (not a runtime
+  dependency — used once to generate this file, keyed by the exact
+  `WORLD_COUNTRIES` name strings so the two files can't drift silently).
+  Same English-names-everywhere convention as `WORLD_COUNTRIES`. Both
+  city selects stay optional (`deliveryCountry` is still the only
+  required field in that pair) — a disabled `<select>` is simply excluded
+  from `FormData` on submit, so nothing extra was needed server-side.
+- **Product hand-off**: any page can pre-fill the form via query params —
+  `?product=<name>&slug=<slug>&category=<legacy formCategory>&material=<...>&gsm=<...>`
+  (see `ProductView.astro`'s `quoteParams`). The parsing side
+  (`applyProductFromUrl()` in `rfq-form.ts`) reads whichever params are
+  present into a generic `RfqProductMeta` object — add a new param (thread
+  count, size, SKU, ...) on the producer side and it flows through
+  automatically, no form changes needed.
+- **What's fully functional now**: end-to-end client + server validation,
+  file type/size checks, honeypot + minimum-time-on-form anti-spam gate (a
+  submission that trips either one gets a fake-success response so a bot
+  gets no feedback signal — see the code comment in `api/submit-quote.ts`
+  before "fixing" this if it looks like a bug), a generated
+  `RFQ-<year>-<6 chars>` reference number (via `crypto.randomUUID()`,
+  server-side only — never generate this client-side), and **email
+  notifications** (added 2026-09-18, see below).
+- **Email**: `notifyHadaraTeam()` sends the internal "New RFQ — ..." email to
+  `CONTACT_EMAIL` (`partnerships@hadarahospitality.com`, from
+  `src/config.ts` — override with `RFQ_NOTIFY_EMAIL` if it should ever go
+  elsewhere) with every submitted field in a readable table;
+  `confirmToCustomer()` sends a short thank-you + reference number to the
+  submitter's own work email. Both go through Resend
+  (`api.resend.com/emails` via plain `fetch`, no SDK dependency).
+  **`RESEND_API_KEY` was set in Vercel's env vars 2026-09-18** — confirmed
+  via runtime logs that it's picked up (no more "not set, skipping"), but
+  sending itself is still blocked: Resend's sandbox mode only allows
+  sending to the account's own signup address
+  (`kerim.alastal@gmail.com`) until `hadarahospitality.com` is verified as
+  a sending domain, so both `notifyHadaraTeam` (→
+  `partnerships@hadarahospitality.com`) and `confirmToCustomer` (→
+  whatever the submitter's own work email is) currently 403 unless that
+  happens to be the account email — confirmed via a live test submission
+  (`RFQ-2026-2BBB56`) whose customer-confirmation happened to succeed only
+  because the test used that exact address, while the internal
+  notification failed. **Domain verification in progress**: the 4 DNS
+  records Resend's dashboard (resend.com/domains) asks for — a
+  `resend._domainkey` TXT (DKIM), `rsend`/`send` CNAMEs, and an optional
+  `_dmarc` TXT — were added in Natro's (the domain registrar) DNS panel,
+  but as of the last check (direct query against
+  `ns1.natrohost.com`/`ns2.natrohost.com`, the domain's actual
+  authoritative nameservers) they hadn't propagated yet, and oddly didn't
+  match what Natro's own panel displayed as the existing SPF record
+  either (the live root TXT is `v=spf1 include:_spf.google.com ~all` +
+  a Google site-verification TXT, not the `_spfcls.natrohost.com` one
+  the panel showed) — worth re-querying before assuming it's just normal
+  propagation delay if it still hasn't shown up after an hour or so.
+  Once verified, also set `RESEND_FROM_EMAIL` (e.g. `HADARA Hospitality
+  <rfq@hadarahospitality.com>`) to send from the real domain instead of
+  Resend's sandbox address (`onboarding@resend.dev`).
+- **File storage — client uploads, resolved 2026-09-18**: a first attempt
+  (same day, briefly merged as PR #26) called `@vercel/blob`'s `put()`
+  directly from `api/submit-quote.ts` and broke the production deployment
+  (`NOW_SANDBOX_WORKER_EDGE_FUNCTION_UNSUPPORTED_MODULES` — `@vercel/blob`
+  pulls in Node built-ins the Edge sandbox rejects at build time; reverted
+  the same day). The actual fix, now shipped: **client uploads**, Vercel
+  Blob's own recommended pattern for exactly this situation.
+  - `api/blob-upload.ts` — a Vercel **Node.js** Function (no `runtime:
+    'edge'` config — Node.js is the default), using the classic `(req,
+    res)` signature with small hand-rolled `VercelRequest`/`VercelResponse`
+    types instead of the `@vercel/node` package (which pulled in ~100
+    unrelated packages and several vulnerable transitive deps for what's
+    purely a type-only import — not worth it for two interface
+    declarations). Its only job: call `@vercel/blob/client`'s
+    `handleUpload()` to issue a short-lived upload token, after checking
+    the requested pathname starts with `RFQ_BLOB_PATH_PREFIX` ('rfq/') and
+    enforcing `RFQ_FILE_MIME_TYPES`/`RFQ_FILE_MAX_BYTES` server-side
+    (`onBeforeGenerateToken`) — defense in depth in case something calls
+    this endpoint directly, bypassing the client's own pre-validation.
+  - `src/scripts/rfq-form.ts` — on submit, if a file is selected, calls
+    `@vercel/blob/client`'s `upload()` (pointing `handleUploadUrl` at
+    `/api/blob-upload`) **before** the `/api/submit-quote` fetch. The file
+    bytes go straight from the browser to Blob storage; only the resulting
+    URL + name/size/type are then sent to `/api/submit-quote` as plain
+    form fields (`fileUrl`/`fileName`/`fileSize`/`fileType`) — the raw file
+    is deleted from that FormData first. This works in the browser because
+    `@vercel/blob`'s `package.json` has a `"browser"` field remapping its
+    Node dependencies (`undici`, `crypto`, `stream`) to small browser-safe
+    shims, which Vite's client build picks up automatically — verified by
+    grepping the actual built bundle for Node built-in references (found
+    none) after shipping this, not just assumed.
+  - **A failed upload doesn't block the submission**: the file was always
+    optional, so `upload()` throwing (e.g. `BLOB_READ_WRITE_TOKEN` still
+    unset) is caught, shows `f.uploadErrorFailed` inline, and the form
+    still submits without the attachment rather than getting the visitor
+    stuck. Verified this exact path with Playwright against a static
+    preview server (where `/api/blob-upload` 404s, since Vercel Functions
+    don't run under `astro preview`) before considering it done.
+  - `api/submit-quote.ts` no longer touches `@vercel/blob` at all or
+    receives the raw file — it just validates the `fileUrl` actually looks
+    like a Vercel Blob public URL (`isValidRfqBlobUrl()` in
+    `src/lib/rfq.ts`) before trusting it enough to embed in the internal
+    notification email, since a client could otherwise submit an arbitrary
+    URL in that field.
+  - Needs `BLOB_READ_WRITE_TOKEN` set (see "Email" above for the general
+    pattern — Storage tab → Create Database → Blob, auto-injected, no
+    external account) for uploads to actually succeed; until then, every
+    upload attempt fails and degrades per the point above.
+- **What's still stubbed**: `syncToHubSpot` needs `HUBSPOT_ACCESS_TOKEN`.
+- **Lesson from the above**: `npx tsc --noEmit` / `astro check` passing
+  locally does **not** guarantee an `api/*.ts` Edge Function will actually
+  build on Vercel — Astro's own tsconfig uses lenient `Bundler` module
+  resolution, but Vercel's real Edge Function bundler enforces stricter
+  Node ESM rules (explicit `.js` extensions on relative imports — already
+  fixed in `api/submit-quote.ts`) and, more importantly, can't be
+  emulated locally at all for runtime-environment failures like the
+  Node-built-in-modules-in-Edge one above. After any change to `api/`,
+  don't just build locally — check the resulting Vercel deployment's
+  state after pushing/merging (the Vercel MCP tools can pull deployment
+  state and build logs; a `state: "ERROR"` deployment needs `errorMessage`
+  read via `get_deployment`, and `get_deployment_build_logs` for compile-time
+  errors) before telling the owner it's done.
+- **A CSS gotcha that bit this feature twice**: an element toggled with the
+  plain `hidden` **attribute** stays visible if any author stylesheet rule
+  also sets `display` on it (e.g. `.foo{display:flex}` beats the browser's
+  own `[hidden]{display:none}`, because author-origin CSS always wins over
+  user-agent CSS regardless of specificity). Every `.rfq-*` class that sets
+  its own `display` and is also toggled via `.hidden = true/false` in
+  `rfq-form.ts` needs an explicit `.foo[hidden]{display:none}` override
+  next to it (see `global.css` around `.rfq-selected-product[hidden]`,
+  `.rfq-file-chip[hidden]`, `.rfq-form input[type="file"]`). `type="hidden"`
+  inputs don't have this problem (`display:none !important` in the browser's
+  own UA stylesheet) — only the boolean `hidden` attribute does. Watch for
+  this pattern anywhere else `hidden` gets toggled on a flex/grid element.
+- **i18n**: fully translated into ar/fr/ru as of 2026-09-18 — every field
+  label, placeholder, dropdown/chip/segmented option, validation message
+  and success-state string under `getAQuote.form`. Same fallback mechanism
+  as the rest of the site still applies to anything added later.
+- **A real RTL layout bug this surfaced, not just a screenshot artifact**:
+  the honeypot field (`.rfq-honeypot`) used `position:absolute;
+  left:-9999px` to hide it off-screen — standard-looking, but in a
+  `dir="rtl"` document, browsers include negatively-offset absolutely
+  positioned descendants in the *document's* horizontal scrollable area
+  (unlike LTR, where they're simply clipped and ignored). Confirmed via
+  `document.documentElement.scrollWidth` (11199px in `ar`, a correct
+  1200px in `en`, same page, same viewport — `document.body.scrollWidth`
+  stayed 1200 in both, which is why this is easy to miss testing only
+  `body`). A real Arabic visitor could scroll the page sideways into a
+  huge empty area. Fixed by dropping the offset entirely — `.rfq-honeypot`
+  now uses the standard `clip: rect(0,0,0,0)` visually-hidden pattern
+  (1×1px, `overflow:hidden`, no position offset needed) instead of moving
+  it off-canvas. **Lesson**: never hide an off-screen element with a large
+  negative `left`/`top`/`right`/`bottom` offset on a page that has (or
+  might later have) an RTL variant — use `clip`/`clip-path` sizing
+  instead, and when testing a new RTL page, check
+  `document.documentElement.scrollWidth` at a few viewport widths, not
+  just eyeballing a screenshot (a `fullPage` Playwright screenshot only
+  happens to visually reveal this exact bug by accident).
+
+## Hotel Opening Package (`/hotel-opening-package`)
+
+A dedicated landing page (added 2026-09-19, owner's idea) pitching the six
+product categories as one bundled request for a hotel that's opening —
+bed linen, towels, robes, pillows, mattress protection, amenities — instead
+of a visitor having to discover each collection separately. Fully static
+(prerendered in all 4 locales like every other marketing page, unlike the
+Partner Portal) and fully translated-with-fallback from day one — only
+`en.ts` has real copy so far, same "ships English-first, ar/fr/ru degrade
+to English until translated" pattern as everything else.
+
+- **Content stays in sync with the catalog automatically**:
+  `src/views/HotelOpeningPackageView.astro` picks one photographed product
+  per category straight from `PRODUCTS`/`CATEGORIES`/`CATEGORY_ORDER` in
+  `src/data/products.ts` (`PRODUCTS.find(p => p.category === key &&
+  p.main)`) rather than hardcoding slugs or image URLs — a category with no
+  photographed product yet (currently `amenities`) falls back to a plain
+  navy `.package-card-placeholder` card instead of a broken image.
+- **Every CTA pre-fills the RFQ form's Project Type** — links append
+  `?projectType=New%20Hotel%20Opening` ('New Hotel Opening' is already one
+  of `getAQuote.form.projectTypeOptions`, so no new dictionary value was
+  needed). `src/scripts/rfq-form.ts` gained a small standalone
+  `applyProjectTypeFromUrl()` alongside the existing `applyProductFromUrl()`
+  — deliberately independent of whether a `product` param is also present,
+  since this page's links only ever pass `projectType`.
+- Linked from the homepage (a new navy `.products-cta` banner right under
+  the hero, reusing that existing section class rather than inventing a new
+  one) and the footer's Explore column; also registered in both
+  `scripts/build-sitemap.ts`'s and `scripts/build-search-index.ts`'s
+  hardcoded static-page lists (neither is auto-discovered from
+  `src/pages/` — a new static marketing page needs adding to both by hand,
+  same as every other one already there).
+- New CSS in `global.css`: `.package-contents`/`.package-grid`/
+  `.package-card`(`-placeholder`) for the 6-category grid, and a
+  `.steps-4` modifier on the existing `.steps` component (which hardcodes
+  `repeat(5,1fr)` for the homepage's 5-step process) since this page's
+  "how it works" only has 4 steps.
+
+## MOQ & lead time on product pages
+
+Every product page's spec table (`src/views/ProductView.astro`, the same
+`dl.spec-table` as Material/GSM/Category/etc.) now shows a **Minimum Order
+Quantity** and **Estimated Lead Time** row, with a small `.spec-note`
+underneath reading "Indicative — confirmed as part of your quotation...".
+
+- **These are placeholder figures, not confirmed by the owner** — set
+  category-by-category (`CATEGORIES[key].moq`/`.leadTime` in
+  `src/data/products.ts`, e.g. towels: "100 pieces per style" / "3–4
+  weeks"), not fabricated per-product, and not to be read as real
+  commitments. The owner asked for this feature with real numbers TBD
+  ("استخدم قيم مؤقتة منطقية لحد ما تراجعها" — use reasonable placeholder
+  values until reviewed) — **flag this to the owner and get the real
+  per-category (or per-product, if they turn out to actually vary that
+  granularly) numbers before this ships to a real customer negotiating
+  a contract on them.** Update `CATEGORIES` directly once confirmed — no
+  other wiring needed, every product in that category picks it up
+  automatically.
+- Dictionary keys: `productDetail.moq`, `.leadTime`, `.moqNote` (English
+  only so far — same fallback-to-English pattern as everything else).
+
+## Fabric Quality Guide (`/fabric-quality-guide`)
+
+A dedicated explainer page (added 2026-09-19) demystifying the two numbers
+that dominate hospitality-textile buying decisions — **GSM** for towels and
+**thread count** for bed linen — with a visual scale plus a 5-tier (GSM) /
+4-tier (thread count) breakdown of what each range means in practice.
+Fully static. Shipped English-first, then fully translated into ar/fr/ru
+the same day (`fabricGuide.*` in each of
+`src/i18n/dictionaries/{ar,fr,ru}.ts`) — unlike Hotel Opening Package
+above, which is still English-only.
+
+- **"HADARA's range" bracket is computed from live catalog data, never
+  hardcoded** — `src/views/FabricQualityGuideView.astro`'s `numbersFrom()`
+  scans `PRODUCTS` for every `specValues` entry matching `specLabel: 'GSM'`
+  or `specLabel: 'Fabric Quality'` (the thread-count products' actual
+  `specLabel`), so the highlighted bracket on each scale can't drift out of
+  sync with what's really in the catalog as products are added/changed.
+  `GSM_SCALE`/`TC_SCALE` (the fixed axis endpoints the bracket is
+  positioned against) are the only hand-set numbers on the page.
+- Linked from every product page's spec table (`ProductView.astro`) next to
+  the GSM/Fabric Quality spec row — only for products where that field
+  applies (`product.specLabel === 'GSM' || 'Fabric Quality'`) — and from the
+  footer's Explore column; registered in `scripts/build-sitemap.ts` and
+  `scripts/build-search-index.ts`'s hardcoded static-page lists, same
+  by-hand step every new static marketing page needs (see Hotel Opening
+  Package above).
+- **RTL-verified**: `document.documentElement.scrollWidth` matches
+  `innerWidth` on the Arabic version at a few viewport widths (no sideways
+  overflow), and `[dir="rtl"] .quality-scale-wrap{direction:ltr}` keeps the
+  gradient scale itself reading low→high in a fixed visual direction
+  regardless of page direction (only the surrounding text/labels flip),
+  matching the same "keep a scale/track LTR inside an RTL page" precedent
+  as `.featured-track`.
+- New CSS in `global.css`: `.quality-section`/`.quality-intro`/
+  `.quality-scale-*`/`.quality-tiers`/`.quality-tier`.
+
 ## Pending / deferred (owner-blocked, don't guess)
 
 - **"شركاء النجاح" (Partners of Success) homepage section** — 10 hotel-chain
@@ -213,7 +574,160 @@ markup to fall out of sync.
   content exists yet; do not fabricate.
 - **Self-hosting product/blog images off the Wix account** — flagged as a
   real business risk (single point of failure), not yet resolved; this
-  sandbox can't fetch `static.wixstatic.com` to re-host the files locally.
+  sandbox can't fetch `static.wixstatic.com` to re-host the files locally,
+  or even `curl` a single URL to check it's still alive — confirmed this
+  the hard way 2026-09-19, when the owner reported the homepage's
+  "Robes & Slippers" collection card (`HomeView.astro`) showing no image.
+  Its `data-bg` pointed at a Wix media ID referenced nowhere else in the
+  codebase — almost certainly a bad copy from the original conversion —
+  and couldn't be fetched or inspected from here to confirm, only worked
+  around by pointing it at the "Luxury Waffle Bathrobe" product's own
+  `main` image instead — an ID already proven live elsewhere (its own
+  product page, a blog article's inline image), and deliberately *not*
+  any image already shown elsewhere on the homepage itself (the
+  "Luxury Terry Bathrobe" one in the featured-products carousel was the
+  first instinct, but reused it verbatim, so the same photo would've
+  shown twice on one page). If another card/image ever looks blank
+  again, check whether its exact media ID is referenced anywhere else in
+  `src/` first — an orphaned one-off ID is the likely culprit, same as
+  this one, since this sandbox still can't verify a Wix URL directly —
+  and prefer a replacement not already used elsewhere on the *same page*.
+- **Real MOQ / lead-time figures per category** — see "MOQ & lead time on
+  product pages" above; every product page currently shows placeholder
+  numbers the owner hasn't confirmed yet.
+
+## Full-site audit (2026-09-19)
+
+Owner asked to confirm the entire site works correctly across all 4
+locales. Ran three automated passes (scripts written ad hoc, not
+committed — see git history of this session if reconstructing them):
+1. A link checker crawling every built `dist/**/*.html` file (all 177
+   pages), resolving every `href`/`src`/`data-bg` starting with `/`
+   against the actual `dist` output (respecting `build.format:
+   'directory'`), flagging anything that doesn't resolve.
+2. A Playwright pass over a representative page set × all 4 locales,
+   checking HTTP status, `<html dir>`/`<html lang>` correctness,
+   `document.documentElement.scrollWidth` vs `innerWidth` (no horizontal
+   overflow), literal `"undefined"`/`"[object Object]"` leaking into
+   rendered text (an i18n-fallback bug signature), console/page errors,
+   and failed requests.
+3. A full mobile-width (390px, then re-verified at 320px) sweep of
+   **every** page × every locale (176 combinations) for horizontal
+   overflow specifically, since that class of bug (see the RFQ honeypot
+   RTL bug earlier in this file) tends to be viewport- and
+   content-length-dependent, not something a desktop-only check catches.
+
+Route parity was also confirmed structurally: all 4 locales build the
+exact same 44 routes (verified by diffing the route lists), plus English
+gets the one extra `404.html`.
+
+**Two real bugs found and fixed, both content-length/locale-dependent —
+neither reproduces in English, which is exactly why an all-4-locales
+pass matters and an English-only check would've missed both:**
+
+- **Dead links in the 404 page's language switcher.** `404.astro` is the
+  one intentionally-unlocalized page (see "Internationalization" above),
+  but `LanguageSwitcher.astro` blindly generated `localizePath(l, path)`
+  for every locale regardless of whether that locale actually has a page
+  at `path` — for `/404` specifically, that produced links to
+  `/ar/404`, `/fr/404`, `/ru/404`, none of which exist. Fixed with a
+  narrow, path-specific special-case in `LanguageSwitcher.astro`: when
+  `path === '/404'`, every locale link now points at that locale's
+  homepage instead. This is the one hardcoded exception because 404 is
+  the one hardcoded exception to "every page exists in all 4 locales."
+- **Horizontal mobile overflow on `/fr/blog`** (and, by the same root
+  cause, latent everywhere a sufficiently long single word could appear
+  in any locale's hero heading): the Blog listing page's hero `<h1>`
+  uses the shared `.products-hero` component, which — unlike the
+  homepage's `.hero h1` — had **no mobile font-size override** at all,
+  so it stayed at its desktop `clamp(52px,6.2vw,92px)` size (52px
+  minimum) even on a 390px phone. French's `"l'approvisionnement
+  hôtelier."` includes a 20-character unbreakable word (the apostrophe
+  isn't a break point) that doesn't fit in the resulting narrow column,
+  and CSS's default `overflow-wrap: normal` lets an unbreakable word
+  overflow its container rather than shrink or break — pushing the page
+  382px wider than the viewport. Fixed defensively rather than by
+  chasing every hero variant's missing breakpoint: added
+  `overflow-wrap:anywhere` to the base `h1` rule and the shared
+  `.hero h1,h2` rule (the latter's bare `,h2` already applies to every
+  `<h2>` on the site) in `global.css`. This is a universal, content-
+  agnostic safety net — it only ever engages when a single word actually
+  doesn't fit, so it doesn't change layout for any normal-width text,
+  and it protects every heading everywhere against a too-long word in
+  *any* locale, not just the one instance that happened to surface it
+  today. **Lesson for next time**: a font-size/layout fix verified only
+  in English (or only at desktop width) can hide for a long time — the
+  RFQ honeypot RTL bug earlier in this file and this one are the same
+  pattern: locale- or viewport-specific overflow that a same-language,
+  same-viewport check structurally cannot catch. When auditing layout
+  again, sweep every locale at mobile width, not just English at
+  desktop.
+- Also fixed as part of the same audit, found via the owner's own
+  browsing rather than the automated pass: the homepage's "Robes &
+  Slippers" collection card had a dead/orphaned Wix image ID — see
+  "Self-hosting product/blog images off the Wix account" above.
+
+Everything else came back clean: 0 broken internal links, 0 broken
+hreflang alternates (checked by the same link-checker, since
+`<link rel="alternate">` also has an `href`), 0 `astro check` errors, 0
+`[object Object]`/literal-`undefined` artifacts, correct `dir`/`lang` on
+every page in every locale, and no console/page errors beyond this
+sandbox's own known-blocked hosts (`fonts.googleapis.com` — the sandbox
+proxy's CA isn't trusted by a fresh headless browser, unrelated to the
+real site — and Google Maps embeds, both expected per "Sandbox quirks"
+below).
+
+## Product catalog gap analysis (2026-09-19)
+
+The owner asked what's missing from the catalog in the "guest room"
+world. Compared the current 6 categories/23 products against a typical
+hospitality-textile supplier's range and flagged 9 gaps, scoped to
+**textile** products only (matching "trusted Turkish manufacturing
+partners" — non-textile items like door hangers or stationery were
+explicitly excluded as out of scope for this business):
+
+- `bed-linen`: fitted sheet ✅ **added**, bed blanket ✅ **added**,
+  decorative bed runner ✅ **added**
+- `protectors`: pillow protector ✅ **added**
+- `towels`: oversized bath sheet ✅ **added**, washcloth ✅ **added**,
+  fabric shower curtain
+- New category territory: blackout curtains, ironing board cover
+
+**Six added so far** (`src/data/products.ts` + full ar/fr/ru
+translations in `src/data/products.i18n.ts`), same "no photography yet"
+placeholder-gallery treatment as the `amenities` category (`main`/
+`gallery` left empty — see the comment above the `amenities` block):
+- `luxury-hotel-fitted-sheet-250-tc` (`bed-linen`) — deep elasticized
+  pocket, same 200–300 TC range as the existing bedsheet/pillowcase.
+- `waterproof-pillow-protector` (`protectors`) — mirrors
+  `waterproof-mattress-protector`'s fields/tone, with a zippered-closure
+  spec value distinct from the mattress protector's quilted-comfort one.
+- `luxury-hotel-bed-blanket` (`bed-linen`) — a warmth layer alongside
+  the duvet, `specLabel: 'Weight'` like the microfiber duvet but with
+  its own distinct spec values (`Lightweight`/`Medium Weight`/
+  `Heavyweight`) so it doesn't read as a literal duplicate.
+- `decorative-bed-runner` (`bed-linen`) — a boutique-style bed accent,
+  `specLabel: 'Style'` (`Solid`/`Textured`/`Quilted`) since it's a
+  presentation item rather than a fabric-quality one — note its
+  `specLabel` is deliberately *not* `'GSM'`/`'Fabric Quality'`, so it
+  correctly doesn't pick up the Fabric Quality Guide cross-link that
+  those two spec labels trigger on `ProductView.astro`.
+- `hotel-bath-sheet-700-gsm` (`towels`) — an oversized bath towel, same
+  500–700 GSM range and `suitableFor` as the regular bath towel, sized
+  up for full-body coverage rather than a different quality tier.
+- `hotel-washcloth` (`towels`) — the smallest/lightest towel in the
+  catalog (350–450 GSM, below the face towel's 450–600 range), a
+  distinct everyday item rather than a smaller face towel.
+
+**The remaining three are not yet added** — waiting on the owner to
+confirm which ones to do next. Also worth a future look: the
+`protectors` category is still labeled "Mattress Protectors"
+(`CATEGORIES.protectors.label` and `common.categoryLabels.protectors`
+in all 4 dictionaries) even though it now also holds a pillow
+protector — a rename (e.g. "Mattress & Pillow Protectors") would need
+updating in `src/data/products.ts` and all 4 locale files; deliberately
+left as-is for this pass since it wasn't asked for and touches
+translated strings.
 
 ## Sandbox quirks
 

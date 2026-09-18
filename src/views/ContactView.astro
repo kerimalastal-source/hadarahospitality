@@ -13,7 +13,7 @@ const c = t.contact;
 const f = c.form;
 const p = (path: string) => localizePath(locale, path);
 ---
-<BaseLayout title={c.title} description={c.description} path="/contact.html" locale={locale} active="contact">
+<BaseLayout title={c.title} description={c.description} path="/contact" locale={locale} active="contact">
   <main>
     <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>{c.hero.eyebrow}</p><p class="eyebrow light">{c.hero.eyebrow}</p><h1>{c.hero.heading1}<br /><em>{c.hero.heading2}</em></h1><p class="pdp-tagline">{c.hero.body}</p></div></section>
     <section class="quote-trust wrap">

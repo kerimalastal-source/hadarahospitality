@@ -24,9 +24,10 @@ function isAssetPath(pathname: string): boolean {
   ) {
     return true;
   }
-  // Anything with a file extension that isn't .html is a static asset, not a page.
+  // Pages are clean URLs with no extension; anything with a dot in the last
+  // segment (css, js, images, xml, json, ...) is a static asset, not a page.
   const lastSegment = pathname.split('/').pop() ?? '';
-  return lastSegment.includes('.') && !lastSegment.endsWith('.html');
+  return lastSegment.includes('.');
 }
 
 function preferredLocale(acceptLanguage: string): SupportedLocale | null {
@@ -67,9 +68,7 @@ export default function middleware(request: Request): Response | undefined {
     return undefined;
   }
 
-  // The homepage is special-cased: Astro's static build outputs the localized
-  // homepage as "/<locale>.html" (a flat file), not "/<locale>/index.html".
-  const localizedPath = pathname === '/' || pathname === '/index.html' ? `/${locale}.html` : `/${locale}${pathname}`;
+  const localizedPath = pathname === '/' ? `/${locale}` : `/${locale}${pathname}`;
   const redirectUrl = new URL(`${localizedPath}${url.search}`, url);
   return new Response(null, {
     status: 307,

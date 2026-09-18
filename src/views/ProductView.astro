@@ -15,7 +15,7 @@ const t = getDictionary(locale);
 const pd = t.productDetail;
 const category = CATEGORIES[product.category];
 const categoryLabel = t.common.categoryLabels[product.category] ?? category.label;
-const pageUrl = `${SITE_URL}${localizePath(locale, `/products/${product.slug}.html`)}`;
+const pageUrl = `${SITE_URL}${localizePath(locale, `/products/${product.slug}`)}`;
 const p = (path: string) => localizePath(locale, path);
 
 // Localized text falls back to the English data whenever a translation
@@ -39,8 +39,12 @@ const { base: heroBase, suffix: heroSuffix } = splitName(name);
 // The quote link and mailto body always use the canonical English product
 // name/category so the resulting email stays consistent for the owner,
 // regardless of which language the visitor's page was in.
-const quoteParams = new URLSearchParams({ product: product.name, category: category.formCategory });
-const quoteLink = `${p('/get-a-quote.html')}?${quoteParams.toString()}`;
+// Generic product metadata handed off to the RFQ form — new fields (thread
+// count, size, SKU, ...) can be added here later without the form needing
+// any changes, since it just reads whichever params are present.
+const quoteParams = new URLSearchParams({ product: product.name, category: category.formCategory, slug: product.slug, material: product.material });
+if (product.specLabel === 'GSM' && product.specValues.length) quoteParams.set('gsm', product.specValues.join(' / '));
+const quoteLink = `${p('/get-a-quote')}?${quoteParams.toString()}`;
 
 const description = `${overview} ${material}. Suitable for ${suitableFor}. Request hospitality supply specifications and a tailored quote from HADARA Hospitality.`;
 const metaDescription = description.length > 158 ? `${description.slice(0, 158).replace(/\s+\S*$/, '')}…` : description;
@@ -73,8 +77,8 @@ const breadcrumbSchema = {
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: t.common.home, item: `${SITE_URL}${p('/')}` },
-    { '@type': 'ListItem', position: 2, name: t.common.nav.products, item: `${SITE_URL}${p('/products.html')}` },
-    { '@type': 'ListItem', position: 3, name: categoryLabel, item: `${SITE_URL}${p('/products.html')}#${product.category}` },
+    { '@type': 'ListItem', position: 2, name: t.common.nav.products, item: `${SITE_URL}${p('/products')}` },
+    { '@type': 'ListItem', position: 3, name: categoryLabel, item: `${SITE_URL}${p('/products')}#${product.category}` },
     { '@type': 'ListItem', position: 4, name, item: pageUrl },
   ],
 };
@@ -84,7 +88,7 @@ const relatedLocalized = related.map((pr) => ({ ...pr, name: getProductTranslati
 <BaseLayout
   title={`${name} | HADARA Hospitality`}
   description={metaDescription}
-  path={`/products/${product.slug}.html`}
+  path={`/products/${product.slug}`}
   locale={locale}
   ogType="product"
   ogImage={ogImage}
@@ -97,7 +101,7 @@ const relatedLocalized = related.map((pr) => ({ ...pr, name: getProductTranslati
   <main>
     <section class="pdp-hero">
       <div class="wrap">
-        <p class="breadcrumb"><a href={p('/products.html')}>{t.common.nav.products}</a><span>/</span><a href={`${p('/products.html')}#${product.category}`}>{categoryLabel}</a><span>/</span>{name}</p>
+        <p class="breadcrumb"><a href={p('/products')}>{t.common.nav.products}</a><span>/</span><a href={`${p('/products')}#${product.category}`}>{categoryLabel}</a><span>/</span>{name}</p>
         <p class="eyebrow light">{categoryLabel.toUpperCase()}</p>
         <h1>{heroSuffix ? <>{heroBase} <em>{heroSuffix}</em></> : heroBase}</h1>
         <p class="pdp-tagline">{overview}</p>
@@ -141,10 +145,13 @@ const relatedLocalized = related.map((pr) => ({ ...pr, name: getProductTranslati
         <dl class="spec-table">
           <div class="spec-row"><dt>{pd.category}</dt><dd>{categoryLabel}</dd></div>
           <div class="spec-row"><dt>{pd.material}</dt><dd>{material}</dd></div>
-          <div class="spec-row"><dt>{specLabel}</dt><dd>{specValues.join(' / ')}</dd></div>
+          <div class="spec-row"><dt>{specLabel}</dt><dd>{specValues.join(' / ')}{(product.specLabel === 'GSM' || product.specLabel === 'Fabric Quality') && <a class="text-link" style="display:inline-block;margin-left:14px;font-size:11px" href={p('/fabric-quality-guide')}>{t.fabricGuide.hero.label} →</a>}</dd></div>
           <div class="spec-row"><dt>{pd.suitableFor}</dt><dd>{suitableFor}</dd></div>
           <div class="spec-row"><dt>{pd.customization}</dt><dd><ul class="chip-list">{customization.map((c) => <li>{c}</li>)}</ul></dd></div>
+          <div class="spec-row"><dt>{pd.moq}</dt><dd>{category.moq}</dd></div>
+          <div class="spec-row"><dt>{pd.leadTime}</dt><dd>{category.leadTime}</dd></div>
         </dl>
+        <p class="spec-note">{pd.moqNote}</p>
         <div class="info-box"><strong>{pd.productionSupply}</strong>{pd.productionSupplyBody}</div>
       </div>
     </section>
@@ -155,9 +162,9 @@ const relatedLocalized = related.map((pr) => ({ ...pr, name: getProductTranslati
         <div class="related-grid">
           {relatedLocalized.map((pr) =>
             pr.main ? (
-              <a class="related-card" href={p(`/products/${pr.slug}.html`)} data-bg={pr.main}><span>{pr.name}</span></a>
+              <a class="related-card" href={p(`/products/${pr.slug}`)} data-bg={pr.main}><span>{pr.name}</span></a>
             ) : (
-              <a class="related-card related-card-placeholder" href={p(`/products/${pr.slug}.html`)}><span>{pr.name}</span></a>
+              <a class="related-card related-card-placeholder" href={p(`/products/${pr.slug}`)}><span>{pr.name}</span></a>
             ),
           )}
         </div>

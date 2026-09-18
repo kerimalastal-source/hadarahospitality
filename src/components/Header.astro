@@ -17,24 +17,25 @@ const nav = t.common.nav;
 const home = (p: string) => localizePath(locale, p);
 ---
 <header class="site-header" id="top">
-  <a class="brand" href={home('/')} aria-label="HADARA Hospitality home">
-    <img src="/assets/hadara-logo-black.svg" alt="HADARA Hospitality" class="hadara-header-logo" />
+  <a class="brand" href={home('/')}>
+    <img src="/assets/hadara-logo-black.png" alt="" class="hadara-header-logo" />
+    <span><strong>HADARA</strong><small>HOSPITALITY</small></span>
   </a>
   <button class="menu-toggle" aria-label={nav.openMenu} aria-expanded="false" aria-controls="navigation"><span></span><span></span><span></span></button>
   <nav id="navigation" aria-label="Main navigation">
     <div class="nav-links">
       <a href={home('/')} aria-current={active === 'home' ? 'page' : undefined}>{t.common.home}</a>
-      <a href={home('/products.html')} aria-current={active === 'products' ? 'page' : undefined}>{nav.products}</a>
+      <a href={home('/products')} aria-current={active === 'products' ? 'page' : undefined}>{nav.products}</a>
       <a href={`${home('/')}#approach`}>{nav.approach}</a>
       <a href={`${home('/')}#process`}>{nav.process}</a>
-      <a href={home('/about.html')} aria-current={active === 'about' ? 'page' : undefined}>{nav.about}</a>
-      <a href={home('/blog.html')} aria-current={active === 'blog' ? 'page' : undefined}>{nav.blog}</a>
-      <a href={home('/contact.html')} aria-current={active === 'contact' ? 'page' : undefined}>{nav.contact}</a>
+      <a href={home('/about')} aria-current={active === 'about' ? 'page' : undefined}>{nav.about}</a>
+      <a href={home('/blog')} aria-current={active === 'blog' ? 'page' : undefined}>{nav.blog}</a>
+      <a href={home('/contact')} aria-current={active === 'contact' ? 'page' : undefined}>{nav.contact}</a>
     </div>
     <div class="nav-utils">
-      <a class="nav-search" href={home('/search.html')} aria-label={nav.search}><SearchIcon /></a>
+      <a class="nav-search" href={home('/search')} aria-label={nav.search}><SearchIcon /></a>
       <LanguageSwitcher locale={locale} path={path} />
-      <a class="nav-quote" href={home('/get-a-quote.html')}>{nav.requestQuote} <span>↗</span></a>
+      <a class="nav-quote" href={home('/get-a-quote')}>{nav.requestQuote} <span>↗</span></a>
     </div>
   </nav>
 </header>

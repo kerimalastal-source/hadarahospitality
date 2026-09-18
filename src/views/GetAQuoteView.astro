@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { CONTACT_EMAIL, CONTACT_PHONE } from '../config';
 import { getDictionary, localizePath, type Locale } from '../i18n';
+import { WORLD_COUNTRIES } from '../data/countries';
 
 interface Props {
   locale: Locale;
@@ -12,46 +12,168 @@ const t = getDictionary(locale);
 const q = t.getAQuote;
 const f = q.form;
 const p = (path: string) => localizePath(locale, path);
-
-// Stable English values so a product page's prefilled category and the resulting
-// mailto email stay consistent for the owner, regardless of the visitor's language.
-const CATEGORY_VALUES = ['Bed linen & bedding', 'Towels & bath', 'Robes & slippers', 'Pillows & duvets', 'Mattress protectors', 'Multiple categories', 'Other hospitality essentials'];
 ---
-<BaseLayout title={q.title} description={q.description} path="/get-a-quote.html" locale={locale}>
+<BaseLayout title={q.title} description={q.description} path="/get-a-quote" locale={locale}>
   <main>
-    <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>{q.hero.eyebrow}</p><p class="eyebrow light">{q.hero.eyebrow}</p><h1>{q.hero.heading1}<br /><em>{q.hero.heading2}</em></h1><p class="pdp-tagline">{q.hero.body}</p></div></section>
+    <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>{t.common.nav.requestQuote}</p><p class="eyebrow light">{q.hero.eyebrow}</p><h1>{q.hero.heading1} <em>{q.hero.heading2}</em></h1><p class="pdp-tagline">{q.hero.body}</p></div></section>
     <section class="quote-trust wrap">
       {q.trust.map((line) => <span>{line}</span>)}
     </section>
-    <section class="quote-section wrap" id="quote">
-      <div>
-        <p class="eyebrow">{f.eyebrow}</p>
-        <h2>{f.heading1}<br /><em>{f.heading2}</em></h2>
-        <p>{f.body}</p>
-        <div class="contact-details">
-          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-          <a href={`tel:${CONTACT_PHONE.replace(/\s+/g, '')}`}>{CONTACT_PHONE}</a>
-          <span>Istanbul, Türkiye</span>
+
+    <section class="rfq-page wrap" id="quote">
+      <form id="rfq-form" class="rfq-form" novalidate data-locale={locale}>
+        <div class="rfq-honeypot" aria-hidden="true">
+          <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
         </div>
-      </div>
-      <form id="quote-form" class="quote-form">
-        <h3>{f.title}</h3>
-        <div class="field-row">
-          <label>{f.name} <input name="name" required autocomplete="name" placeholder="Full name" /></label>
-          <label>{f.email} <input name="email" type="email" required autocomplete="email" placeholder="name@hotel.com" /></label>
+        <input type="hidden" name="formRenderedAt" id="rfq-rendered-at" />
+        <input type="hidden" name="sourcePage" id="rfq-source-page" />
+        <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="productMeta" id="rfq-product-meta" />
+
+        <div class="rfq-intro">
+          <p class="eyebrow">{f.eyebrow}</p>
+          <h2>{f.heading1}<br /><em>{f.heading2}</em></h2>
+          <p>{f.body}</p>
         </div>
-        <div class="field-row">
-          <label>{f.hotel} <input name="hotel" required placeholder="Property name" /></label>
-          <label>{f.country} <input name="country" required autocomplete="country-name" placeholder="Country" /></label>
+
+        <div class="rfq-selected-product" id="rfq-selected-product" hidden>
+          <span class="rfq-selected-product-label">{f.selectedProductLabel}</span>
+          <strong id="rfq-selected-product-name"></strong>
+          <button type="button" id="rfq-remove-product" class="rfq-selected-product-remove">{f.removeProduct}</button>
         </div>
-        <label>{f.category} <select name="category" required>
-          <option value="">{f.categoryPlaceholder}</option>
-          {CATEGORY_VALUES.map((value, i) => <option value={value}>{f.categoryOptions[i]}</option>)}
-        </select></label>
-        <label>{f.details} <textarea name="details" rows="4" placeholder={f.detailsPlaceholder}></textarea></label>
-        <button class="button button-gold" type="submit">{f.submit} <span>↗</span></button>
+
+        <fieldset class="rfq-section">
+          <legend><span class="rfq-step">01</span> {f.section1}</legend>
+          <div class="rfq-grid">
+            <label class="rfq-required">{f.fullName}<input name="fullName" required autocomplete="name" /></label>
+            <label class="rfq-required">{f.workEmail}<input name="workEmail" type="email" required autocomplete="email" placeholder="name@hotel.com" /></label>
+            <label>{f.phone}<input name="phone" type="tel" autocomplete="tel" /></label>
+            <label class="rfq-required">{f.companyName}<input name="companyName" required /></label>
+            <label class="rfq-required">{f.propertyType}<select name="propertyType" required>
+              <option value="">{f.propertyTypePlaceholder}</option>
+              {f.propertyTypeOptions.map((option) => <option value={option}>{option}</option>)}
+            </select></label>
+            <label>{f.hotelCategory}<select name="hotelCategory">
+              <option value="">{f.hotelCategoryPlaceholder}</option>
+              {f.hotelCategoryOptions.map((option) => <option value={option}>{option}</option>)}
+            </select></label>
+            <label>{f.rooms}<input name="roomsKeys" type="number" min="0" step="1" inputmode="numeric" /><small class="rfq-help">{f.roomsHelp}</small></label>
+            <label>{f.country}<select name="country" id="rfq-country" autocomplete="country-name">
+              <option value="">{f.countryPlaceholder}</option>
+              {WORLD_COUNTRIES.map((country) => <option value={country}>{country}</option>)}
+            </select></label>
+            <label>{f.city}<select name="city" id="rfq-city" autocomplete="address-level2" disabled data-ready-placeholder={f.cityPlaceholderReady}>
+              <option value="">{f.cityPlaceholderLocked}</option>
+            </select></label>
+          </div>
+          <div class="rfq-field-block">
+            <span class="rfq-label">{f.preferredContact}</span>
+            <div class="rfq-segmented" role="radiogroup" aria-label={f.preferredContact}>
+              {f.preferredContactOptions.map((option, i) => (
+                <label><input type="radio" name="preferredContact" value={option} checked={i === 0} /><span>{option}</span></label>
+              ))}
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="rfq-section">
+          <legend><span class="rfq-step">02</span> {f.section2}</legend>
+          <div class="rfq-field-block">
+            <span class="rfq-label rfq-required">{f.productsRequired}</span>
+            <div class="rfq-chip-grid" role="group" aria-label={f.productsRequired}>
+              {f.productCategories.map((option) => (
+                <label class="rfq-chip"><input type="checkbox" name="categories" value={option} /><span>{option}</span></label>
+              ))}
+            </div>
+            <p class="rfq-error" id="rfq-categories-error" role="alert" hidden>{f.errorProducts}</p>
+          </div>
+          <label>{f.estimatedQuantity}<input name="estimatedQuantity" placeholder={f.estimatedQuantityPlaceholder} /></label>
+        </fieldset>
+
+        <fieldset class="rfq-section">
+          <legend><span class="rfq-step">03</span> {f.section3}</legend>
+          <div class="rfq-grid">
+            <label>{f.projectType}<select name="projectType">
+              <option value="">{f.projectTypePlaceholder}</option>
+              {f.projectTypeOptions.map((option) => <option value={option}>{option}</option>)}
+            </select></label>
+            <label class="rfq-required">{f.deliveryCountry}<select name="deliveryCountry" id="rfq-delivery-country" required autocomplete="country-name">
+              <option value="">{f.deliveryCountryPlaceholder}</option>
+              {WORLD_COUNTRIES.map((country) => <option value={country}>{country}</option>)}
+            </select></label>
+            <label>{f.deliveryCity}<select name="deliveryCity" id="rfq-delivery-city" disabled data-ready-placeholder={f.cityPlaceholderReady}>
+              <option value="">{f.cityPlaceholderLocked}</option>
+            </select></label>
+            <label>{f.targetDeliveryDate}<input name="targetDeliveryDate" type="date" /></label>
+          </div>
+          <div class="rfq-field-row-2">
+            <div class="rfq-field-block">
+              <span class="rfq-label">{f.customBranding}</span>
+              <div class="rfq-segmented" role="radiogroup" aria-label={f.customBranding}>
+                {f.customBrandingOptions.map((option) => (
+                  <label><input type="radio" name="customBranding" value={option} /><span>{option}</span></label>
+                ))}
+              </div>
+            </div>
+            <div class="rfq-field-block">
+              <span class="rfq-label">{f.sampleRequired}</span>
+              <div class="rfq-segmented" role="radiogroup" aria-label={f.sampleRequired}>
+                {f.sampleRequiredOptions.map((option) => (
+                  <label><input type="radio" name="sampleRequired" value={option} /><span>{option}</span></label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="rfq-section">
+          <legend><span class="rfq-step">04</span> {f.section4}</legend>
+          <label>{f.notes}<textarea name="notes" rows="4" placeholder={f.notesPlaceholder}></textarea></label>
+
+          <div class="rfq-upload">
+            <p class="rfq-upload-heading">{f.uploadHeading}</p>
+            <p class="rfq-upload-help">{f.uploadHelp}</p>
+            <div class="rfq-dropzone" id="rfq-dropzone" tabindex="0" role="button" aria-describedby="rfq-upload-accepted">
+              <input type="file" id="rfq-file-input" name="file" accept=".pdf,.xls,.xlsx,.doc,.docx" hidden />
+              <svg class="rfq-upload-icon" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3M12 3v12M7 8l5-5 5 5"/></svg>
+              <span class="rfq-dropzone-text">{f.uploadDrag} <span class="rfq-browse-link">{f.uploadBrowse}</span></span>
+              <span id="rfq-upload-accepted" class="rfq-upload-accepted">{f.uploadAccepted}</span>
+            </div>
+            <div class="rfq-file-chip" id="rfq-file-chip" hidden>
+              <span class="rfq-file-name" id="rfq-file-name"></span>
+              <span class="rfq-file-size" id="rfq-file-size"></span>
+              <button type="button" class="rfq-file-remove" id="rfq-file-remove" aria-label={f.uploadRemove}>✕</button>
+            </div>
+            <p class="rfq-error" id="rfq-upload-error" role="alert" hidden data-error-type={f.uploadErrorType} data-error-size={f.uploadErrorSize} data-error-upload={f.uploadErrorFailed}></p>
+          </div>
+
+          <label>{f.additionalMessage}<textarea name="additionalMessage" rows="3" placeholder={f.additionalMessagePlaceholder}></textarea></label>
+        </fieldset>
+
+        <p class="rfq-error rfq-form-error" id="rfq-form-error" role="alert" hidden>{f.errorGeneric}</p>
+        <button class="button button-gold rfq-submit" type="submit" id="rfq-submit" data-label-idle={f.submit} data-label-busy={f.submitting}>
+          <span class="rfq-submit-label">{f.submit}</span> <span>→</span>
+        </button>
         <p class="form-note">{f.note}</p>
       </form>
+
+      <div class="rfq-success" id="rfq-success" hidden tabindex="-1">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="rfq-success-icon"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>
+        <h2>{f.successHeading}</h2>
+        <p>{f.successMessage}</p>
+        <div class="rfq-reference">
+          <span>{f.successReferenceLabel}</span>
+          <strong id="rfq-reference-value"></strong>
+        </div>
+        <p class="rfq-success-note">{f.successNote}</p>
+        <div class="rfq-success-actions">
+          <a class="button button-dark" href={p('/products')}>{f.backToProducts}</a>
+          <a class="text-link" href={p('/')}>{f.returnHome}</a>
+        </div>
+      </div>
     </section>
   </main>
+  <script>
+    import '../scripts/rfq-form';
+  </script>
 </BaseLayout>

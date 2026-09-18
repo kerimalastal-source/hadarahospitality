@@ -41,6 +41,7 @@ export interface Dictionary {
     title: string;
     description: string;
     hero: { eyebrow: string; heading1: string; heading2: string; lead: string; explore: string; requestQuote: string };
+    openingBanner: { eyebrow: string; heading1: string; heading2: string; cta: string };
     catalogs: { eyebrow: string; heading1: string; heading2: string; body: string; productCatalog: string; techSpecs: string };
     intro: { eyebrow: string; heading1: string; heading2: string; body: string; moreAboutUs: string };
     collections: {
@@ -95,6 +96,9 @@ export interface Dictionary {
     category: string;
     suitableFor: string;
     customization: string;
+    moq: string;
+    leadTime: string;
+    moqNote: string;
     requestQuoteFor: string;
     specifications: string;
     technicalDetails1: string;
@@ -120,17 +124,78 @@ export interface Dictionary {
       heading2: string;
       body: string;
       title: string;
-      name: string;
-      email: string;
-      hotel: string;
+      selectedProductLabel: string;
+      removeProduct: string;
+
+      section1: string;
+      fullName: string;
+      workEmail: string;
+      phone: string;
+      companyName: string;
+      propertyType: string;
+      propertyTypePlaceholder: string;
+      propertyTypeOptions: string[];
+      hotelCategory: string;
+      hotelCategoryPlaceholder: string;
+      hotelCategoryOptions: string[];
+      rooms: string;
+      roomsHelp: string;
       country: string;
-      category: string;
-      categoryPlaceholder: string;
-      categoryOptions: string[];
-      details: string;
-      detailsPlaceholder: string;
+      countryPlaceholder: string;
+      city: string;
+      cityPlaceholderLocked: string;
+      cityPlaceholderReady: string;
+      preferredContact: string;
+      preferredContactOptions: string[];
+
+      section2: string;
+      productsRequired: string;
+      productCategories: string[];
+      estimatedQuantity: string;
+      estimatedQuantityPlaceholder: string;
+
+      section3: string;
+      projectType: string;
+      projectTypePlaceholder: string;
+      projectTypeOptions: string[];
+      deliveryCountry: string;
+      deliveryCountryPlaceholder: string;
+      deliveryCity: string;
+      targetDeliveryDate: string;
+      customBranding: string;
+      customBrandingOptions: string[];
+      sampleRequired: string;
+      sampleRequiredOptions: string[];
+
+      section4: string;
+      notes: string;
+      notesPlaceholder: string;
+      uploadHeading: string;
+      uploadHelp: string;
+      uploadDrag: string;
+      uploadBrowse: string;
+      uploadAccepted: string;
+      uploadRemove: string;
+      uploadErrorType: string;
+      uploadErrorSize: string;
+      uploadErrorFailed: string;
+      additionalMessage: string;
+      additionalMessagePlaceholder: string;
+
       submit: string;
+      submitting: string;
       note: string;
+      errorRequired: string;
+      errorEmail: string;
+      errorProducts: string;
+      errorGeneric: string;
+
+      successHeading: string;
+      successMessage: string;
+      successReferenceLabel: string;
+      successNote: string;
+      backToProducts: string;
+      returnHome: string;
     };
   };
   contact: {
@@ -144,6 +209,41 @@ export interface Dictionary {
   faq: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; items: FaqItem[]; ctaEyebrow: string; ctaHeading1: string; ctaHeading2: string; contactUs: string };
   privacyPolicy: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; sections: { heading: string; body: string }[]; ctaEyebrow: string; ctaHeading1: string; ctaHeading2: string };
   search: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; placeholder: string; searchButton: string };
+  hotelOpening: {
+    title: string;
+    description: string;
+    hero: { label: string; eyebrow: string; heading1: string; heading2: string; body: string; cta: string };
+    contents: { eyebrow: string; heading1: string; heading2: string; body: string; comingSoon: string };
+    benefits: { eyebrow: string; heading1: string; heading2: string; body: string; cta: string; items: { title: string; body: string }[] };
+    process: { eyebrow: string; heading1: string; heading2: string; body: string; steps: { title: string; body: string }[] };
+    cta: { eyebrow: string; heading1: string; heading2: string; button: string };
+  };
+  fabricGuide: {
+    title: string;
+    description: string;
+    hero: { label: string; eyebrow: string; heading1: string; heading2: string; body: string };
+    gsm: {
+      eyebrow: string;
+      heading1: string;
+      heading2: string;
+      body: string;
+      ourRange: string;
+      scaleMin: string;
+      scaleMax: string;
+      tiers: { title: string; range: string; body: string }[];
+    };
+    tc: {
+      eyebrow: string;
+      heading1: string;
+      heading2: string;
+      body: string;
+      ourRange: string;
+      scaleMin: string;
+      scaleMax: string;
+      tiers: { title: string; range: string; body: string }[];
+    };
+    cta: { eyebrow: string; heading1: string; heading2: string; button: string };
+  };
   notFound: {
     title: string;
     description: string;

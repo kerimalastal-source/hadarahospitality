@@ -14,26 +14,28 @@ const p = (path: string) => localizePath(locale, path);
 <footer>
   <div class="wrap footer-grid">
     <div>
-      <a class="brand footer-brand" href={p('/')}><span class="brand-mark">H</span><span><strong>HADARA</strong><small>HOSPITALITY</small></span></a>
+      <a class="brand footer-brand" href={p('/')}><img src="/assets/hadara-logo-gold.png" alt="" class="footer-brand-logo" /><span><strong>HADARA</strong><small>HOSPITALITY</small></span></a>
       <p>{f.tagline}</p>
     </div>
     <div>
       <h4>{f.explore}</h4>
-      <a href={p('/products.html')}>{t.common.nav.products}</a>
-      <a href={p('/blog.html')}>{t.common.nav.blog}</a>
-      <a href={p('/about.html')}>{t.common.nav.about}</a>
-      <a href={p('/faq.html')}>FAQ</a>
+      <a href={p('/products')}>{t.common.nav.products}</a>
+      <a href={p('/hotel-opening-package')}>{t.hotelOpening.hero.label}</a>
+      <a href={p('/fabric-quality-guide')}>{t.fabricGuide.hero.label}</a>
+      <a href={p('/blog')}>{t.common.nav.blog}</a>
+      <a href={p('/about')}>{t.common.nav.about}</a>
+      <a href={p('/faq')}>FAQ</a>
     </div>
     <div>
       <h4>{f.getInTouch}</h4>
-      <a href={p('/contact.html')}>{f.contactUs}</a>
-      <a href={p('/get-a-quote.html')}>{f.requestQuote}</a>
+      <a href={p('/contact')}>{f.contactUs}</a>
+      <a href={p('/get-a-quote')}>{f.requestQuote}</a>
       <a href={`mailto:${CONTACT_EMAIL}`}>{f.emailTeam}</a>
       <span>{f.location}</span>
     </div>
   </div>
   <div class="wrap footer-bottom">
     <span>© <span id="year"></span> {f.copyright}</span>
-    <span class="footer-legal"><a href={p('/privacy-policy.html')}>{f.privacyPolicy}</a><a href="#top">{f.backToTop}</a></span>
+    <span class="footer-legal"><a href={p('/privacy-policy')}>{f.privacyPolicy}</a><a href="#top">{f.backToTop}</a></span>
   </div>
 </footer>
