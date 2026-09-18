@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getDictionary, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const pp = t.privacyPolicy;
+const p = (path: string) => localizePath(locale, path);
+---
+<BaseLayout title={pp.title} description={pp.description} path="/privacy-policy.html" locale={locale}>
+  <main>
+    <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>{pp.hero.eyebrow}</p><p class="eyebrow light">{pp.hero.eyebrow}</p><h1>{pp.hero.heading1} <em>{pp.hero.heading2}</em></h1><p class="pdp-tagline">{pp.hero.body}</p></div></section>
+    <article class="article-body wrap">
+      {pp.sections.map((section) => (
+        <>
+          <h2>{section.heading}</h2>
+          <p>{section.body}</p>
+        </>
+      ))}
+    </article>
+    <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">{pp.ctaEyebrow}</p><h2>{pp.ctaHeading1}<br /><em>{pp.ctaHeading2}</em></h2></div><a class="button button-gold" href={p('/contact.html')}>{t.common.footer.contactUs} <span>↗</span></a></div></section>
+  </main>
+</BaseLayout>

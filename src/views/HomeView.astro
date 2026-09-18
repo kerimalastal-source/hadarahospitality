@@ -1,0 +1,150 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ChevronIcon from '../components/icons/ChevronIcon.astro';
+import { getDictionary, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const h = t.home;
+const p = (path: string) => localizePath(locale, path);
+---
+<BaseLayout title={h.title} description={h.description} path="/" locale={locale}>
+  <main>
+    <section class="hero">
+      <div class="hero-photo" role="img" aria-label="Refined hotel room textile setting"></div>
+      <div class="hero-shade"></div>
+      <div class="hero-content wrap">
+        <p class="eyebrow light">{h.hero.eyebrow}</p>
+        <h1>{h.hero.heading1}<br /><em>{h.hero.heading2}</em></h1>
+        <p class="hero-lead">{h.hero.lead}</p>
+        <div class="hero-actions">
+          <a class="button button-gold" href="#collections">{h.hero.explore} <span>↗</span></a>
+          <a class="text-link light-link" href={p('/get-a-quote.html')}>{h.hero.requestQuote} <span>↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="catalogs">
+      <div class="wrap catalogs-inner">
+        <div>
+          <p class="eyebrow">{h.catalogs.eyebrow}</p>
+          <h2>{h.catalogs.heading1}<br /><em>{h.catalogs.heading2}</em></h2>
+          <p>{h.catalogs.body}</p>
+        </div>
+        <div class="catalog-actions">
+          <a class="button button-gold" href="https://0bbc49c5-cd98-4397-a1bf-fb287441ccbc.usrfiles.com/ugd/3510f9_5d858d62dbeb46b6bf07b4315adec477.pdf" target="_blank" rel="noopener">{h.catalogs.productCatalog} <span>↓</span></a>
+          <a class="button button-dark" href="https://0bbc49c5-cd98-4397-a1bf-fb287441ccbc.usrfiles.com/ugd/3510f9_5cad678f3a8d4102bf94bde19f75b134.pdf" target="_blank" rel="noopener">{h.catalogs.techSpecs} <span>↓</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="intro wrap" id="about">
+      <div>
+        <p class="eyebrow">{h.intro.eyebrow}</p>
+        <h2>{h.intro.heading1}<br /><em>{h.intro.heading2}</em></h2>
+      </div>
+      <div class="intro-copy">
+        <p>{h.intro.body}</p>
+        <a class="text-link" href={p('/about.html')}>{h.intro.moreAboutUs} <span>↗</span></a>
+      </div>
+    </section>
+
+    <section class="collections-section" id="collections">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">{h.collections.eyebrow}</p>
+            <h2>{h.collections.heading1} <em>{h.collections.heading2}</em></h2>
+          </div>
+          <p>{h.collections.body} <a href={`${p('/products.html')}`}>{h.collections.viewAll} ↗</a></p>
+        </div>
+        <div class="collection-grid">
+          <a class="collection-card large" href={`${p('/products.html')}#bed-linen`} data-bg="https://static.wixstatic.com/media/3510f9_31e3e15c1c32448ab352c26b3134e3f1~mv2.png"><span class="card-number">01 / COLLECTION</span><span class="card-bottom"><span><small>{h.collections.bedLinenSmall}</small><strong>{h.collections.bedLinenBig}</strong></span><span class="round-arrow">↗</span></span></a>
+          <a class="collection-card" href={`${p('/products.html')}#towels`} data-bg="https://static.wixstatic.com/media/3510f9_6a9758922952452189f1e329890e60be~mv2.png"><span class="card-number">02 / COLLECTION</span><span class="card-bottom"><span><small>{h.collections.towelsSmall}</small><strong>{h.collections.towelsBig}</strong></span><span class="round-arrow">↗</span></span></a>
+          <a class="collection-card" href={`${p('/products.html')}#robes`} data-bg="https://static.wixstatic.com/media/3510f9_3d59ca4a34f741b8a74fb7cbfd1989ca~mv2.png"><span class="card-number">03 / COLLECTION</span><span class="card-bottom"><span><small>{h.collections.robesSmall}</small><strong>{h.collections.robesBig}</strong></span><span class="round-arrow">↗</span></span></a>
+        </div>
+        <div class="collection-tags">
+          <a href={`${p('/products.html')}#bed-linen`}>{h.collections.tags.bedLinen}</a>
+          <a href={`${p('/products.html')}#towels`}>{h.collections.tags.towels}</a>
+          <a href={`${p('/products.html')}#robes`}>{h.collections.tags.robes}</a>
+          <a href={`${p('/products.html')}#robes`}>{h.collections.tags.slippers}</a>
+          <a href={`${p('/products.html')}#pillows`}>{h.collections.tags.pillows}</a>
+          <a href={`${p('/products.html')}#protectors`}>{h.collections.tags.protectors}</a>
+          <a href={`${p('/products.html')}#amenities`}>{h.collections.tags.amenities}</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="featured-products">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">{h.featured.eyebrow}</p>
+            <h2>{h.featured.heading1}<br />{h.featured.heading2}</h2>
+          </div>
+          <p>{h.featured.body}</p>
+        </div>
+        <div class="featured-carousel">
+          <button class="carousel-arrow carousel-arrow-prev" type="button" aria-label="Previous products" data-carousel-prev><ChevronIcon /></button>
+          <div class="featured-track" data-carousel-track>
+            <a class="featured-card" href={p('/products/hotel-quality-bath-towel-600-gsm.html')}><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_383c86f602ab4db3a9aa1a04ed0fe7f9~mv2.jpg"></div><div class="featured-card-body"><strong>Hotel Quality Bath Towel – 600 GSM</strong><span>100% hospitality-grade cotton</span></div></a>
+            <a class="featured-card" href={p('/products/luxury-spa-towel-700-gsm.html')}><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_9408505de6554d6ab16b78b7ae8fc02d~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Spa Towel</strong><span>100% hospitality-grade cotton</span></div></a>
+            <a class="featured-card" href={p('/products/luxury-terry-bathrobe.html')}><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_c149a939b7cd40ddb717033660ab0a5c~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Terry Bathrobe</strong><span>Premium terry cotton</span></div></a>
+            <a class="featured-card" href={p('/products/luxury-hotel-slippers.html')}><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_956e8bf269e44a6d809c7d5ca0f88039~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Slippers</strong><span>Premium hospitality-grade materials</span></div></a>
+            <a class="featured-card" href={p('/products/luxury-duvet-cover-300-tc.html')}><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_b8f104a0ec244582bbaefcba949370ad~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Duvet Cover – 300 TC</strong><span>Premium hospitality-grade fabric</span></div></a>
+            <a class="featured-card" href={p('/products/luxury-hotel-bedsheet-250-tc.html')}><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_4928cbc2283e42138f3bcf999e3c4faf~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Bedsheet – 250 TC</strong><span>Premium hospitality-grade fabric</span></div></a>
+            <a class="featured-card" href={p('/products/luxury-hotel-pillowcase-250-tc.html')}><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_2e20426e9db2480691f32aac420443da~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Pillowcase – 250 TC</strong><span>Premium hospitality-grade fabric</span></div></a>
+            <a class="featured-card" href={p('/products/luxury-hotel-duvet-microfiber.html')}><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_57f05d28565b47d9a1e67129e0e8196e~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Duvet – Microfiber</strong><span>Premium microfiber filling</span></div></a>
+            <a class="featured-card" href={p('/products/luxury-hotel-pillow-microfiber.html')}><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_aed304b1825d48ae8bcef3e2da00b4f3~mv2.jpg"></div><div class="featured-card-body"><strong>Luxury Hotel Pillow – Microfiber</strong><span>Premium microfiber filling</span></div></a>
+            <a class="featured-card" href={p('/products/waterproof-mattress-protector.html')}><div class="featured-card-image" data-bg="https://static.wixstatic.com/media/3510f9_1b16cf4752f548279969376473721ab3~mv2.jpg"></div><div class="featured-card-body"><strong>Waterproof Mattress Protector</strong><span>Waterproof &amp; breathable structure</span></div></a>
+          </div>
+          <button class="carousel-arrow carousel-arrow-next" type="button" aria-label="Next products" data-carousel-next><ChevronIcon /></button>
+        </div>
+        <div class="featured-more"><a class="button button-dark" href={p('/products.html')}>{h.featured.more} <span>↗</span></a></div>
+      </div>
+    </section>
+
+    <section class="approach wrap" id="approach">
+      <div class="approach-heading">
+        <p class="eyebrow">{h.approach.eyebrow}</p>
+        <h2>{h.approach.heading1}<br /><em>{h.approach.heading2}</em></h2>
+        <p>{h.approach.body}</p>
+        <a class="button button-dark" href={p('/get-a-quote.html')}>{h.approach.cta} <span>↗</span></a>
+      </div>
+      <div class="benefits">
+        {h.approach.items.map((item, i) => (
+          <article><span>{String(i + 1).padStart(2, '0')}</span><div><h3>{item.title}</h3><p>{item.body}</p></div></article>
+        ))}
+      </div>
+    </section>
+
+    <section class="process" id="process">
+      <div class="wrap">
+        <p class="eyebrow light">{h.process.eyebrow}</p>
+        <div class="process-heading">
+          <h2>{h.process.heading1}<br /><em>{h.process.heading2}</em></h2>
+          <p>{h.process.body}</p>
+        </div>
+        <div class="steps">
+          {h.process.steps.map((step, i) => (
+            <article><span>{String(i + 1).padStart(2, '0')}</span><h3>{step.title}</h3><p>{step.body}</p></article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="products-cta" id="quote">
+      <div class="wrap">
+        <div>
+          <p class="eyebrow light">{h.cta.eyebrow}</p>
+          <h2>{h.cta.heading1}<br /><em>{h.cta.heading2}</em></h2>
+        </div>
+        <a class="button button-gold" href={p('/get-a-quote.html')}>{h.hero.requestQuote} <span>↗</span></a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

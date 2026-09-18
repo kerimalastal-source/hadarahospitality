@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { PRODUCTS, CATEGORIES, type Product } from '../data/products';
+import { SITE_URL } from '../config';
+import { getDictionary, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  product: Product;
+  locale: Locale;
+}
+
+const { product, locale } = Astro.props;
+const t = getDictionary(locale);
+const pd = t.productDetail;
+const category = CATEGORIES[product.category];
+const pageUrl = `${SITE_URL}${localizePath(locale, `/products/${product.slug}.html`)}`;
+const p = (path: string) => localizePath(locale, path);
+
+function splitName(name: string) {
+  const parts = name.split(' – ');
+  return parts.length === 2 ? { base: parts[0], suffix: parts[1] } : { base: name, suffix: '' };
+}
+const { base: heroBase, suffix: heroSuffix } = splitName(product.name);
+
+const quoteParams = new URLSearchParams({ product: product.name, category: category.formCategory });
+const quoteLink = `${p('/get-a-quote.html')}?${quoteParams.toString()}`;
+
+const description = `${product.overview} ${product.material}. Suitable for ${product.suitableFor}. Request hospitality supply specifications and a tailored quote from HADARA Hospitality.`;
+const metaDescription = description.length > 158 ? `${description.slice(0, 158).replace(/\s+\S*$/, '')}…` : description;
+const ogImage = product.main || undefined;
+
+const galleryExtras = product.gallery.filter((url) => url !== product.main).slice(0, 4);
+
+const related = PRODUCTS.filter((pr) => pr.category === product.category && pr.slug !== product.slug).slice(0, 3);
+
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: product.name,
+  description: product.overview,
+  image: product.gallery.length ? product.gallery : product.main ? [product.main] : undefined,
+  category: category.label,
+  material: product.material,
+  url: pageUrl,
+  brand: { '@type': 'Brand', name: 'HADARA Hospitality' },
+  manufacturer: { '@type': 'Organization', name: 'HADARA Hospitality', url: SITE_URL },
+  additionalProperty: [
+    { '@type': 'PropertyValue', name: product.specLabel, value: product.specValues.join(' / ') },
+    { '@type': 'PropertyValue', name: 'Suitable For', value: product.suitableFor },
+    { '@type': 'PropertyValue', name: 'Customization', value: product.customization.join(', ') },
+  ],
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: t.common.home, item: `${SITE_URL}${p('/')}` },
+    { '@type': 'ListItem', position: 2, name: t.common.nav.products, item: `${SITE_URL}${p('/products.html')}` },
+    { '@type': 'ListItem', position: 3, name: category.label, item: `${SITE_URL}${p('/products.html')}#${product.category}` },
+    { '@type': 'ListItem', position: 4, name: product.name, item: pageUrl },
+  ],
+};
+---
+<BaseLayout
+  title={`${product.name} | HADARA Hospitality`}
+  description={metaDescription}
+  path={`/products/${product.slug}.html`}
+  locale={locale}
+  ogType="product"
+  ogImage={ogImage}
+  active="products"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  </Fragment>
+  <main>
+    <section class="pdp-hero">
+      <div class="wrap">
+        <p class="breadcrumb"><a href={p('/products.html')}>{t.common.nav.products}</a><span>/</span><a href={`${p('/products.html')}#${product.category}`}>{category.label}</a><span>/</span>{product.name}</p>
+        <p class="eyebrow light">{category.label.toUpperCase()}</p>
+        <h1>{heroSuffix ? <>{heroBase} <em>{heroSuffix}</em></> : heroBase}</h1>
+        <p class="pdp-tagline">{product.overview}</p>
+        <div class="pdp-actions">
+          <a class="button button-gold" href={quoteLink}>{pd.requestQuoteFor} <span>↗</span></a>
+          <a class="button button-gold technical-sheet-download" href={`/technical-sheets/${product.slug}.pdf`} download={`${product.slug}-technical-sheet.pdf`}>{pd.downloadSheet}</a>
+        </div>
+      </div>
+    </section>
+    <section class="pdp-main wrap">
+      <div class="pdp-gallery">
+        {product.main ? (
+          <div class="pdp-gallery-main" data-bg={product.main} role="img" aria-label={product.name}></div>
+        ) : (
+          <div class="pdp-gallery-main pdp-gallery-placeholder" role="img" aria-label={`${product.name} — photo coming soon`}><span>Photo coming soon</span></div>
+        )}
+        {galleryExtras.length > 0 && (
+          <div class="pdp-gallery-thumbs">
+            {galleryExtras.map((url) => <span data-bg={url}></span>)}
+          </div>
+        )}
+      </div>
+      <div class="pdp-info">
+        <p class="eyebrow">{pd.overview}</p>
+        <h2>{pd.builtFor1} <em>{pd.builtFor2}</em></h2>
+        <div class="pdp-quickfacts">
+          <span><strong>{pd.material}</strong>{product.material}</span>
+          <span><strong>{pd.category}</strong>{category.label}</span>
+          <span><strong>{pd.suitableFor}</strong>{product.suitableFor}</span>
+        </div>
+        <ul class="pdp-features">
+          {product.features.map((f) => <li>{f}</li>)}
+        </ul>
+        <a class="text-link" href={quoteLink}>{pd.requestQuoteFor} <span>↗</span></a>
+      </div>
+    </section>
+    <section class="pdp-specs">
+      <div class="wrap">
+        <p class="eyebrow">{pd.specifications}</p>
+        <h2>{pd.technicalDetails1} <em>{pd.technicalDetails2}</em></h2>
+        <dl class="spec-table">
+          <div class="spec-row"><dt>{pd.category}</dt><dd>{category.label}</dd></div>
+          <div class="spec-row"><dt>{pd.material}</dt><dd>{product.material}</dd></div>
+          <div class="spec-row"><dt>{product.specLabel}</dt><dd>{product.specValues.join(' / ')}</dd></div>
+          <div class="spec-row"><dt>{pd.suitableFor}</dt><dd>{product.suitableFor}</dd></div>
+          <div class="spec-row"><dt>{pd.customization}</dt><dd><ul class="chip-list">{product.customization.map((c) => <li>{c}</li>)}</ul></dd></div>
+        </dl>
+        <div class="info-box"><strong>{pd.productionSupply}</strong>{pd.productionSupplyBody}</div>
+      </div>
+    </section>
+    {related.length > 0 && (
+      <section class="pdp-related wrap">
+        <p class="eyebrow">{pd.youMayAlsoLike}</p>
+        <h2>{pd.moreFrom} <em>{category.label}.</em></h2>
+        <div class="related-grid">
+          {related.map((pr) =>
+            pr.main ? (
+              <a class="related-card" href={p(`/products/${pr.slug}.html`)} data-bg={pr.main}><span>{pr.name}</span></a>
+            ) : (
+              <a class="related-card related-card-placeholder" href={p(`/products/${pr.slug}.html`)}><span>{pr.name}</span></a>
+            ),
+          )}
+        </div>
+      </section>
+    )}
+    <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>{pd.lookingFor1}<br /><em>{pd.lookingFor2}</em></h2></div><a class="button button-gold" href={quoteLink}>{t.common.requestTailoredQuote} <span>↗</span></a></div></section>
+  </main>
+</BaseLayout>

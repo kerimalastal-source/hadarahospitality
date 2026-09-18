@@ -18,6 +18,28 @@ if (menuButton && navigation) {
   );
 }
 
+document.querySelectorAll<HTMLElement>('.lang-switcher').forEach((switcher) => {
+  const toggle = switcher.querySelector<HTMLButtonElement>('[data-lang-toggle]');
+  const menu = switcher.querySelector<HTMLElement>('[data-lang-menu]');
+  if (!toggle || !menu) return;
+  const close = () => {
+    menu.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  };
+  toggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const open = !menu.classList.contains('open');
+    menu.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', (event) => {
+    if (!switcher.contains(event.target as Node)) close();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') close();
+  });
+});
+
 const year = document.querySelector('#year');
 if (year) year.textContent = String(new Date().getFullYear());
 

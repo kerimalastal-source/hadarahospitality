@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getDictionary, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const s = t.search;
+---
+<BaseLayout title={s.title} description={s.description} path="/search.html" locale={locale} noindex>
+  <main>
+    <section class="pdp-hero"><div class="wrap"><p class="eyebrow light">{s.hero.eyebrow}</p><h1>{s.hero.heading1}<br /><em>{s.hero.heading2}</em></h1><p class="pdp-tagline">{s.hero.body}</p>
+      <form class="search-form" id="search-form"><input type="text" name="q" id="search-input" placeholder={s.placeholder} aria-label={t.common.searchLabel} autocomplete="off" /><button class="button button-gold" type="submit">{s.searchButton} <span>↗</span></button></form>
+    </div></section>
+    <section class="search-results wrap">
+      <p id="search-status" class="search-status"></p>
+      <div id="search-results-list"></div>
+    </section>
+  </main>
+  <script>
+    import '../scripts/search';
+  </script>
+</BaseLayout>

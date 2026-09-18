@@ -1,29 +1,39 @@
 ---
 import { CONTACT_EMAIL } from '../config';
+import { localizePath, type Locale, type Dictionary } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  t: Dictionary;
+}
+
+const { locale, t } = Astro.props;
+const f = t.common.footer;
+const p = (path: string) => localizePath(locale, path);
 ---
 <footer>
   <div class="wrap footer-grid">
     <div>
-      <a class="brand footer-brand" href="/index.html"><span class="brand-mark">H</span><span><strong>HADARA</strong><small>HOSPITALITY</small></span></a>
-      <p>Hospitality procurement &amp; supply solutions from Türkiye.</p>
+      <a class="brand footer-brand" href={p('/')}><span class="brand-mark">H</span><span><strong>HADARA</strong><small>HOSPITALITY</small></span></a>
+      <p>{f.tagline}</p>
     </div>
     <div>
-      <h4>EXPLORE</h4>
-      <a href="/products.html">Products</a>
-      <a href="/blog.html">Blog</a>
-      <a href="/about.html">About us</a>
-      <a href="/faq.html">FAQ</a>
+      <h4>{f.explore}</h4>
+      <a href={p('/products.html')}>{t.common.nav.products}</a>
+      <a href={p('/blog.html')}>{t.common.nav.blog}</a>
+      <a href={p('/about.html')}>{t.common.nav.about}</a>
+      <a href={p('/faq.html')}>FAQ</a>
     </div>
     <div>
-      <h4>GET IN TOUCH</h4>
-      <a href="/contact.html">Contact us</a>
-      <a href="/get-a-quote.html">Request a quote</a>
-      <a href={`mailto:${CONTACT_EMAIL}`}>Email our team</a>
-      <span>Istanbul, Türkiye</span>
+      <h4>{f.getInTouch}</h4>
+      <a href={p('/contact.html')}>{f.contactUs}</a>
+      <a href={p('/get-a-quote.html')}>{f.requestQuote}</a>
+      <a href={`mailto:${CONTACT_EMAIL}`}>{f.emailTeam}</a>
+      <span>{f.location}</span>
     </div>
   </div>
   <div class="wrap footer-bottom">
-    <span>© <span id="year"></span> HADARA Hospitality · Part of BYHADARA Group</span>
-    <span class="footer-legal"><a href="/privacy-policy.html">Privacy Policy</a><a href="#top">Back to top ↑</a></span>
+    <span>© <span id="year"></span> {f.copyright}</span>
+    <span class="footer-legal"><a href={p('/privacy-policy.html')}>{f.privacyPolicy}</a><a href="#top">{f.backToTop}</a></span>
   </div>
 </footer>

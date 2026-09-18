@@ -4,12 +4,14 @@ import Footer from '../components/Footer.astro';
 import WhatsAppFloat from '../components/WhatsAppFloat.astro';
 import '../styles/global.css';
 import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '../config';
+import { getDictionary, LOCALES, LOCALE_TAGS, DEFAULT_LOCALE, isRtl, localizePath, type Locale } from '../i18n';
 
 interface Props {
   title: string;
   description: string;
-  /** Site-root path used for the canonical link and og:url, e.g. "/about.html". Omit for utility pages (search, 404) that carry no canonical/OG tags. */
-  canonicalPath?: string;
+  /** Site-root, locale-agnostic path, e.g. "/about.html" or "/" for the homepage. Used for the canonical link, hreflang alternates and the language switcher. */
+  path: string;
+  locale?: Locale;
   ogType?: 'website' | 'product' | 'article';
   ogImage?: string;
   noindex?: boolean;
@@ -20,7 +22,8 @@ interface Props {
 const {
   title,
   description,
-  canonicalPath,
+  path,
+  locale = DEFAULT_LOCALE,
   ogType = 'website',
   ogImage = DEFAULT_OG_IMAGE,
   noindex = false,
@@ -28,11 +31,13 @@ const {
   showWhatsApp = true,
 } = Astro.props;
 
-const canonicalUrl = canonicalPath ? `${SITE_URL}${canonicalPath}` : undefined;
+const t = getDictionary(locale);
+const dir = isRtl(locale) ? 'rtl' : 'ltr';
+const canonicalUrl = noindex ? undefined : `${SITE_URL}${localizePath(locale, path)}`;
 const absoluteOgImage = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`;
 ---
 <!doctype html>
-<html lang="en">
+<html lang={LOCALE_TAGS[locale]} dir={dir}>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -41,6 +46,8 @@ const absoluteOgImage = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogI
   <meta name="description" content={description} />
   <title>{title}</title>
   {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+  {!noindex && LOCALES.map((l) => <link rel="alternate" hreflang={LOCALE_TAGS[l]} href={`${SITE_URL}${localizePath(l, path)}`} />)}
+  {!noindex && <link rel="alternate" hreflang="x-default" href={`${SITE_URL}${localizePath(DEFAULT_LOCALE, path)}`} />}
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
@@ -62,14 +69,14 @@ const absoluteOgImage = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogI
   <slot name="head" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&family=Cairo:wght@400;500;600;700&family=Markazi+Text:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div class="announcement">ISTANBUL, TÜRKIYE <span>✦</span> HOTEL TEXTILE PROCUREMENT &amp; SUPPLY</div>
-  <Header active={active} />
+  <div class="announcement">{t.common.announcement.location} <span>✦</span> {t.common.announcement.tagline}</div>
+  <Header active={active} locale={locale} t={t} path={path} />
   <slot />
-  <Footer />
-  {showWhatsApp && <WhatsAppFloat />}
+  <Footer locale={locale} t={t} />
+  {showWhatsApp && <WhatsAppFloat t={t} />}
   <script>
     import '../scripts/site';
   </script>

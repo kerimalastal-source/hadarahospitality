@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { CONTACT_EMAIL, CONTACT_PHONE } from '../config';
+import { getDictionary, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const c = t.contact;
+const f = c.form;
+const p = (path: string) => localizePath(locale, path);
+---
+<BaseLayout title={c.title} description={c.description} path="/contact.html" locale={locale} active="contact">
+  <main>
+    <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>{c.hero.eyebrow}</p><p class="eyebrow light">{c.hero.eyebrow}</p><h1>{c.hero.heading1}<br /><em>{c.hero.heading2}</em></h1><p class="pdp-tagline">{c.hero.body}</p></div></section>
+    <section class="quote-trust wrap">
+      {c.trust.map((line) => <span>{line}</span>)}
+    </section>
+    <section class="quote-section wrap">
+      <div>
+        <p class="eyebrow">{f.eyebrow}</p>
+        <h2>{f.heading1}<br /><em>{f.heading2}</em></h2>
+        <p>{f.body}</p>
+        <div class="contact-details">
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          <a href={`tel:${CONTACT_PHONE.replace(/\s+/g, '')}`}>{CONTACT_PHONE}</a>
+          <span>Beylikdüzü, Istanbul, Türkiye</span>
+        </div>
+      </div>
+      <form id="contact-form" class="quote-form">
+        <h3>{f.title}</h3>
+        <div class="field-row">
+          <label>{f.name} <input name="name" required autocomplete="name" placeholder="Full name" /></label>
+          <label>{f.email} <input name="email" type="email" required autocomplete="email" placeholder="name@hotel.com" /></label>
+        </div>
+        <label>{f.subject} <input name="subject" required placeholder="What's this about?" /></label>
+        <label>{f.message} <textarea name="message" rows="5" required placeholder="Tell us how we can help..."></textarea></label>
+        <button class="button button-gold" type="submit">{f.submit} <span>↗</span></button>
+        <p class="form-note">{f.note}</p>
+      </form>
+    </section>
+    <section class="contact-map-section wrap">
+      <p class="eyebrow">{c.findUs.eyebrow}</p>
+      <h2>{c.findUs.heading1} <em>{c.findUs.heading2}</em></h2>
+      <div class="contact-map">
+        <iframe src="https://www.google.com/maps?q=Beylikd%C3%BCz%C3%BC,+Istanbul,+Turkey&output=embed" width="100%" height="100%" style="border:0" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="HADARA Hospitality location — Beylikdüzü, Istanbul"></iframe>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

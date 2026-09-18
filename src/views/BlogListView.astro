@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ARTICLES } from '../data/blog';
+import { getDictionary, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const bp = t.blogPage;
+const p = (path: string) => localizePath(locale, path);
+
+const DATE_LOCALE: Record<Locale, string> = { en: 'en-US', ar: 'ar', fr: 'fr-FR', ru: 'ru-RU' };
+function formatDate(iso: string) {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(DATE_LOCALE[locale], { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+}
+---
+<BaseLayout title={bp.title} description={bp.description} path="/blog.html" locale={locale} active="blog">
+  <main>
+    <section class="products-hero"><div class="wrap"><p class="eyebrow light">{bp.hero.eyebrow}</p><h1>{bp.hero.heading1} <em>{bp.hero.heading2}</em></h1><p>{bp.hero.body}</p></div></section>
+    <section class="blog-list wrap">
+      <div class="blog-grid">
+        {ARTICLES.map((article) => (
+          <a class="blog-card" href={p(`/blog/${article.slug}.html`)}>
+            <div class="blog-card-image" data-bg={article.hero} role="img" aria-label={article.heroAlt}></div>
+            <div class="blog-card-body">
+              <span class="blog-tag">{article.category}</span>
+              <h3>{article.title}</h3>
+              <p>{article.excerpt}</p>
+              <span class="blog-meta">{formatDate(article.date)} <span>·</span> {article.readTime}</span>
+              <span class="text-link">{t.common.readArticle} <span>↗</span></span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+    <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>{bp.questionHeading1}<br /><em>{bp.questionHeading2}</em></h2></div><a class="button button-gold" href={p('/get-a-quote.html')}>{t.common.requestTailoredQuote} <span>↗</span></a></div></section>
+  </main>
+</BaseLayout>

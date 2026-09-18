@@ -1,5 +1,12 @@
 ---
 import WhatsAppIcon from './icons/WhatsAppIcon.astro';
 import { WHATSAPP_URL } from '../config';
+import type { Dictionary } from '../i18n';
+
+interface Props {
+  t: Dictionary;
+}
+
+const { t } = Astro.props;
 ---
-<a class="whatsapp-float" href={WHATSAPP_URL} target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><WhatsAppIcon /></a>
+<a class="whatsapp-float" href={WHATSAPP_URL} target="_blank" rel="noopener" aria-label={t.common.whatsappLabel}><WhatsAppIcon /></a>

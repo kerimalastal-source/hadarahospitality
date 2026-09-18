@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { CONTACT_EMAIL, CONTACT_PHONE } from '../config';
+import { getDictionary, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const q = t.getAQuote;
+const f = q.form;
+const p = (path: string) => localizePath(locale, path);
+
+// Stable English values so a product page's prefilled category and the resulting
+// mailto email stay consistent for the owner, regardless of the visitor's language.
+const CATEGORY_VALUES = ['Bed linen & bedding', 'Towels & bath', 'Robes & slippers', 'Pillows & duvets', 'Mattress protectors', 'Multiple categories', 'Other hospitality essentials'];
+---
+<BaseLayout title={q.title} description={q.description} path="/get-a-quote.html" locale={locale}>
+  <main>
+    <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>{q.hero.eyebrow}</p><p class="eyebrow light">{q.hero.eyebrow}</p><h1>{q.hero.heading1}<br /><em>{q.hero.heading2}</em></h1><p class="pdp-tagline">{q.hero.body}</p></div></section>
+    <section class="quote-trust wrap">
+      {q.trust.map((line) => <span>{line}</span>)}
+    </section>
+    <section class="quote-section wrap" id="quote">
+      <div>
+        <p class="eyebrow">{f.eyebrow}</p>
+        <h2>{f.heading1}<br /><em>{f.heading2}</em></h2>
+        <p>{f.body}</p>
+        <div class="contact-details">
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          <a href={`tel:${CONTACT_PHONE.replace(/\s+/g, '')}`}>{CONTACT_PHONE}</a>
+          <span>Istanbul, Türkiye</span>
+        </div>
+      </div>
+      <form id="quote-form" class="quote-form">
+        <h3>{f.title}</h3>
+        <div class="field-row">
+          <label>{f.name} <input name="name" required autocomplete="name" placeholder="Full name" /></label>
+          <label>{f.email} <input name="email" type="email" required autocomplete="email" placeholder="name@hotel.com" /></label>
+        </div>
+        <div class="field-row">
+          <label>{f.hotel} <input name="hotel" required placeholder="Property name" /></label>
+          <label>{f.country} <input name="country" required autocomplete="country-name" placeholder="Country" /></label>
+        </div>
+        <label>{f.category} <select name="category" required>
+          <option value="">{f.categoryPlaceholder}</option>
+          {CATEGORY_VALUES.map((value, i) => <option value={value}>{f.categoryOptions[i]}</option>)}
+        </select></label>
+        <label>{f.details} <textarea name="details" rows="4" placeholder={f.detailsPlaceholder}></textarea></label>
+        <button class="button button-gold" type="submit">{f.submit} <span>↗</span></button>
+        <p class="form-note">{f.note}</p>
+      </form>
+    </section>
+  </main>
+</BaseLayout>
