@@ -41,6 +41,7 @@ export interface Dictionary {
     title: string;
     description: string;
     hero: { eyebrow: string; heading1: string; heading2: string; lead: string; explore: string; requestQuote: string };
+    openingBanner: { eyebrow: string; heading1: string; heading2: string; cta: string };
     catalogs: { eyebrow: string; heading1: string; heading2: string; body: string; productCatalog: string; techSpecs: string };
     intro: { eyebrow: string; heading1: string; heading2: string; body: string; moreAboutUs: string };
     collections: {
@@ -95,6 +96,9 @@ export interface Dictionary {
     category: string;
     suitableFor: string;
     customization: string;
+    moq: string;
+    leadTime: string;
+    moqNote: string;
     requestQuoteFor: string;
     specifications: string;
     technicalDetails1: string;
@@ -205,6 +209,41 @@ export interface Dictionary {
   faq: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; items: FaqItem[]; ctaEyebrow: string; ctaHeading1: string; ctaHeading2: string; contactUs: string };
   privacyPolicy: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; sections: { heading: string; body: string }[]; ctaEyebrow: string; ctaHeading1: string; ctaHeading2: string };
   search: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; placeholder: string; searchButton: string };
+  hotelOpening: {
+    title: string;
+    description: string;
+    hero: { label: string; eyebrow: string; heading1: string; heading2: string; body: string; cta: string };
+    contents: { eyebrow: string; heading1: string; heading2: string; body: string; comingSoon: string };
+    benefits: { eyebrow: string; heading1: string; heading2: string; body: string; cta: string; items: { title: string; body: string }[] };
+    process: { eyebrow: string; heading1: string; heading2: string; body: string; steps: { title: string; body: string }[] };
+    cta: { eyebrow: string; heading1: string; heading2: string; button: string };
+  };
+  fabricGuide: {
+    title: string;
+    description: string;
+    hero: { label: string; eyebrow: string; heading1: string; heading2: string; body: string };
+    gsm: {
+      eyebrow: string;
+      heading1: string;
+      heading2: string;
+      body: string;
+      ourRange: string;
+      scaleMin: string;
+      scaleMax: string;
+      tiers: { title: string; range: string; body: string }[];
+    };
+    tc: {
+      eyebrow: string;
+      heading1: string;
+      heading2: string;
+      body: string;
+      ourRange: string;
+      scaleMin: string;
+      scaleMax: string;
+      tiers: { title: string; range: string; body: string }[];
+    };
+    cta: { eyebrow: string; heading1: string; heading2: string; button: string };
+  };
   notFound: {
     title: string;
     description: string;

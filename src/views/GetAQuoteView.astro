@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getDictionary, localizePath, type Locale } from '../i18n';
+import { en } from '../i18n/dictionaries/en';
 import { WORLD_COUNTRIES } from '../data/countries';
 
 interface Props {
@@ -12,6 +13,17 @@ const t = getDictionary(locale);
 const q = t.getAQuote;
 const f = q.form;
 const p = (path: string) => localizePath(locale, path);
+
+// Checkbox values stay the stable English canonical strings (matching
+// LEGACY_CATEGORY_TO_RFQ_CATEGORY in src/lib/rfq.ts) regardless of locale —
+// only the visible label is translated — so a product page's pre-check
+// (applyProductFromUrl() in rfq-form.ts, which matches on value) keeps
+// working outside English. Both arrays are always the same length/order
+// (see CLAUDE.md's i18n section), so a positional zip is safe.
+const productCategoryOptions = en.getAQuote.form.productCategories.map((value, i) => ({
+  value,
+  label: f.productCategories[i] ?? value,
+}));
 ---
 <BaseLayout title={q.title} description={q.description} path="/get-a-quote" locale={locale}>
   <main>
@@ -81,8 +93,8 @@ const p = (path: string) => localizePath(locale, path);
           <div class="rfq-field-block">
             <span class="rfq-label rfq-required">{f.productsRequired}</span>
             <div class="rfq-chip-grid" role="group" aria-label={f.productsRequired}>
-              {f.productCategories.map((option) => (
-                <label class="rfq-chip"><input type="checkbox" name="categories" value={option} /><span>{option}</span></label>
+              {productCategoryOptions.map(({ value, label }) => (
+                <label class="rfq-chip"><input type="checkbox" name="categories" value={value} /><span>{label}</span></label>
               ))}
             </div>
             <p class="rfq-error" id="rfq-categories-error" role="alert" hidden>{f.errorProducts}</p>

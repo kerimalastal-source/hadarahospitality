@@ -8,15 +8,22 @@ export type CategoryKey = 'towels' | 'robes' | 'bed-linen' | 'pillows' | 'protec
 export interface Category {
   label: string;
   formCategory: string;
+  /** Category-level placeholder figures shown on every product page in this
+   * category (src/views/ProductView.astro's spec table) until the owner
+   * confirms real per-category numbers — see the "tentative" note shown
+   * alongside them (productDetail.moqNote in the dictionary). Never treat
+   * these as confirmed pricing/ordering terms. */
+  moq: string;
+  leadTime: string;
 }
 
 export const CATEGORIES: Record<CategoryKey, Category> = {
-  towels: { label: 'Towels & Bath', formCategory: 'Towels & bath' },
-  robes: { label: 'Robes & Slippers', formCategory: 'Robes & slippers' },
-  'bed-linen': { label: 'Bed Linen', formCategory: 'Bed linen & bedding' },
-  pillows: { label: 'Pillows & Duvets', formCategory: 'Pillows & duvets' },
-  protectors: { label: 'Mattress Protectors', formCategory: 'Mattress protectors' },
-  amenities: { label: 'Hotel Amenities', formCategory: 'Other hospitality essentials' },
+  towels: { label: 'Towels & Bath', formCategory: 'Towels & bath', moq: '100 pieces per style', leadTime: '3–4 weeks' },
+  robes: { label: 'Robes & Slippers', formCategory: 'Robes & slippers', moq: '50 pieces per style', leadTime: '4–5 weeks' },
+  'bed-linen': { label: 'Bed Linen', formCategory: 'Bed linen & bedding', moq: '100 sets per style', leadTime: '4–5 weeks' },
+  pillows: { label: 'Pillows & Duvets', formCategory: 'Pillows & duvets', moq: '100 pieces per style', leadTime: '3–4 weeks' },
+  protectors: { label: 'Mattress Protectors', formCategory: 'Mattress protectors', moq: '100 pieces per style', leadTime: '3–4 weeks' },
+  amenities: { label: 'Hotel Amenities', formCategory: 'Other hospitality essentials', moq: '500 pieces per style', leadTime: '3–5 weeks' },
 };
 
 // Category display order used on the products listing page and the jump nav.
@@ -61,6 +68,22 @@ export const PRODUCTS: Product[] = [
     gallery: ['https://static.wixstatic.com/media/3510f9_383c86f602ab4db3a9aa1a04ed0fe7f9~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_d4c7ad29d236402c80bb9349656237ed~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_845509d74baf4444b6504ffd68c458bd~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_0eef6acf5bef4ef9bdbe4b0749564c7d~mv2.jpg'],
   },
   {
+    // No product photography yet — same placeholder-gallery treatment as
+    // the rest of this file's unphotographed entries.
+    slug: 'hotel-bath-sheet-700-gsm',
+    name: 'Hotel Bath Sheet',
+    category: 'towels',
+    material: '100% hospitality-grade cotton',
+    suitableFor: '4★ & 5★ hotel segments',
+    specLabel: 'GSM',
+    specValues: ['500 GSM', '600 GSM', '700 GSM'],
+    customization: ['Custom Logo Embroidery', 'Custom Size Request', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: 'Premium oversized bath sheet designed for luxury hospitality environments, including hotels, resorts, and spa facilities. Larger than a standard bath towel, manufactured from high-quality cotton fabrics to provide full-body coverage, exceptional softness, and lasting absorbency for professional hospitality use.',
+    features: ['Oversized full-body coverage', '600 GSM premium hospitality quality', 'High absorbency & soft-touch texture', 'Durable for commercial laundry operations', 'Suitable for 4★ & 5★ hotel segments'],
+    main: '',
+    gallery: [],
+  },
+  {
     slug: 'hotel-hand-towel',
     name: 'Hotel Hand Towel',
     category: 'towels',
@@ -87,6 +110,22 @@ export const PRODUCTS: Product[] = [
     features: ['500 GSM hospitality-grade quality', 'Soft-touch & high absorbency', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments', 'Elegant white hospitality presentation'],
     main: 'https://static.wixstatic.com/media/3510f9_5e83f411e37e4dcd942f23465c007250~mv2.jpg',
     gallery: ['https://static.wixstatic.com/media/3510f9_5e83f411e37e4dcd942f23465c007250~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_5771c7b23a614390bd7b2f8551003ba1~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_b910500fa875415db60b4945ff730c67~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_cd269d83c63c47dc9225cc7840f04d79~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_1e2e6c22b4884042b07badab80e43ab1~mv2.jpg'],
+  },
+  {
+    // No product photography yet — same placeholder-gallery treatment as
+    // the rest of this file's unphotographed entries.
+    slug: 'hotel-washcloth',
+    name: 'Hotel Washcloth',
+    category: 'towels',
+    material: '100% hospitality-grade cotton',
+    suitableFor: 'Hotels, resorts & serviced apartments',
+    specLabel: 'GSM',
+    specValues: ['350 GSM', '400 GSM', '450 GSM'],
+    customization: ['Custom Logo Embroidery', 'Custom Size Request', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: 'Compact hotel washcloth developed for hospitality bathrooms and guest room operations. Manufactured from high-quality cotton fabrics to provide a soft, practical everyday essential for washing and cleansing during a stay.',
+    features: ['Compact everyday cotton essential', '400 GSM hospitality-grade quality', 'Soft-touch & absorbent texture', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments'],
+    main: '',
+    gallery: [],
   },
   {
     slug: 'hotel-pool-towel-600-gsm',
@@ -229,6 +268,54 @@ export const PRODUCTS: Product[] = [
     gallery: ['https://static.wixstatic.com/media/3510f9_2e20426e9db2480691f32aac420443da~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_afda1e59439d4a878c9ad4f1818ea7b3~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_db79943c4f5442f28ef3c56165021f92~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_b5f4236ce10d4c1eb245feb1529b6a03~mv2.jpg'],
   },
   {
+    // No product photography yet — see the "Hotel Amenities" note below;
+    // same placeholder-gallery treatment applies here.
+    slug: 'luxury-hotel-fitted-sheet-250-tc',
+    name: 'Luxury Hotel Fitted Sheet – 250 TC',
+    category: 'bed-linen',
+    material: 'Premium hospitality-grade fabric',
+    suitableFor: 'Hotels, resorts & serviced apartments',
+    specLabel: 'Fabric Quality',
+    specValues: ['200 TC', '250 TC', '300 TC'],
+    customization: ['Custom Size Request', 'Custom Embroidery', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: 'Premium fitted sheet designed for luxury hotels, resorts, and hospitality guest room environments. Manufactured from high-quality hospitality fabrics with a deep, elasticized pocket for a secure, wrinkle-free fit on hotel-depth mattresses.',
+    features: ['250 TC premium hospitality fabric', 'Deep elasticized pocket for hotel mattress depths', 'Soft-touch & breathable structure', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments'],
+    main: '',
+    gallery: [],
+  },
+  {
+    // No product photography yet — same placeholder-gallery treatment as
+    // the rest of this file's unphotographed entries.
+    slug: 'luxury-hotel-bed-blanket',
+    name: 'Luxury Hotel Bed Blanket',
+    category: 'bed-linen',
+    material: 'Premium cotton-blend fabric',
+    suitableFor: 'Hotels, resorts & serviced apartments',
+    specLabel: 'Weight',
+    specValues: ['Lightweight', 'Medium Weight', 'Heavyweight'],
+    customization: ['Custom Size Request', 'Custom Embroidery', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: 'Premium bed blanket designed for luxury hotels, resorts, and hospitality guest room environments. Manufactured from soft cotton-blend fabric to provide an extra warmth layer alongside the duvet, with reliable performance through repeated commercial laundering.',
+    features: ['Soft cotton-blend fabric', 'Available in multiple weights for warmth', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments', 'Elegant guest room presentation'],
+    main: '',
+    gallery: [],
+  },
+  {
+    // No product photography yet — same placeholder-gallery treatment as
+    // the rest of this file's unphotographed entries.
+    slug: 'decorative-bed-runner',
+    name: 'Decorative Bed Runner',
+    category: 'bed-linen',
+    material: 'Premium decorative fabric',
+    suitableFor: 'Hotels, resorts & serviced apartments',
+    specLabel: 'Style',
+    specValues: ['Solid', 'Textured', 'Quilted'],
+    customization: ['Custom Size Request', 'Custom Embroidery', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: "Decorative bed runner designed to finish the guest room bed presentation for luxury hotels, resorts, and hospitality environments. Placed across the foot of the bed for an elevated, boutique-style finish that complements the room's overall bedding.",
+    features: ['Elegant decorative bed accent', 'Available in multiple styles & finishes', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments', 'Boutique-style guest room presentation'],
+    main: '',
+    gallery: [],
+  },
+  {
     slug: 'luxury-hotel-duvet-microfiber',
     name: 'Luxury Hotel Duvet – Microfiber',
     category: 'pillows',
@@ -269,6 +356,22 @@ export const PRODUCTS: Product[] = [
     features: ['Waterproof & breathable structure', 'Hospitality-grade protection', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments', 'Long-lasting mattress protection'],
     main: 'https://static.wixstatic.com/media/3510f9_1b16cf4752f548279969376473721ab3~mv2.jpg',
     gallery: ['https://static.wixstatic.com/media/3510f9_1b16cf4752f548279969376473721ab3~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_078056a0a70e4302ba7f495493deb3c6~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_9107a234593345f9abd26328f523bdcf~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_754a4169933f4f7882a7a421360ce344~mv2.jpg'],
+  },
+  {
+    // No product photography yet — same placeholder-gallery treatment as
+    // "Hotel Amenities" below.
+    slug: 'waterproof-pillow-protector',
+    name: 'Waterproof Pillow Protector',
+    category: 'protectors',
+    material: 'Waterproof & breathable structure',
+    suitableFor: 'Hotels, resorts & serviced apartments',
+    specLabel: 'Type',
+    specValues: ['Waterproof', 'Breathable', 'Zippered Closure'],
+    customization: ['Custom Size Request', 'Custom Labeling', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: 'Waterproof pillow protector designed for hotels, resorts, and hospitality guest room environments. Manufactured with breathable, protective materials and a secure zippered closure to safeguard pillows and extend their hospitality service life.',
+    features: ['Waterproof & breathable structure', 'Secure zippered closure', 'Hospitality-grade protection', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments'],
+    main: '',
+    gallery: [],
   },
   // Hotel Amenities — no product photography yet; pages render a clean
   // placeholder gallery until real photos are supplied (main/gallery left empty).
