@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { PRODUCTS, CATEGORIES, CATEGORY_ORDER } from '../data/products';
+
+const categoryImages: Record<string, { url: string; alt: string }> = {
+  towels: { url: 'https://static.wixstatic.com/media/3510f9_64e4d5bf01d347bba5b26b2e14db43c0~mv2.jpg', alt: 'Hotel towels' },
+  robes: { url: 'https://static.wixstatic.com/media/3510f9_e334fadc9f214cc7bbe0bb1050b9125c~mv2.png', alt: 'Hospitality robes and slippers' },
+  'bed-linen': { url: 'https://static.wixstatic.com/media/3510f9_acfee53c28934ff28e4f1f352930fd21~mv2.jpg', alt: 'Hotel bed linen' },
+  pillows: { url: 'https://static.wixstatic.com/media/3510f9_1972a7ea1d9b4470ba7478bfdb71baba~mv2.jpg', alt: 'Hotel pillows and duvets' },
+  protectors: { url: 'https://static.wixstatic.com/media/nsplsh_5a56322d64347a316d306b~mv2.jpg', alt: 'Mattress protection for hotels' },
+  amenities: { url: 'https://static.wixstatic.com/media/3510f9_fd456c76b4e44f8689e5b09877a749f1~mv2.jpg', alt: 'Hotel guest room amenities' },
+};
+
+const categoryCta: Record<string, string> = {
+  amenities: 'Ask about other amenities',
+};
+
+function splitHeading(label: string) {
+  const words = label.split(' ');
+  const last = words.pop() ?? '';
+  return { lead: words.join(' '), emphasis: last };
+}
+---
+<BaseLayout
+  title="Products & Collections | HADARA Hospitality"
+  description="Explore HADARA Hospitality collections: hotel bed linen, towels, bathrobes, slippers, pillows, duvets, mattress protectors and guest amenities."
+  canonicalPath="/products.html"
+  active="products"
+>
+  <main>
+    <section class="products-hero"><div class="wrap"><p class="eyebrow light">HADARA HOSPITALITY COLLECTIONS</p><h1>Essentials for<br /><em>every stay.</em></h1><p>Explore our hospitality product categories for hotels, resorts and serviced apartments.</p></div></section>
+    <nav class="product-jump wrap" aria-label="Product categories">
+      {CATEGORY_ORDER.map((key) => <a href={`#${key}`}>{CATEGORIES[key].label}</a>)}
+    </nav>
+    <div class="product-list wrap">
+      {CATEGORY_ORDER.map((key, i) => {
+        const cat = CATEGORIES[key];
+        const products = PRODUCTS.filter((p) => p.category === key);
+        const image = categoryImages[key];
+        const { lead, emphasis } = splitHeading(cat.label);
+        return (
+          <section class="product-category" id={key}>
+            <div class="product-image" data-bg={image.url} role="img" aria-label={image.alt}></div>
+            <div class="product-copy">
+              <span class="product-number">{String(i + 1).padStart(2, '0')} / COLLECTION</span>
+              <h2>{lead} <em>{emphasis}.</em></h2>
+              <p>
+                {key === 'towels' && 'Hospitality towel collections for hotels, resorts and spa environments, selected for softness, absorbency and durability.'}
+                {key === 'robes' && 'Robes and slippers for hotels, spas and resorts, with options suited to guest comfort and presentation.'}
+                {key === 'bed-linen' && 'Hotel bedding collections developed for guest comfort, operational durability and refined room presentation.'}
+                {key === 'pillows' && 'Hospitality pillows and duvets for hotels, resorts and serviced apartments.'}
+                {key === 'protectors' && 'Mattress protection options focused on hygiene, guest comfort and long-term use.'}
+                {key === 'amenities' && 'Guest room essentials selected to support comfort, branding and hospitality presentation.'}
+              </p>
+              <ul>
+                {products.map((p) => (
+                  <li><a href={`/products/${p.slug}.html`}>{p.name}</a></li>
+                ))}
+              </ul>
+              <a class="text-link" href="/get-a-quote.html">{categoryCta[key] ?? 'Request this collection'} <span>↗</span></a>
+            </div>
+          </section>
+        );
+      })}
+    </div>
+    <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>Looking for a particular<br /><em>specification?</em></h2></div><a class="button button-gold" href="/get-a-quote.html">Request a tailored quote <span>↗</span></a></div></section>
+  </main>
+</BaseLayout>

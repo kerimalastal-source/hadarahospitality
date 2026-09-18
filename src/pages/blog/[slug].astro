@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ARTICLES, type Article } from '../../data/blog';
+
+export function getStaticPaths() {
+  return ARTICLES.map((article) => ({ params: { slug: article.slug }, props: { article } }));
+}
+
+interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+
+function formatDate(iso: string) {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+}
+
+const related = ARTICLES.filter((a) => a.category === article.category && a.slug !== article.slug).slice(0, 3);
+const relatedPool = related.length ? related : ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 3);
+---
+<BaseLayout
+  title={`${article.title} | HADARA Hospitality`}
+  description={article.excerpt}
+  canonicalPath={`/blog/${article.slug}.html`}
+  ogType="article"
+  ogImage={article.hero}
+  active="blog"
+>
+  <main>
+    <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href="/blog.html">Blog</a><span>/</span>{article.title}</p><p class="eyebrow light">{article.category.toUpperCase()}</p><h1>{article.title}</h1><p class="article-meta-line">{formatDate(article.date)} <span>·</span> {article.readTime} <span>·</span> HADARA Hospitality Team</p></div></section>
+    <figure class="article-cover-figure"><img class="article-cover" src={article.hero} alt={article.heroAlt} /></figure>
+    <article class="article-body wrap">
+      {article.body.map((block) => {
+        if (block.type === 'p') return <p>{block.text}</p>;
+        if (block.type === 'h2') return <h2>{block.text}</h2>;
+        if (block.type === 'ul') return <ul>{block.items.map((item) => <li>{item}</li>)}</ul>;
+        if (block.type === 'image') return <figure class="article-figure"><img src={article.inlineImage} alt={article.inlineAlt} loading="lazy" /></figure>;
+        return null;
+      })}
+    </article>
+    <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>Ready to talk about<br /><em>your property?</em></h2></div><a class="button button-gold" href="/get-a-quote.html">Request a tailored quote <span>↗</span></a></div></section>
+    <section class="pdp-related wrap">
+      <p class="eyebrow">YOU MAY ALSO LIKE</p>
+      <h2>More from the <em>HADARA journal.</em></h2>
+      <div class="related-grid">
+        {relatedPool.map((a) => (
+          <a class="related-card" href={`/blog/${a.slug}.html`} data-bg={a.hero}><span>{a.title}</span></a>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

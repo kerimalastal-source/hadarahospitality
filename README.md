@@ -1,4 +1,7 @@
-# HADARA Hospitality — new homepage prototype
+# HADARA Hospitality — website
+
+Code-built site for hadarahospitality.com. Built with [Astro](https://astro.build)
+and TypeScript — static output, no backend, no client-side framework runtime.
 
 ## Design colors
 
@@ -11,9 +14,9 @@ Use this palette for every new page and component:
 | Pure white | `#FFFFFF` |
 | Warm ivory | `#F1EBE4` |
 
-The shared CSS variables in `styles.css` define these colors. Use navy for primary text and dark surfaces, white for main content, ivory for alternating sections, and gold for accents and calls to action. Keep small body text navy on light backgrounds for readability.
-
-Responsive, static homepage inspired by the existing HADARA Hospitality site. It includes collections, supply benefits, process and a quotation request that opens the visitor's email app. It does not yet send or store submissions server-side.
+The shared CSS variables in `src/styles/global.css` define these colors. Use navy
+for primary text and dark surfaces, white for main content, ivory for
+alternating sections, and gold for accents and calls to action.
 
 ## Run
 
@@ -22,8 +25,18 @@ npm install
 npm run dev
 ```
 
+## Build
+
+```sh
+npm run build   # runs the generators, then `astro build` into dist/
+npm run preview # serve the built dist/ locally
+```
+
 ## Publish on Vercel
 
-Push this folder to a GitHub repository, import the repository in Vercel, and use the default Vite build (`npm run build`, output directory `dist`). Keep the existing live domain unchanged until the new site has been reviewed and all needed pages and integrations have been migrated.
+Vercel auto-detects Astro and runs `npm run build` (output directory `dist`).
+No manual configuration needed. See `CLAUDE.md` for the full project context,
+architecture and conventions.
 
-Some collection photos currently reference the existing site's Wix media URLs. Replace those with locally hosted licensed/owned optimized images before final launch. The H monogram is a temporary text mark pending the original logo asset.
+Some collection photos currently reference the existing site's Wix media URLs
+— see the "Pending / deferred" section of `CLAUDE.md`.

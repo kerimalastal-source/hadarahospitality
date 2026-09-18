@@ -1,0 +1,27 @@
+---
+import SearchIcon from './icons/SearchIcon.astro';
+
+export type NavKey = 'products' | 'about' | 'blog' | 'contact';
+
+interface Props {
+  active?: NavKey;
+}
+
+const { active } = Astro.props;
+---
+<header class="site-header" id="top">
+  <a class="brand" href="/index.html" aria-label="HADARA Hospitality home">
+    <img src="/assets/hadara-logo-black.svg" alt="HADARA Hospitality" class="hadara-header-logo" />
+  </a>
+  <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="navigation"><span></span><span></span><span></span></button>
+  <nav id="navigation" aria-label="Main navigation">
+    <a href="/products.html" aria-current={active === 'products' ? 'page' : undefined}>Products</a>
+    <a href="/index.html#approach">Our approach</a>
+    <a href="/index.html#process">How it works</a>
+    <a href="/about.html" aria-current={active === 'about' ? 'page' : undefined}>About us</a>
+    <a href="/blog.html" aria-current={active === 'blog' ? 'page' : undefined}>Blog</a>
+    <a href="/contact.html" aria-current={active === 'contact' ? 'page' : undefined}>Contact</a>
+    <a class="nav-search" href="/search.html" aria-label="Search"><SearchIcon /></a>
+    <a class="nav-quote" href="/get-a-quote.html">Request a quote <span>↗</span></a>
+  </nav>
+</header>
