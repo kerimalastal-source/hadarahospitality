@@ -48,7 +48,9 @@ export interface RfqSubmission {
   specifications: {
     notes?: string;
     additionalMessage?: string;
-    uploadedFile?: { name: string; size: number; type: string } | null;
+    /** `url` is set only once BLOB_READ_WRITE_TOKEN is configured and the
+     * upload succeeded — see persistUploadedFile() in api/submit-quote.ts. */
+    uploadedFile?: { name: string; size: number; type: string; url?: string } | null;
   };
   system: {
     submittedAt: string;

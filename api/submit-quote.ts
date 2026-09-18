@@ -17,6 +17,7 @@
 
 import { isValidRfqFile, isValidWorkEmail, RFQ_FILE_MAX_BYTES, type RfqProductMeta, type RfqSubmission } from '../src/lib/rfq';
 import { CONTACT_EMAIL } from '../src/config';
+import { put } from '@vercel/blob';
 
 export const config = { runtime: 'edge' };
 
@@ -54,6 +55,15 @@ function row(label: string, value?: string): string {
   return `<tr><td style="padding:5px 16px 5px 0;color:#626a72;font-size:13px;white-space:nowrap;vertical-align:top">${escapeHtml(label)}</td><td style="padding:5px 0;font-size:13px;color:#1e2a38">${escapeHtml(value).replace(/\n/g, '<br>')}</td></tr>`;
 }
 
+function fileRow(file?: { name: string; size: number; url?: string } | null): string {
+  if (!file) return '';
+  const sizeLabel = `${(file.size / 1024).toFixed(0)} KB`;
+  const value = file.url
+    ? `<a href="${escapeHtml(file.url)}" style="color:#8b6634">${escapeHtml(file.name)}</a> (${sizeLabel})`
+    : `${escapeHtml(file.name)} (${sizeLabel}) — not stored, storage not configured`;
+  return `<tr><td style="padding:5px 16px 5px 0;color:#626a72;font-size:13px;white-space:nowrap;vertical-align:top">Attached file</td><td style="padding:5px 0;font-size:13px;color:#1e2a38">${value}</td></tr>`;
+}
+
 function renderInternalEmail(s: RfqSubmission): string {
   const sp = s.products.selectedProduct;
   const selectedProductLine = sp ? [sp.name, sp.material, sp.gsm].filter(Boolean).join(' — ') : undefined;
@@ -82,7 +92,7 @@ function renderInternalEmail(s: RfqSubmission): string {
       ${row('Sample required', s.project.sampleRequired)}
       ${row('Notes / specifications', s.specifications.notes)}
       ${row('Additional message', s.specifications.additionalMessage)}
-      ${row('Attached file', s.specifications.uploadedFile ? `${s.specifications.uploadedFile.name} (${(s.specifications.uploadedFile.size / 1024).toFixed(0)} KB)` : undefined)}
+      ${fileRow(s.specifications.uploadedFile)}
       ${row('Source page', s.system.sourcePage)}
     </table>
   </div>`;
@@ -138,16 +148,24 @@ async function syncToHubSpot(submission: RfqSubmission): Promise<void> {
   // TODO: Contact (email/name/phone) -> Company (companyName/country) -> Deal (reference, categories, notes).
 }
 
-/** Stub — persist the uploaded file once BLOB_READ_WRITE_TOKEN (Vercel Blob) or
- * equivalent object storage is configured. Until then, the file is validated
- * but its bytes are discarded after this request — only its metadata is kept. */
+/** Persists the uploaded file to Vercel Blob once BLOB_READ_WRITE_TOKEN is
+ * configured (that env var is all `put()` needs — no other setup). Until
+ * then, the file is validated but its bytes are discarded after this
+ * request; only its name/size/type are kept.
+ *
+ * Stored as `access: 'public'` with a random suffix: the URL isn't listed
+ * or guessable anywhere, and this keeps the owner's workflow simple — the
+ * download link goes straight in the internal notification email, no
+ * separate login or signed-URL step. If these documents need to be
+ * access-controlled instead, switch to `access: 'private'` and fetch them
+ * with the Blob SDK's own authenticated `get()`/dashboard access. */
 async function persistUploadedFile(file: File, reference: string): Promise<{ stored: boolean; url?: string }> {
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     console.info('[rfq] persistUploadedFile: no storage configured, discarding file bytes', reference, file.name);
     return { stored: false };
   }
-  // TODO: upload `file` to Vercel Blob (or chosen storage) under a key namespaced by `reference`.
-  return { stored: false };
+  const blob = await put(`rfq/${reference}/${file.name}`, file, { access: 'public', addRandomSuffix: true });
+  return { stored: true, url: blob.url };
 }
 
 export default async function handler(request: Request): Promise<Response> {
@@ -201,7 +219,7 @@ export default async function handler(request: Request): Promise<Response> {
 
   // --- File validation (optional field) -----------------------------------
   const fileEntry = formData.get('file');
-  let fileMeta: { name: string; size: number; type: string } | null = null;
+  let fileMeta: { name: string; size: number; type: string; url?: string } | null = null;
   let uploadedFile: File | null = null;
   if (fileEntry instanceof File && fileEntry.size > 0) {
     if (!isValidRfqFile(fileEntry)) {
@@ -231,6 +249,18 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   const reference = generateReference();
+
+  // Store the file (if any) before building the emails below, so a
+  // successful upload's download link can be included in them.
+  if (uploadedFile && fileMeta) {
+    try {
+      const stored = await persistUploadedFile(uploadedFile, reference);
+      if (stored.url) fileMeta.url = stored.url;
+    } catch (error) {
+      console.error('[rfq] persistUploadedFile failed', reference, error);
+    }
+  }
+
   const submission: RfqSubmission = {
     contact: {
       fullName,
@@ -274,9 +304,10 @@ export default async function handler(request: Request): Promise<Response> {
 
   // allSettled, not all: one integration failing (e.g. email) must never stop
   // the others from running, and must never fail the submission itself — the
-  // RFQ was already validated and has a reference number.
+  // RFQ was already validated and has a reference number. (File storage
+  // already ran above, before the emails were built, so its result could be
+  // included in them.)
   const tasks: Promise<unknown>[] = [notifyHadaraTeam(submission), confirmToCustomer(submission), syncToHubSpot(submission)];
-  if (uploadedFile) tasks.push(persistUploadedFile(uploadedFile, reference));
   const results = await Promise.allSettled(tasks);
   results.forEach((result) => {
     if (result.status === 'rejected') console.error('[rfq] post-submission integration error', reference, result.reason);
