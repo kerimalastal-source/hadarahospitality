@@ -260,6 +260,7 @@ export const ru: DeepPartial<Dictionary> = {
       projectTypePlaceholder: 'Выберите тип проекта',
       projectTypeOptions: ['Открытие нового отеля', 'Реновация', 'Пополнение запасов', 'Новый гостиничный проект', 'Образец / Оценка продукта', 'Другое'],
       deliveryCountry: 'Страна доставки',
+      deliveryCountryPlaceholder: 'Выберите страну доставки',
       deliveryCity: 'Город доставки',
       targetDeliveryDate: 'Желаемая дата доставки',
       customBranding: 'Индивидуальный логотип / брендинг',

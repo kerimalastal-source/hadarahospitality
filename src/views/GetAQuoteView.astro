@@ -95,7 +95,10 @@ const p = (path: string) => localizePath(locale, path);
               <option value="">{f.projectTypePlaceholder}</option>
               {f.projectTypeOptions.map((option) => <option value={option}>{option}</option>)}
             </select></label>
-            <label class="rfq-required">{f.deliveryCountry}<input name="deliveryCountry" required autocomplete="country-name" /></label>
+            <label class="rfq-required">{f.deliveryCountry}<select name="deliveryCountry" required autocomplete="country-name">
+              <option value="">{f.deliveryCountryPlaceholder}</option>
+              {WORLD_COUNTRIES.map((country) => <option value={country}>{country}</option>)}
+            </select></label>
             <label>{f.deliveryCity}<input name="deliveryCity" /></label>
             <label>{f.targetDeliveryDate}<input name="targetDeliveryDate" type="date" /></label>
           </div>
