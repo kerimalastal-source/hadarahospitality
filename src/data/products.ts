@@ -236,6 +236,22 @@ export const PRODUCTS: Product[] = [
     gallery: ['https://static.wixstatic.com/media/3510f9_2e20426e9db2480691f32aac420443da~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_afda1e59439d4a878c9ad4f1818ea7b3~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_db79943c4f5442f28ef3c56165021f92~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_b5f4236ce10d4c1eb245feb1529b6a03~mv2.jpg'],
   },
   {
+    // No product photography yet — see the "Hotel Amenities" note below;
+    // same placeholder-gallery treatment applies here.
+    slug: 'luxury-hotel-fitted-sheet-250-tc',
+    name: 'Luxury Hotel Fitted Sheet – 250 TC',
+    category: 'bed-linen',
+    material: 'Premium hospitality-grade fabric',
+    suitableFor: 'Hotels, resorts & serviced apartments',
+    specLabel: 'Fabric Quality',
+    specValues: ['200 TC', '250 TC', '300 TC'],
+    customization: ['Custom Size Request', 'Custom Embroidery', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: 'Premium fitted sheet designed for luxury hotels, resorts, and hospitality guest room environments. Manufactured from high-quality hospitality fabrics with a deep, elasticized pocket for a secure, wrinkle-free fit on hotel-depth mattresses.',
+    features: ['250 TC premium hospitality fabric', 'Deep elasticized pocket for hotel mattress depths', 'Soft-touch & breathable structure', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments'],
+    main: '',
+    gallery: [],
+  },
+  {
     slug: 'luxury-hotel-duvet-microfiber',
     name: 'Luxury Hotel Duvet – Microfiber',
     category: 'pillows',
@@ -276,6 +292,22 @@ export const PRODUCTS: Product[] = [
     features: ['Waterproof & breathable structure', 'Hospitality-grade protection', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments', 'Long-lasting mattress protection'],
     main: 'https://static.wixstatic.com/media/3510f9_1b16cf4752f548279969376473721ab3~mv2.jpg',
     gallery: ['https://static.wixstatic.com/media/3510f9_1b16cf4752f548279969376473721ab3~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_078056a0a70e4302ba7f495493deb3c6~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_9107a234593345f9abd26328f523bdcf~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_754a4169933f4f7882a7a421360ce344~mv2.jpg'],
+  },
+  {
+    // No product photography yet — same placeholder-gallery treatment as
+    // "Hotel Amenities" below.
+    slug: 'waterproof-pillow-protector',
+    name: 'Waterproof Pillow Protector',
+    category: 'protectors',
+    material: 'Waterproof & breathable structure',
+    suitableFor: 'Hotels, resorts & serviced apartments',
+    specLabel: 'Type',
+    specValues: ['Waterproof', 'Breathable', 'Zippered Closure'],
+    customization: ['Custom Size Request', 'Custom Labeling', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: 'Waterproof pillow protector designed for hotels, resorts, and hospitality guest room environments. Manufactured with breathable, protective materials and a secure zippered closure to safeguard pillows and extend their hospitality service life.',
+    features: ['Waterproof & breathable structure', 'Secure zippered closure', 'Hospitality-grade protection', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments'],
+    main: '',
+    gallery: [],
   },
   // Hotel Amenities — no product photography yet; pages render a clean
   // placeholder gallery until real photos are supplied (main/gallery left empty).

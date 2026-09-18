@@ -91,7 +91,7 @@ manual switch required. **All content is now fully translated in all 4
 languages**: full routing for every page (zero 404s anywhere), RTL layout
 for Arabic, the language switcher, hreflang tags, the auto-detect-and-
 redirect middleware, every static page's body copy, the 6 product category
-names (`common.categoryLabels`), and all 23 products' and all 10 articles'
+names (`common.categoryLabels`), and all 25 products' and all 10 articles'
 actual content (name/overview/features/specs, and full article bodies) —
 see `src/i18n/dictionaries/{ar,fr,ru}.ts`, `src/data/products.i18n.ts` and
 `src/data/blog.i18n.ts`.
@@ -675,6 +675,41 @@ sandbox's own known-blocked hosts (`fonts.googleapis.com` — the sandbox
 proxy's CA isn't trusted by a fresh headless browser, unrelated to the
 real site — and Google Maps embeds, both expected per "Sandbox quirks"
 below).
+
+## Product catalog gap analysis (2026-09-19)
+
+The owner asked what's missing from the catalog in the "guest room"
+world. Compared the current 6 categories/23 products against a typical
+hospitality-textile supplier's range and flagged 8 gaps, scoped to
+**textile** products only (matching "trusted Turkish manufacturing
+partners" — non-textile items like door hangers or stationery were
+explicitly excluded as out of scope for this business):
+
+- `bed-linen`: fitted sheet ✅ **added**, bed blanket, decorative bed
+  runner
+- `pillows`: pillow protector ✅ **added**
+- `towels`: oversized bath sheet, washcloth, fabric shower curtain
+- New category territory: blackout curtains, ironing board cover
+
+**Two added so far** (`src/data/products.ts` + full ar/fr/ru
+translations in `src/data/products.i18n.ts`), same "no photography yet"
+placeholder-gallery treatment as the `amenities` category (`main`/
+`gallery` left empty — see the comment above the `amenities` block):
+- `luxury-hotel-fitted-sheet-250-tc` (`bed-linen`) — deep elasticized
+  pocket, same 200–300 TC range as the existing bedsheet/pillowcase.
+- `waterproof-pillow-protector` (`protectors`) — mirrors
+  `waterproof-mattress-protector`'s fields/tone, with a zippered-closure
+  spec value distinct from the mattress protector's quilted-comfort one.
+
+**The remaining six are not yet added** — waiting on the owner to
+confirm which ones to do next. Also worth a future look: the
+`protectors` category is still labeled "Mattress Protectors"
+(`CATEGORIES.protectors.label` and `common.categoryLabels.protectors`
+in all 4 dictionaries) even though it now also holds a pillow
+protector — a rename (e.g. "Mattress & Pillow Protectors") would need
+updating in `src/data/products.ts` and all 4 locale files; deliberately
+left as-is for this pass since it wasn't asked for and touches
+translated strings.
 
 ## Sandbox quirks
 
