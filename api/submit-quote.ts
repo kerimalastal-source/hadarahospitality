@@ -15,9 +15,8 @@
 // do so this is easy to find and wire up later. See CLAUDE.md for the
 // exact env vars each one needs.
 
-import { isValidRfqFile, isValidWorkEmail, RFQ_FILE_MAX_BYTES, type RfqProductMeta, type RfqSubmission } from '../src/lib/rfq';
-import { CONTACT_EMAIL } from '../src/config';
-import { put } from '@vercel/blob';
+import { isValidRfqFile, isValidWorkEmail, RFQ_FILE_MAX_BYTES, type RfqProductMeta, type RfqSubmission } from '../src/lib/rfq.js';
+import { CONTACT_EMAIL } from '../src/config.js';
 
 export const config = { runtime: 'edge' };
 
@@ -148,24 +147,26 @@ async function syncToHubSpot(submission: RfqSubmission): Promise<void> {
   // TODO: Contact (email/name/phone) -> Company (companyName/country) -> Deal (reference, categories, notes).
 }
 
-/** Persists the uploaded file to Vercel Blob once BLOB_READ_WRITE_TOKEN is
- * configured (that env var is all `put()` needs — no other setup). Until
+/** Stub — persist the uploaded file once real storage is wired up. Until
  * then, the file is validated but its bytes are discarded after this
  * request; only its name/size/type are kept.
  *
- * Stored as `access: 'public'` with a random suffix: the URL isn't listed
- * or guessable anywhere, and this keeps the owner's workflow simple — the
- * download link goes straight in the internal notification email, no
- * separate login or signed-URL step. If these documents need to be
- * access-controlled instead, switch to `access: 'private'` and fetch them
- * with the Blob SDK's own authenticated `get()`/dashboard access. */
+ * NOT using @vercel/blob's `put()` here: this function runs on the Edge
+ * runtime (see top of file for why), and `@vercel/blob` pulls in Node
+ * built-ins (node:stream, node:net, node:tls, ...) that the Edge sandbox
+ * rejects outright — a real attempt at this shipped as PR #26 and failed
+ * to deploy (NOW_SANDBOX_WORKER_EDGE_FUNCTION_UNSUPPORTED_MODULES). Vercel
+ * Blob's own recommended fix for exactly this situation is *client
+ * uploads*: the browser uploads the file straight to Blob storage using a
+ * short-lived token from a dedicated (Node-runtime) token endpoint,
+ * bypassing this Edge function's body entirely — see `@vercel/blob/client`
+ * and `handleUpload()`. That's a genuine restructure of the upload flow
+ * (a two-phase submit: upload the file, then submit the form with the
+ * resulting URL), not a drop-in fix, so it's left as a separate follow-up
+ * rather than guessed at here. */
 async function persistUploadedFile(file: File, reference: string): Promise<{ stored: boolean; url?: string }> {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    console.info('[rfq] persistUploadedFile: no storage configured, discarding file bytes', reference, file.name);
-    return { stored: false };
-  }
-  const blob = await put(`rfq/${reference}/${file.name}`, file, { access: 'public', addRandomSuffix: true });
-  return { stored: true, url: blob.url };
+  console.info('[rfq] persistUploadedFile: file storage not yet implemented, discarding file bytes', reference, file.name);
+  return { stored: false };
 }
 
 export default async function handler(request: Request): Promise<Response> {

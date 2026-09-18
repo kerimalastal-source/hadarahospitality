@@ -262,21 +262,45 @@ form. Added 2026-09-18.
   isn't a great long-term look — once `hadarahospitality.com` is verified
   as a sending domain in Resend, set `RESEND_FROM_EMAIL` (e.g. `HADARA
   Hospitality <rfq@hadarahospitality.com>`) to send from the real domain.
-- **File storage**: `persistUploadedFile()` uploads via `@vercel/blob`'s
-  `put()` once `BLOB_READ_WRITE_TOKEN` is set — a no-op until then (file
-  validated, bytes discarded after the request, only name/size/type kept).
-  This is a native Vercel product, so setup needs **no external account**:
-  in the Vercel dashboard, go to the project's **Storage** tab → **Create
-  Database** → **Blob** → connect it to this project, and Vercel
-  auto-injects `BLOB_READ_WRITE_TOKEN` (no copy-pasting a key needed,
-  unlike Resend). Files are stored `access: 'public'` with a random
-  suffix — not listed or guessable anywhere, so it's reasonably private in
-  practice, and it means the download link can go straight in the internal
-  notification email (see `fileRow()` in `api/submit-quote.ts`) rather than
-  needing a signed-URL step or a separate dashboard login. If these
-  documents ever need real access control, switch to `access: 'private'`
-  and fetch via the Blob SDK's authenticated `get()` instead.
+- **File storage — still a stub, and here's why**: `persistUploadedFile()`
+  validates the file and then discards its bytes; only name/size/type are
+  kept. A first attempt (2026-09-18, briefly merged as PR #26) called
+  `@vercel/blob`'s `put()` directly from this function — **that broke the
+  production deployment** with `NOW_SANDBOX_WORKER_EDGE_FUNCTION_
+  UNSUPPORTED_MODULES`: `@vercel/blob` pulls in Node built-ins (`node:stream`,
+  `node:net`, `node:tls`, ...) that the Edge sandbox this function runs on
+  (see the top-of-file comment) rejects outright at build time. It was
+  reverted the same day once the deploy failure was caught. **Don't just
+  re-add `@vercel/blob` to this file** — it needs either (a) moving this
+  whole function to the Node.js runtime (loses the zero-dependency
+  `request.formData()` handling that Edge gives for free — multipart
+  parsing would need its own solution), or (b) Vercel Blob's own
+  recommended pattern for this exact situation, **client uploads**: the
+  browser uploads the file straight to Blob storage using a short-lived
+  token from a small dedicated Node-runtime token endpoint
+  (`@vercel/blob/client`'s `handleUpload()`), bypassing this Edge
+  function's body entirely. (b) is the more correct fix but is a genuine
+  two-phase-submit restructure of the client form, not a drop-in change —
+  plan it as its own piece of work, verify the Node.js function signature
+  question (does a bare `/api/*.ts` Node function support the Web
+  `Request`/`Response` signature, or does it need the classic
+  `VercelRequest`/`VercelResponse`?) before writing it, and get a real
+  deploy to confirm before calling it done — don't repeat this mistake by
+  shipping an untested guess again.
 - **What's still stubbed**: `syncToHubSpot` needs `HUBSPOT_ACCESS_TOKEN`.
+- **Lesson from the above**: `npx tsc --noEmit` / `astro check` passing
+  locally does **not** guarantee an `api/*.ts` Edge Function will actually
+  build on Vercel — Astro's own tsconfig uses lenient `Bundler` module
+  resolution, but Vercel's real Edge Function bundler enforces stricter
+  Node ESM rules (explicit `.js` extensions on relative imports — already
+  fixed in `api/submit-quote.ts`) and, more importantly, can't be
+  emulated locally at all for runtime-environment failures like the
+  Node-built-in-modules-in-Edge one above. After any change to `api/`,
+  don't just build locally — check the resulting Vercel deployment's
+  state after pushing/merging (the Vercel MCP tools can pull deployment
+  state and build logs; a `state: "ERROR"` deployment needs `errorMessage`
+  read via `get_deployment`, and `get_deployment_build_logs` for compile-time
+  errors) before telling the owner it's done.
 - **A CSS gotcha that bit this feature twice**: an element toggled with the
   plain `hidden` **attribute** stays visible if any author stylesheet rule
   also sets `display` on it (e.g. `.foo{display:flex}` beats the browser's
