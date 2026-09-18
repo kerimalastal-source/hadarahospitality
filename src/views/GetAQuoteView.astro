@@ -133,7 +133,7 @@ const p = (path: string) => localizePath(locale, path);
               <span class="rfq-file-size" id="rfq-file-size"></span>
               <button type="button" class="rfq-file-remove" id="rfq-file-remove" aria-label={f.uploadRemove}>✕</button>
             </div>
-            <p class="rfq-error" id="rfq-upload-error" role="alert" hidden data-error-type={f.uploadErrorType} data-error-size={f.uploadErrorSize}></p>
+            <p class="rfq-error" id="rfq-upload-error" role="alert" hidden data-error-type={f.uploadErrorType} data-error-size={f.uploadErrorSize} data-error-upload={f.uploadErrorFailed}></p>
           </div>
 
           <label>{f.additionalMessage}<textarea name="additionalMessage" rows="3" placeholder={f.additionalMessagePlaceholder}></textarea></label>

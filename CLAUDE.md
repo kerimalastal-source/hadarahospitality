@@ -262,31 +262,54 @@ form. Added 2026-09-18.
   isn't a great long-term look — once `hadarahospitality.com` is verified
   as a sending domain in Resend, set `RESEND_FROM_EMAIL` (e.g. `HADARA
   Hospitality <rfq@hadarahospitality.com>`) to send from the real domain.
-- **File storage — still a stub, and here's why**: `persistUploadedFile()`
-  validates the file and then discards its bytes; only name/size/type are
-  kept. A first attempt (2026-09-18, briefly merged as PR #26) called
-  `@vercel/blob`'s `put()` directly from this function — **that broke the
-  production deployment** with `NOW_SANDBOX_WORKER_EDGE_FUNCTION_
-  UNSUPPORTED_MODULES`: `@vercel/blob` pulls in Node built-ins (`node:stream`,
-  `node:net`, `node:tls`, ...) that the Edge sandbox this function runs on
-  (see the top-of-file comment) rejects outright at build time. It was
-  reverted the same day once the deploy failure was caught. **Don't just
-  re-add `@vercel/blob` to this file** — it needs either (a) moving this
-  whole function to the Node.js runtime (loses the zero-dependency
-  `request.formData()` handling that Edge gives for free — multipart
-  parsing would need its own solution), or (b) Vercel Blob's own
-  recommended pattern for this exact situation, **client uploads**: the
-  browser uploads the file straight to Blob storage using a short-lived
-  token from a small dedicated Node-runtime token endpoint
-  (`@vercel/blob/client`'s `handleUpload()`), bypassing this Edge
-  function's body entirely. (b) is the more correct fix but is a genuine
-  two-phase-submit restructure of the client form, not a drop-in change —
-  plan it as its own piece of work, verify the Node.js function signature
-  question (does a bare `/api/*.ts` Node function support the Web
-  `Request`/`Response` signature, or does it need the classic
-  `VercelRequest`/`VercelResponse`?) before writing it, and get a real
-  deploy to confirm before calling it done — don't repeat this mistake by
-  shipping an untested guess again.
+- **File storage — client uploads, resolved 2026-09-18**: a first attempt
+  (same day, briefly merged as PR #26) called `@vercel/blob`'s `put()`
+  directly from `api/submit-quote.ts` and broke the production deployment
+  (`NOW_SANDBOX_WORKER_EDGE_FUNCTION_UNSUPPORTED_MODULES` — `@vercel/blob`
+  pulls in Node built-ins the Edge sandbox rejects at build time; reverted
+  the same day). The actual fix, now shipped: **client uploads**, Vercel
+  Blob's own recommended pattern for exactly this situation.
+  - `api/blob-upload.ts` — a Vercel **Node.js** Function (no `runtime:
+    'edge'` config — Node.js is the default), using the classic `(req,
+    res)` signature with small hand-rolled `VercelRequest`/`VercelResponse`
+    types instead of the `@vercel/node` package (which pulled in ~100
+    unrelated packages and several vulnerable transitive deps for what's
+    purely a type-only import — not worth it for two interface
+    declarations). Its only job: call `@vercel/blob/client`'s
+    `handleUpload()` to issue a short-lived upload token, after checking
+    the requested pathname starts with `RFQ_BLOB_PATH_PREFIX` ('rfq/') and
+    enforcing `RFQ_FILE_MIME_TYPES`/`RFQ_FILE_MAX_BYTES` server-side
+    (`onBeforeGenerateToken`) — defense in depth in case something calls
+    this endpoint directly, bypassing the client's own pre-validation.
+  - `src/scripts/rfq-form.ts` — on submit, if a file is selected, calls
+    `@vercel/blob/client`'s `upload()` (pointing `handleUploadUrl` at
+    `/api/blob-upload`) **before** the `/api/submit-quote` fetch. The file
+    bytes go straight from the browser to Blob storage; only the resulting
+    URL + name/size/type are then sent to `/api/submit-quote` as plain
+    form fields (`fileUrl`/`fileName`/`fileSize`/`fileType`) — the raw file
+    is deleted from that FormData first. This works in the browser because
+    `@vercel/blob`'s `package.json` has a `"browser"` field remapping its
+    Node dependencies (`undici`, `crypto`, `stream`) to small browser-safe
+    shims, which Vite's client build picks up automatically — verified by
+    grepping the actual built bundle for Node built-in references (found
+    none) after shipping this, not just assumed.
+  - **A failed upload doesn't block the submission**: the file was always
+    optional, so `upload()` throwing (e.g. `BLOB_READ_WRITE_TOKEN` still
+    unset) is caught, shows `f.uploadErrorFailed` inline, and the form
+    still submits without the attachment rather than getting the visitor
+    stuck. Verified this exact path with Playwright against a static
+    preview server (where `/api/blob-upload` 404s, since Vercel Functions
+    don't run under `astro preview`) before considering it done.
+  - `api/submit-quote.ts` no longer touches `@vercel/blob` at all or
+    receives the raw file — it just validates the `fileUrl` actually looks
+    like a Vercel Blob public URL (`isValidRfqBlobUrl()` in
+    `src/lib/rfq.ts`) before trusting it enough to embed in the internal
+    notification email, since a client could otherwise submit an arbitrary
+    URL in that field.
+  - Needs `BLOB_READ_WRITE_TOKEN` set (see "Email" above for the general
+    pattern — Storage tab → Create Database → Blob, auto-injected, no
+    external account) for uploads to actually succeed; until then, every
+    upload attempt fails and degrades per the point above.
 - **What's still stubbed**: `syncToHubSpot` needs `HUBSPOT_ACCESS_TOKEN`.
 - **Lesson from the above**: `npx tsc --noEmit` / `astro check` passing
   locally does **not** guarantee an `api/*.ts` Edge Function will actually
