@@ -58,11 +58,28 @@ prose in English so it stays easy to scan.
   anything under `public/technical-sheets/`, `public/sitemap.xml` or
   `public/search-index.json` — they're ignored on purpose.
 - Client-side only: `src/scripts/site.ts` builds the quote/contact
-  `mailto:` links, handles the mobile nav toggle and lazy-loads `data-bg`
-  images via `IntersectionObserver` — nothing is sent to or stored on a
+  `mailto:` links, handles the mobile nav toggle, lazy-loads `data-bg`
+  images via `IntersectionObserver`, and drives the `[data-carousel-track]`
+  featured-products carousel (arrow buttons + a gentle auto-scrolling
+  ping-pong drift, added 2026-09-18, pauses on hover/touch/focus, skipped
+  under `prefers-reduced-motion`) — nothing is sent to or stored on a
   server. `src/scripts/search.ts` does client-side substring search over
   `search-index.json`. No cookies, no analytics (Google Analytics is
   explicitly deferred, no GA4 ID supplied).
+  **Two scroll-animation gotchas from building the auto-scroll**, worth
+  knowing before touching any `overflow-x:auto` track again: (1) a
+  per-frame delta under 1px written via `el.scrollLeft += x` gets rounded
+  away by the property setter and never accumulates — keep the running
+  position in a JS float variable instead of reading it back from the DOM;
+  (2) `scroll-behavior: smooth` in CSS applies to *any* write to
+  `scrollLeft`, not just `scrollTo`/`scrollBy` calls, so animating a
+  near-zero delta every frame queues up and visibly lags — use
+  `el.scrollTo({ left, behavior: 'auto' })` to force an instant write
+  regardless of the element's CSS. Also, `scroll-snap-type: mandatory` on
+  a track snaps the position back after *every* programmatic write, not
+  just after a user gesture ends — it was removed from `.featured-track`
+  for this reason (the arrow buttons already scroll by an exact card
+  width and never relied on snap-correction).
 - `npm run check` runs `astro check` (TypeScript + template diagnostics) —
   run it after editing `.astro` files or `src/data/*.ts`.
 
@@ -291,16 +308,33 @@ form. Added 2026-09-18.
   elsewhere) with every submitted field in a readable table;
   `confirmToCustomer()` sends a short thank-you + reference number to the
   submitter's own work email. Both go through Resend
-  (`api.resend.com/emails` via plain `fetch`, no SDK dependency) and are
-  genuinely wired up in code — the only thing missing is the credential:
-  **set `RESEND_API_KEY` in the Vercel project's environment variables**
-  (Project → Settings → Environment Variables) and both emails start
-  working on the next deploy, no code change needed. Until then both
-  functions no-op (log and return). The sender defaults to Resend's
-  sandbox address (`onboarding@resend.dev`), which works immediately but
-  isn't a great long-term look — once `hadarahospitality.com` is verified
-  as a sending domain in Resend, set `RESEND_FROM_EMAIL` (e.g. `HADARA
-  Hospitality <rfq@hadarahospitality.com>`) to send from the real domain.
+  (`api.resend.com/emails` via plain `fetch`, no SDK dependency).
+  **`RESEND_API_KEY` was set in Vercel's env vars 2026-09-18** — confirmed
+  via runtime logs that it's picked up (no more "not set, skipping"), but
+  sending itself is still blocked: Resend's sandbox mode only allows
+  sending to the account's own signup address
+  (`kerim.alastal@gmail.com`) until `hadarahospitality.com` is verified as
+  a sending domain, so both `notifyHadaraTeam` (→
+  `partnerships@hadarahospitality.com`) and `confirmToCustomer` (→
+  whatever the submitter's own work email is) currently 403 unless that
+  happens to be the account email — confirmed via a live test submission
+  (`RFQ-2026-2BBB56`) whose customer-confirmation happened to succeed only
+  because the test used that exact address, while the internal
+  notification failed. **Domain verification in progress**: the 4 DNS
+  records Resend's dashboard (resend.com/domains) asks for — a
+  `resend._domainkey` TXT (DKIM), `rsend`/`send` CNAMEs, and an optional
+  `_dmarc` TXT — were added in Natro's (the domain registrar) DNS panel,
+  but as of the last check (direct query against
+  `ns1.natrohost.com`/`ns2.natrohost.com`, the domain's actual
+  authoritative nameservers) they hadn't propagated yet, and oddly didn't
+  match what Natro's own panel displayed as the existing SPF record
+  either (the live root TXT is `v=spf1 include:_spf.google.com ~all` +
+  a Google site-verification TXT, not the `_spfcls.natrohost.com` one
+  the panel showed) — worth re-querying before assuming it's just normal
+  propagation delay if it still hasn't shown up after an hour or so.
+  Once verified, also set `RESEND_FROM_EMAIL` (e.g. `HADARA Hospitality
+  <rfq@hadarahospitality.com>`) to send from the real domain instead of
+  Resend's sandbox address (`onboarding@resend.dev`).
 - **File storage — client uploads, resolved 2026-09-18**: a first attempt
   (same day, briefly merged as PR #26) called `@vercel/blob`'s `put()`
   directly from `api/submit-quote.ts` and broke the production deployment
