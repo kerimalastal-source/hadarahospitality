@@ -252,6 +252,38 @@ export const PRODUCTS: Product[] = [
     gallery: [],
   },
   {
+    // No product photography yet — same placeholder-gallery treatment as
+    // the rest of this file's unphotographed entries.
+    slug: 'luxury-hotel-bed-blanket',
+    name: 'Luxury Hotel Bed Blanket',
+    category: 'bed-linen',
+    material: 'Premium cotton-blend fabric',
+    suitableFor: 'Hotels, resorts & serviced apartments',
+    specLabel: 'Weight',
+    specValues: ['Lightweight', 'Medium Weight', 'Heavyweight'],
+    customization: ['Custom Size Request', 'Custom Embroidery', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: 'Premium bed blanket designed for luxury hotels, resorts, and hospitality guest room environments. Manufactured from soft cotton-blend fabric to provide an extra warmth layer alongside the duvet, with reliable performance through repeated commercial laundering.',
+    features: ['Soft cotton-blend fabric', 'Available in multiple weights for warmth', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments', 'Elegant guest room presentation'],
+    main: '',
+    gallery: [],
+  },
+  {
+    // No product photography yet — same placeholder-gallery treatment as
+    // the rest of this file's unphotographed entries.
+    slug: 'decorative-bed-runner',
+    name: 'Decorative Bed Runner',
+    category: 'bed-linen',
+    material: 'Premium decorative fabric',
+    suitableFor: 'Hotels, resorts & serviced apartments',
+    specLabel: 'Style',
+    specValues: ['Solid', 'Textured', 'Quilted'],
+    customization: ['Custom Size Request', 'Custom Embroidery', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: "Decorative bed runner designed to finish the guest room bed presentation for luxury hotels, resorts, and hospitality environments. Placed across the foot of the bed for an elevated, boutique-style finish that complements the room's overall bedding.",
+    features: ['Elegant decorative bed accent', 'Available in multiple styles & finishes', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments', 'Boutique-style guest room presentation'],
+    main: '',
+    gallery: [],
+  },
+  {
     slug: 'luxury-hotel-duvet-microfiber',
     name: 'Luxury Hotel Duvet – Microfiber',
     category: 'pillows',

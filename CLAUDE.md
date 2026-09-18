@@ -91,7 +91,7 @@ manual switch required. **All content is now fully translated in all 4
 languages**: full routing for every page (zero 404s anywhere), RTL layout
 for Arabic, the language switcher, hreflang tags, the auto-detect-and-
 redirect middleware, every static page's body copy, the 6 product category
-names (`common.categoryLabels`), and all 25 products' and all 10 articles'
+names (`common.categoryLabels`), and all 27 products' and all 10 articles'
 actual content (name/overview/features/specs, and full article bodies) —
 see `src/i18n/dictionaries/{ar,fr,ru}.ts`, `src/data/products.i18n.ts` and
 `src/data/blog.i18n.ts`.
@@ -680,18 +680,18 @@ below).
 
 The owner asked what's missing from the catalog in the "guest room"
 world. Compared the current 6 categories/23 products against a typical
-hospitality-textile supplier's range and flagged 8 gaps, scoped to
+hospitality-textile supplier's range and flagged 9 gaps, scoped to
 **textile** products only (matching "trusted Turkish manufacturing
 partners" — non-textile items like door hangers or stationery were
 explicitly excluded as out of scope for this business):
 
-- `bed-linen`: fitted sheet ✅ **added**, bed blanket, decorative bed
-  runner
-- `pillows`: pillow protector ✅ **added**
+- `bed-linen`: fitted sheet ✅ **added**, bed blanket ✅ **added**,
+  decorative bed runner ✅ **added**
+- `protectors`: pillow protector ✅ **added**
 - `towels`: oversized bath sheet, washcloth, fabric shower curtain
 - New category territory: blackout curtains, ironing board cover
 
-**Two added so far** (`src/data/products.ts` + full ar/fr/ru
+**Four added so far** (`src/data/products.ts` + full ar/fr/ru
 translations in `src/data/products.i18n.ts`), same "no photography yet"
 placeholder-gallery treatment as the `amenities` category (`main`/
 `gallery` left empty — see the comment above the `amenities` block):
@@ -700,8 +700,18 @@ placeholder-gallery treatment as the `amenities` category (`main`/
 - `waterproof-pillow-protector` (`protectors`) — mirrors
   `waterproof-mattress-protector`'s fields/tone, with a zippered-closure
   spec value distinct from the mattress protector's quilted-comfort one.
+- `luxury-hotel-bed-blanket` (`bed-linen`) — a warmth layer alongside
+  the duvet, `specLabel: 'Weight'` like the microfiber duvet but with
+  its own distinct spec values (`Lightweight`/`Medium Weight`/
+  `Heavyweight`) so it doesn't read as a literal duplicate.
+- `decorative-bed-runner` (`bed-linen`) — a boutique-style bed accent,
+  `specLabel: 'Style'` (`Solid`/`Textured`/`Quilted`) since it's a
+  presentation item rather than a fabric-quality one — note its
+  `specLabel` is deliberately *not* `'GSM'`/`'Fabric Quality'`, so it
+  correctly doesn't pick up the Fabric Quality Guide cross-link that
+  those two spec labels trigger on `ProductView.astro`.
 
-**The remaining six are not yet added** — waiting on the owner to
+**The remaining five are not yet added** — waiting on the owner to
 confirm which ones to do next. Also worth a future look: the
 `protectors` category is still labeled "Mattress Protectors"
 (`CATEGORIES.protectors.label` and `common.categoryLabels.protectors`
