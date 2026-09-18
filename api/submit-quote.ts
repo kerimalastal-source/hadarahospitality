@@ -1,4 +1,4 @@
-// Vercel Edge Function — RFQ submission intake for /get-a-quote.html.
+// Vercel Edge Function — RFQ submission intake for /get-a-quote.
 //
 // This lives outside src/ on purpose: the site itself is a fully static
 // Astro build (see CLAUDE.md), and Vercel deploys any file under /api at

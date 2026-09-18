@@ -30,7 +30,7 @@ function splitHeading(label: string) {
 
 const categoryLabel = (key: string) => t.common.categoryLabels[key] ?? CATEGORIES[key as keyof typeof CATEGORIES].label;
 ---
-<BaseLayout title={pp.title} description={pp.description} path="/products.html" locale={locale} active="products">
+<BaseLayout title={pp.title} description={pp.description} path="/products" locale={locale} active="products">
   <main>
     <section class="products-hero"><div class="wrap"><p class="eyebrow light">{pp.hero.eyebrow}</p><h1>{pp.hero.heading1}<br /><em>{pp.hero.heading2}</em></h1><p>{pp.hero.body}</p></div></section>
     <nav class="product-jump wrap" aria-label="Product categories">
@@ -50,15 +50,15 @@ const categoryLabel = (key: string) => t.common.categoryLabels[key] ?? CATEGORIE
               <p>{pp.categoryBodies[key]}</p>
               <ul>
                 {products.map((pr) => (
-                  <li><a href={p(`/products/${pr.slug}.html`)}>{getProductTranslation(locale, pr.slug)?.name ?? pr.name}</a></li>
+                  <li><a href={p(`/products/${pr.slug}`)}>{getProductTranslation(locale, pr.slug)?.name ?? pr.name}</a></li>
                 ))}
               </ul>
-              <a class="text-link" href={p('/get-a-quote.html')}>{pp.cta} <span>↗</span></a>
+              <a class="text-link" href={p('/get-a-quote')}>{pp.cta} <span>↗</span></a>
             </div>
           </section>
         );
       })}
     </div>
-    <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>{pp.sourcingHeading1}<br /><em>{pp.sourcingHeading2}</em></h2></div><a class="button button-gold" href={p('/get-a-quote.html')}>{pp.tailoredQuote} <span>↗</span></a></div></section>
+    <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>{pp.sourcingHeading1}<br /><em>{pp.sourcingHeading2}</em></h2></div><a class="button button-gold" href={p('/get-a-quote')}>{pp.tailoredQuote} <span>↗</span></a></div></section>
   </main>
 </BaseLayout>

@@ -13,7 +13,7 @@ const q = t.getAQuote;
 const f = q.form;
 const p = (path: string) => localizePath(locale, path);
 ---
-<BaseLayout title={q.title} description={q.description} path="/get-a-quote.html" locale={locale}>
+<BaseLayout title={q.title} description={q.description} path="/get-a-quote" locale={locale}>
   <main>
     <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>{t.common.nav.requestQuote}</p><p class="eyebrow light">{q.hero.eyebrow}</p><h1>{q.hero.heading1} <em>{q.hero.heading2}</em></h1><p class="pdp-tagline">{q.hero.body}</p></div></section>
     <section class="quote-trust wrap">
@@ -163,7 +163,7 @@ const p = (path: string) => localizePath(locale, path);
         </div>
         <p class="rfq-success-note">{f.successNote}</p>
         <div class="rfq-success-actions">
-          <a class="button button-dark" href={p('/products.html')}>{f.backToProducts}</a>
+          <a class="button button-dark" href={p('/products')}>{f.backToProducts}</a>
           <a class="text-link" href={p('/')}>{f.returnHome}</a>
         </div>
       </div>

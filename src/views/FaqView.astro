@@ -11,7 +11,7 @@ const t = getDictionary(locale);
 const faq = t.faq;
 const p = (path: string) => localizePath(locale, path);
 ---
-<BaseLayout title={faq.title} description={faq.description} path="/faq.html" locale={locale}>
+<BaseLayout title={faq.title} description={faq.description} path="/faq" locale={locale}>
   <main>
     <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>FAQ</p><p class="eyebrow light">{faq.hero.eyebrow}</p><h1>{faq.hero.heading1} <em>{faq.hero.heading2}</em></h1><p class="pdp-tagline">{faq.hero.body}</p></div></section>
     <section class="faq-list wrap">
@@ -22,6 +22,6 @@ const p = (path: string) => localizePath(locale, path);
         </details>
       ))}
     </section>
-    <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">{faq.ctaEyebrow}</p><h2>{faq.ctaHeading1}<br /><em>{faq.ctaHeading2}</em></h2></div><a class="button button-gold" href={p('/contact.html')}>{faq.contactUs} <span>↗</span></a></div></section>
+    <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">{faq.ctaEyebrow}</p><h2>{faq.ctaHeading1}<br /><em>{faq.ctaHeading2}</em></h2></div><a class="button button-gold" href={p('/contact')}>{faq.contactUs} <span>↗</span></a></div></section>
   </main>
 </BaseLayout>
