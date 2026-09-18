@@ -16,6 +16,7 @@
 // exact env vars each one needs.
 
 import { isValidRfqFile, isValidWorkEmail, RFQ_FILE_MAX_BYTES, type RfqProductMeta, type RfqSubmission } from '../src/lib/rfq';
+import { CONTACT_EMAIL } from '../src/config';
 
 export const config = { runtime: 'edge' };
 
@@ -25,6 +26,76 @@ const MAX_SHORT_LENGTH = 200;
 
 function json(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), { status, headers: JSON_HEADERS });
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/** Sends via the Resend API (https://resend.com). Throws on failure so the
+ * caller's try/catch can log it — a failed email must never fail the RFQ
+ * submission itself, since the submission was already validated. */
+async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return;
+  const from = process.env.RESEND_FROM_EMAIL || 'HADARA Hospitality <onboarding@resend.dev>';
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from, to, subject, html }),
+  });
+  if (!response.ok) {
+    throw new Error(`Resend API error ${response.status}: ${await response.text().catch(() => '')}`);
+  }
+}
+
+function row(label: string, value?: string): string {
+  if (!value) return '';
+  return `<tr><td style="padding:5px 16px 5px 0;color:#626a72;font-size:13px;white-space:nowrap;vertical-align:top">${escapeHtml(label)}</td><td style="padding:5px 0;font-size:13px;color:#1e2a38">${escapeHtml(value).replace(/\n/g, '<br>')}</td></tr>`;
+}
+
+function renderInternalEmail(s: RfqSubmission): string {
+  const sp = s.products.selectedProduct;
+  const selectedProductLine = sp ? [sp.name, sp.material, sp.gsm].filter(Boolean).join(' — ') : undefined;
+  return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:640px;color:#1e2a38">
+    <h2 style="margin:0 0 4px;font-size:20px">New RFQ — ${escapeHtml(s.property.companyName)}</h2>
+    <p style="color:#626a72;font-size:13px;margin:0 0 22px">Reference <strong>${s.system.reference}</strong> · ${escapeHtml(s.system.submittedAt)}</p>
+    <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">
+      ${row('Full name', s.contact.fullName)}
+      ${row('Work email', s.contact.workEmail)}
+      ${row('Phone / WhatsApp', s.contact.phone)}
+      ${row('Preferred contact', s.contact.preferredContact)}
+      ${row('Company / hotel', s.property.companyName)}
+      ${row('Property type', s.property.propertyType)}
+      ${row('Hotel category', s.property.hotelCategory)}
+      ${row('Rooms / keys', s.property.roomsKeys)}
+      ${row('Country', s.property.country)}
+      ${row('City', s.property.city)}
+      ${row('Product categories', s.products.categories.join(', '))}
+      ${row('Selected product', selectedProductLine)}
+      ${row('Estimated quantity', s.products.estimatedQuantity)}
+      ${row('Project type', s.project.projectType)}
+      ${row('Delivery country', s.project.deliveryCountry)}
+      ${row('Delivery city', s.project.deliveryCity)}
+      ${row('Target delivery date', s.project.targetDeliveryDate)}
+      ${row('Custom branding', s.project.customBranding)}
+      ${row('Sample required', s.project.sampleRequired)}
+      ${row('Notes / specifications', s.specifications.notes)}
+      ${row('Additional message', s.specifications.additionalMessage)}
+      ${row('Attached file', s.specifications.uploadedFile ? `${s.specifications.uploadedFile.name} (${(s.specifications.uploadedFile.size / 1024).toFixed(0)} KB)` : undefined)}
+      ${row('Source page', s.system.sourcePage)}
+    </table>
+  </div>`;
+}
+
+function renderCustomerEmail(s: RfqSubmission): string {
+  return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;color:#1e2a38">
+    <h2 style="margin:0 0 14px;font-size:20px">Thank you, ${escapeHtml(s.contact.fullName)}.</h2>
+    <p style="font-size:14px;line-height:1.7;color:#626a72">We've received your quote request for <strong>${escapeHtml(s.property.companyName)}</strong>. Our team will review your requirements and get back to you shortly.</p>
+    <p style="font-size:13px;color:#626a72;margin-top:20px">Reference number</p>
+    <p style="font:22px Georgia,serif;color:#1e2a38;margin:2px 0 22px">${s.system.reference}</p>
+    <p style="font-size:12px;color:#8b6634">HADARA Hospitality · Istanbul, Türkiye</p>
+  </div>`;
 }
 
 function str(formData: FormData, key: string, max = MAX_SHORT_LENGTH): string {
@@ -38,25 +109,24 @@ function generateReference(): string {
   return `RFQ-${year}-${random}`;
 }
 
-/** Stub — send the internal "New RFQ" notification once RESEND_API_KEY (or
- * equivalent) is configured. Subject format per spec:
- * "New RFQ — [Hotel Name] — [Country] — [RFQ Reference]". */
+/** Sends the internal "New RFQ" notification to partnerships@hadarahospitality.com
+ * (CONTACT_EMAIL) once RESEND_API_KEY is configured; a no-op until then. */
 async function notifyHadaraTeam(submission: RfqSubmission): Promise<void> {
   if (!process.env.RESEND_API_KEY) {
     console.info('[rfq] notifyHadaraTeam: RESEND_API_KEY not set, skipping internal email', submission.system.reference);
     return;
   }
-  // TODO: send via Resend (or chosen provider) to the internal inbox, subject:
-  // `New RFQ — ${submission.property.companyName} — ${submission.property.country} — ${submission.system.reference}`
+  const subject = `New RFQ — ${submission.property.companyName} — ${submission.property.country} — ${submission.system.reference}`;
+  await sendEmail(process.env.RFQ_NOTIFY_EMAIL || CONTACT_EMAIL, subject, renderInternalEmail(submission));
 }
 
-/** Stub — send the customer-facing confirmation email once configured. */
+/** Sends the customer-facing confirmation email once RESEND_API_KEY is configured. */
 async function confirmToCustomer(submission: RfqSubmission): Promise<void> {
   if (!process.env.RESEND_API_KEY) {
     console.info('[rfq] confirmToCustomer: RESEND_API_KEY not set, skipping', submission.system.reference);
     return;
   }
-  // TODO: send a confirmation email to submission.contact.workEmail with the reference number.
+  await sendEmail(submission.contact.workEmail, `We've received your request — ${submission.system.reference}`, renderCustomerEmail(submission));
 }
 
 /** Stub — create/update Contact, Company and a Deal in HubSpot once configured. */
@@ -202,15 +272,15 @@ export default async function handler(request: Request): Promise<Response> {
     },
   };
 
-  try {
-    const tasks: Promise<unknown>[] = [notifyHadaraTeam(submission), confirmToCustomer(submission), syncToHubSpot(submission)];
-    if (uploadedFile) tasks.push(persistUploadedFile(uploadedFile, reference));
-    await Promise.all(tasks);
-  } catch (error) {
-    // Integration stubs shouldn't be able to fail the submission itself —
-    // the RFQ was validated and has a reference; log and move on.
-    console.error('[rfq] post-submission integration error', reference, error);
-  }
+  // allSettled, not all: one integration failing (e.g. email) must never stop
+  // the others from running, and must never fail the submission itself — the
+  // RFQ was already validated and has a reference number.
+  const tasks: Promise<unknown>[] = [notifyHadaraTeam(submission), confirmToCustomer(submission), syncToHubSpot(submission)];
+  if (uploadedFile) tasks.push(persistUploadedFile(uploadedFile, reference));
+  const results = await Promise.allSettled(tasks);
+  results.forEach((result) => {
+    if (result.status === 'rejected') console.error('[rfq] post-submission integration error', reference, result.reason);
+  });
 
   return json({ ok: true, reference, submittedAt: submission.system.submittedAt }, 200);
 }
