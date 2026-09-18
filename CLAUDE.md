@@ -91,7 +91,7 @@ manual switch required. **All content is now fully translated in all 4
 languages**: full routing for every page (zero 404s anywhere), RTL layout
 for Arabic, the language switcher, hreflang tags, the auto-detect-and-
 redirect middleware, every static page's body copy, the 6 product category
-names (`common.categoryLabels`), and all 27 products' and all 10 articles'
+names (`common.categoryLabels`), and all 29 products' and all 10 articles'
 actual content (name/overview/features/specs, and full article bodies) —
 see `src/i18n/dictionaries/{ar,fr,ru}.ts`, `src/data/products.i18n.ts` and
 `src/data/blog.i18n.ts`.
@@ -688,10 +688,11 @@ explicitly excluded as out of scope for this business):
 - `bed-linen`: fitted sheet ✅ **added**, bed blanket ✅ **added**,
   decorative bed runner ✅ **added**
 - `protectors`: pillow protector ✅ **added**
-- `towels`: oversized bath sheet, washcloth, fabric shower curtain
+- `towels`: oversized bath sheet ✅ **added**, washcloth ✅ **added**,
+  fabric shower curtain
 - New category territory: blackout curtains, ironing board cover
 
-**Four added so far** (`src/data/products.ts` + full ar/fr/ru
+**Six added so far** (`src/data/products.ts` + full ar/fr/ru
 translations in `src/data/products.i18n.ts`), same "no photography yet"
 placeholder-gallery treatment as the `amenities` category (`main`/
 `gallery` left empty — see the comment above the `amenities` block):
@@ -710,8 +711,14 @@ placeholder-gallery treatment as the `amenities` category (`main`/
   `specLabel` is deliberately *not* `'GSM'`/`'Fabric Quality'`, so it
   correctly doesn't pick up the Fabric Quality Guide cross-link that
   those two spec labels trigger on `ProductView.astro`.
+- `hotel-bath-sheet-700-gsm` (`towels`) — an oversized bath towel, same
+  500–700 GSM range and `suitableFor` as the regular bath towel, sized
+  up for full-body coverage rather than a different quality tier.
+- `hotel-washcloth` (`towels`) — the smallest/lightest towel in the
+  catalog (350–450 GSM, below the face towel's 450–600 range), a
+  distinct everyday item rather than a smaller face towel.
 
-**The remaining five are not yet added** — waiting on the owner to
+**The remaining three are not yet added** — waiting on the owner to
 confirm which ones to do next. Also worth a future look: the
 `protectors` category is still labeled "Mattress Protectors"
 (`CATEGORIES.protectors.label` and `common.categoryLabels.protectors`
