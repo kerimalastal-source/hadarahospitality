@@ -55,30 +55,22 @@ prose in English so it stays easy to scan.
 
 ## Internationalization (i18n)
 
-The site is being translated into 4 languages — English (native/default),
+The site is translated into 4 languages — English (native/default),
 Arabic, French, Russian — with automatic per-visitor language detection, no
-manual switch required. This is a multi-phase rollout; **Phase 1 (routing +
-infrastructure) is done, Phase 2/3 (content translation) is in progress**:
+manual switch required. **All content is now fully translated in all 4
+languages**: full routing for every page (zero 404s anywhere), RTL layout
+for Arabic, the language switcher, hreflang tags, the auto-detect-and-
+redirect middleware, every static page's body copy, the 6 product category
+names (`common.categoryLabels`), and all 23 products' and all 10 articles'
+actual content (name/overview/features/specs, and full article bodies) —
+see `src/i18n/dictionaries/{ar,fr,ru}.ts`, `src/data/products.i18n.ts` and
+`src/data/blog.i18n.ts`.
 
-- **Done**: full routing for every page in all 4 languages (zero 404s
-  anywhere), RTL layout for Arabic, the language switcher, hreflang tags,
-  the auto-detect-and-redirect middleware, and *fully translated* content
-  for: the shared chrome (nav/footer/WhatsApp label), the homepage, the
-  About page, the generic UI strings on product/article detail pages
-  (labels like "Overview", "Specifications", "Download Technical Sheet"),
-  the body copy of every other static page (products.html, blog.html,
-  get-a-quote.html, contact.html, faq.html, privacy-policy.html,
-  search.html), the 6 product category names (`common.categoryLabels`),
-  and — **Arabic only so far** — all 23 products' and all 10 articles'
-  actual content (name/overview/features/specs, and full article bodies).
-- **Not yet translated** (falls back to English inside the localized
-  nav/RTL shell): all 23 products' and all 10 articles' content, for
-  **French and Russian only** (`src/data/products.i18n.ts` and
-  `src/data/blog.i18n.ts` currently only have an `ar` key). The overlay
-  interfaces, page wiring and fallback logic already handle any locale —
-  adding `fr`/`ru` keys to those two files is purely a translation-content
-  task, no more structural work needed. See `src/i18n/dictionaries/{ar,fr,ru}.ts`
-  for the static-page dictionary status (all complete as of this writing).
+The one intentionally-unlocalized page is `404.astro` (a single English
+404 page was kept by design). If new products, articles, or pages are
+added later, translate them the same way — the overlay/dictionary fallback
+logic means a missing translation degrades gracefully to English rather
+than breaking anything, so translation work can always ship incrementally.
 
 **How it's built:**
 - `src/i18n/locales.ts` — `LOCALES`, `DEFAULT_LOCALE` ('en', never prefixed
@@ -210,13 +202,6 @@ markup to fall out of sync.
   Blocked on: (a) the exact names of the specific hotel properties they
   have real documented relationships with, (b) the actual approved logo
   files. Do not fabricate trademarked logos or invent partnership claims.
-- **4-language site (EN/AR/FR/RU)** — owner decided the URL structure
-  (locale-prefixed paths, e.g. `/ar/about.html`, auto-detected via
-  `Accept-Language`, English default unprefixed) on 2026-09-18. Routing,
-  RTL/switcher/middleware, and all static-page copy (ar/fr/ru) are done.
-  Remaining: translating all 23 products and all 10 articles into French
-  and Russian (Arabic is done for both) — see "Internationalization
-  (i18n)" above for exactly what's left.
 - **Google Analytics** — deferred ("خليها مرحلة اخرى"), no GA4 ID yet.
 - **Certifications / testimonials sections** — owner confirmed no real
   content exists yet; do not fabricate.
