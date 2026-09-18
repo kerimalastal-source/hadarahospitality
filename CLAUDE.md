@@ -341,21 +341,24 @@ form. Added 2026-09-18.
   happens to be the account email — confirmed via a live test submission
   (`RFQ-2026-2BBB56`) whose customer-confirmation happened to succeed only
   because the test used that exact address, while the internal
-  notification failed. **Domain verification in progress**: the 4 DNS
-  records Resend's dashboard (resend.com/domains) asks for — a
-  `resend._domainkey` TXT (DKIM), `rsend`/`send` CNAMEs, and an optional
-  `_dmarc` TXT — were added in Natro's (the domain registrar) DNS panel,
-  but as of the last check (direct query against
-  `ns1.natrohost.com`/`ns2.natrohost.com`, the domain's actual
-  authoritative nameservers) they hadn't propagated yet, and oddly didn't
-  match what Natro's own panel displayed as the existing SPF record
-  either (the live root TXT is `v=spf1 include:_spf.google.com ~all` +
-  a Google site-verification TXT, not the `_spfcls.natrohost.com` one
-  the panel showed) — worth re-querying before assuming it's just normal
-  propagation delay if it still hasn't shown up after an hour or so.
-  Once verified, also set `RESEND_FROM_EMAIL` (e.g. `HADARA Hospitality
-  <rfq@hadarahospitality.com>`) to send from the real domain instead of
-  Resend's sandbox address (`onboarding@resend.dev`).
+  notification failed. **Domain verification resolved 2026-09-18**: the
+  real root cause wasn't propagation delay — `hadarahospitality.com`'s
+  actual authoritative nameservers turned out to be `ns8.wixdns.net` /
+  `ns9.wixdns.net` (Wix), not Natro (the registrar, which only controls
+  which nameservers are delegated — editing DNS records in Natro's own
+  panel silently did nothing, since Natro was never the authoritative
+  zone). The 4 Resend records (`resend._domainkey` TXT/DKIM, `rsend`/
+  `send` CNAMEs, `_dmarc` TXT) were instead added directly to the real
+  DNS zone via the Wix API (`PATCH
+  https://www.wixapis.com/domains/v1/dns-zones/hadarahospitality.com`) —
+  propagated within minutes, and Resend's dashboard now shows **Verified**.
+  If a future domain/DNS issue looks like a propagation problem, verify
+  the actual authoritative nameservers first (`dns.resolveNs()`) before
+  assuming a registrar's own panel is the right place to edit records —
+  it wasn't, here. **Still to do**: set `RESEND_FROM_EMAIL` (e.g. `HADARA
+  Hospitality <rfq@hadarahospitality.com>`) in Vercel's env vars to send
+  from the real domain instead of Resend's sandbox address
+  (`onboarding@resend.dev`) — not yet done as of this writing.
 - **File storage — client uploads, resolved 2026-09-18**: a first attempt
   (same day, briefly merged as PR #26) called `@vercel/blob`'s `put()`
   directly from `api/submit-quote.ts` and broke the production deployment
