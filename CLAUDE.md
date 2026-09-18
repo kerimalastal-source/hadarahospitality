@@ -449,6 +449,44 @@ form. Added 2026-09-18.
   just eyeballing a screenshot (a `fullPage` Playwright screenshot only
   happens to visually reveal this exact bug by accident).
 
+## Hotel Opening Package (`/hotel-opening-package`)
+
+A dedicated landing page (added 2026-09-19, owner's idea) pitching the six
+product categories as one bundled request for a hotel that's opening —
+bed linen, towels, robes, pillows, mattress protection, amenities — instead
+of a visitor having to discover each collection separately. Fully static
+(prerendered in all 4 locales like every other marketing page, unlike the
+Partner Portal) and fully translated-with-fallback from day one — only
+`en.ts` has real copy so far, same "ships English-first, ar/fr/ru degrade
+to English until translated" pattern as everything else.
+
+- **Content stays in sync with the catalog automatically**:
+  `src/views/HotelOpeningPackageView.astro` picks one photographed product
+  per category straight from `PRODUCTS`/`CATEGORIES`/`CATEGORY_ORDER` in
+  `src/data/products.ts` (`PRODUCTS.find(p => p.category === key &&
+  p.main)`) rather than hardcoding slugs or image URLs — a category with no
+  photographed product yet (currently `amenities`) falls back to a plain
+  navy `.package-card-placeholder` card instead of a broken image.
+- **Every CTA pre-fills the RFQ form's Project Type** — links append
+  `?projectType=New%20Hotel%20Opening` ('New Hotel Opening' is already one
+  of `getAQuote.form.projectTypeOptions`, so no new dictionary value was
+  needed). `src/scripts/rfq-form.ts` gained a small standalone
+  `applyProjectTypeFromUrl()` alongside the existing `applyProductFromUrl()`
+  — deliberately independent of whether a `product` param is also present,
+  since this page's links only ever pass `projectType`.
+- Linked from the homepage (a new navy `.products-cta` banner right under
+  the hero, reusing that existing section class rather than inventing a new
+  one) and the footer's Explore column; also registered in both
+  `scripts/build-sitemap.ts`'s and `scripts/build-search-index.ts`'s
+  hardcoded static-page lists (neither is auto-discovered from
+  `src/pages/` — a new static marketing page needs adding to both by hand,
+  same as every other one already there).
+- New CSS in `global.css`: `.package-contents`/`.package-grid`/
+  `.package-card`(`-placeholder`) for the 6-category grid, and a
+  `.steps-4` modifier on the existing `.steps` component (which hardcodes
+  `repeat(5,1fr)` for the homepage's 5-step process) since this page's
+  "how it works" only has 4 steps.
+
 ## Pending / deferred (owner-blocked, don't guess)
 
 - **"شركاء النجاح" (Partners of Success) homepage section** — 10 hotel-chain
