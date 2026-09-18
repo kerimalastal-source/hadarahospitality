@@ -1,27 +1,35 @@
 ---
 import SearchIcon from './icons/SearchIcon.astro';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { localizePath, type Locale, type Dictionary } from '../i18n';
 
 export type NavKey = 'products' | 'about' | 'blog' | 'contact';
 
 interface Props {
   active?: NavKey;
+  locale: Locale;
+  t: Dictionary;
+  path: string;
 }
 
-const { active } = Astro.props;
+const { active, locale, t, path } = Astro.props;
+const nav = t.common.nav;
+const home = (p: string) => localizePath(locale, p);
 ---
 <header class="site-header" id="top">
-  <a class="brand" href="/index.html" aria-label="HADARA Hospitality home">
+  <a class="brand" href={home('/')} aria-label="HADARA Hospitality home">
     <img src="/assets/hadara-logo-black.svg" alt="HADARA Hospitality" class="hadara-header-logo" />
   </a>
-  <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="navigation"><span></span><span></span><span></span></button>
+  <button class="menu-toggle" aria-label={nav.openMenu} aria-expanded="false" aria-controls="navigation"><span></span><span></span><span></span></button>
   <nav id="navigation" aria-label="Main navigation">
-    <a href="/products.html" aria-current={active === 'products' ? 'page' : undefined}>Products</a>
-    <a href="/index.html#approach">Our approach</a>
-    <a href="/index.html#process">How it works</a>
-    <a href="/about.html" aria-current={active === 'about' ? 'page' : undefined}>About us</a>
-    <a href="/blog.html" aria-current={active === 'blog' ? 'page' : undefined}>Blog</a>
-    <a href="/contact.html" aria-current={active === 'contact' ? 'page' : undefined}>Contact</a>
-    <a class="nav-search" href="/search.html" aria-label="Search"><SearchIcon /></a>
-    <a class="nav-quote" href="/get-a-quote.html">Request a quote <span>↗</span></a>
+    <a href={home('/products.html')} aria-current={active === 'products' ? 'page' : undefined}>{nav.products}</a>
+    <a href={`${home('/')}#approach`}>{nav.approach}</a>
+    <a href={`${home('/')}#process`}>{nav.process}</a>
+    <a href={home('/about.html')} aria-current={active === 'about' ? 'page' : undefined}>{nav.about}</a>
+    <a href={home('/blog.html')} aria-current={active === 'blog' ? 'page' : undefined}>{nav.blog}</a>
+    <a href={home('/contact.html')} aria-current={active === 'contact' ? 'page' : undefined}>{nav.contact}</a>
+    <a class="nav-search" href={home('/search.html')} aria-label={nav.search}><SearchIcon /></a>
+    <LanguageSwitcher locale={locale} path={path} />
+    <a class="nav-quote" href={home('/get-a-quote.html')}>{nav.requestQuote} <span>↗</span></a>
   </nav>
 </header>

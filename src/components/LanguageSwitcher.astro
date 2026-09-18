@@ -1,0 +1,24 @@
+---
+import { LOCALES, LOCALE_LABELS, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  /** Site-root, locale-agnostic path for the current page, e.g. "/about.html". */
+  path: string;
+}
+
+const { locale, path } = Astro.props;
+---
+<div class="lang-switcher">
+  <button type="button" class="lang-switcher-toggle" aria-haspopup="true" aria-expanded="false" data-lang-toggle>
+    {LOCALE_LABELS[locale]}
+    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+  </button>
+  <ul class="lang-switcher-menu" data-lang-menu>
+    {LOCALES.map((l) => (
+      <li>
+        <a href={localizePath(l, path)} aria-current={l === locale ? 'true' : undefined}>{LOCALE_LABELS[l]}</a>
+      </li>
+    ))}
+  </ul>
+</div>

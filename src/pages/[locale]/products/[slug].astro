@@ -1,0 +1,19 @@
+---
+import ProductView from '../../../views/ProductView.astro';
+import { PRODUCTS, type Product } from '../../../data/products';
+import { NON_DEFAULT_LOCALES, type Locale } from '../../../i18n';
+
+export function getStaticPaths() {
+  return NON_DEFAULT_LOCALES.flatMap((locale) =>
+    PRODUCTS.map((product) => ({ params: { locale, slug: product.slug }, props: { product, locale } })),
+  );
+}
+
+interface Props {
+  product: Product;
+  locale: Locale;
+}
+
+const { product, locale } = Astro.props;
+---
+<ProductView product={product} locale={locale} />

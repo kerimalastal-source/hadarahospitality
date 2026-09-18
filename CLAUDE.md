@@ -9,7 +9,9 @@ prose in English so it stays easy to scan.
   on every push; no custom domain connected yet — deferred until the whole
   site is finished)
 - **Stack**: [Astro](https://astro.build) + TypeScript, static output. No
-  framework runtime shipped to the browser, no backend. (Converted from a
+  framework runtime shipped to the browser, effectively no backend — the one
+  exception is a single-purpose Vercel Edge Middleware for language
+  auto-detection, see "Internationalization (i18n)" below. (Converted from a
   hand-authored Vite/HTML/JS site on 2026-09-18 — see git history if you
   need the old structure for reference.)
 
@@ -50,6 +52,82 @@ prose in English so it stays easy to scan.
   explicitly deferred, no GA4 ID supplied).
 - `npm run check` runs `astro check` (TypeScript + template diagnostics) —
   run it after editing `.astro` files or `src/data/*.ts`.
+
+## Internationalization (i18n)
+
+The site is being translated into 4 languages — English (native/default),
+Arabic, French, Russian — with automatic per-visitor language detection, no
+manual switch required. This is a multi-phase rollout; **Phase 1 (routing +
+infrastructure) is done, Phase 2/3 (content translation) is in progress**:
+
+- **Done**: full routing for every page in all 4 languages (zero 404s
+  anywhere), RTL layout for Arabic, the language switcher, hreflang tags,
+  the auto-detect-and-redirect middleware, and *fully translated* content
+  for: the shared chrome (nav/footer/WhatsApp label), the homepage, the
+  About page, and the generic UI strings on product/article detail pages
+  (labels like "Overview", "Specifications", "Download Technical Sheet").
+- **Not yet translated** (renders in English inside the localized nav/RTL
+  shell until done): the body copy of products.html, blog.html,
+  get-a-quote.html, contact.html, faq.html, privacy-policy.html and
+  search.html, plus all 23 products' and all 10 articles' actual content
+  (name/overview/features/specs, and article bodies). The dictionary keys
+  and page templates for all of these already exist and are wired up —
+  finishing this is purely a translation-content task, no more structural
+  work needed. See `src/i18n/dictionaries/{ar,fr,ru}.ts` for what's filled
+  in vs. falling back to English.
+
+**How it's built:**
+- `src/i18n/locales.ts` — `LOCALES`, `DEFAULT_LOCALE` ('en', never prefixed
+  in URLs), RTL locale list, `localizePath(locale, path)` (the one helper
+  every link in the codebase should go through to get a locale-correct
+  URL — never hand-build a `/ar/...` path).
+- `src/i18n/dictionary.ts` — the `Dictionary` TypeScript type (the full
+  shape of every translatable string on the site) plus `mergeDictionary()`,
+  which deep-merges a partial translation over the full English dictionary
+  so a missing key **falls back to English instead of breaking the build**.
+  `src/i18n/dictionaries/{en,ar,fr,ru}.ts` are the actual translations —
+  `en.ts` is complete and canonical; the others are `DeepPartial<Dictionary>`
+  and only need to contain what's actually been translated so far.
+- `src/views/*.astro` — the actual page bodies (`HomeView`, `AboutView`,
+  `ProductView`, `ArticleView`, `ProductsListView`, `BlogListView`,
+  `GetAQuoteView`, `ContactView`, `FaqView`, `PrivacyPolicyView`,
+  `SearchView`), each taking a `locale` prop and pulling its copy from
+  `getDictionary(locale)`. **This is the one place each page's markup
+  lives** — both `src/pages/<page>.astro` (English, unprefixed) and
+  `src/pages/[locale]/<page>.astro` (ar/fr/ru, via `getStaticPaths()`) are
+  thin wrappers that just call the matching View with a different locale.
+  When translating a page's content next, edit the dictionary values, not
+  the View — the View should already be reading from `t.<page>.*`.
+- The quote form's category `<option>` values are the stable English
+  strings from `CATEGORIES[key].formCategory` (not the translated display
+  text) — this keeps a product page's prefilled category, and the resulting
+  mailto email's `Collection:` field, correct and consistently in English
+  for the owner, regardless of which language the visitor's page was in.
+- `middleware.ts` (project root, **not** under `src/`) is a Vercel Edge
+  Middleware: on a visitor's first-ever request to an unprefixed (English)
+  page, it reads `Accept-Language`; if it matches ar/fr/ru it 307-redirects
+  to the localized equivalent and sets a `hadara_lang_checked` cookie (1
+  year) so that visitor is never auto-redirected again — respecting
+  whatever language they land on or manually switch to afterward. It only
+  ever redirects; it never renders, stores, or looks up anything, so it
+  doesn't meaningfully change the "no backend" stack story. **This has not
+  been verified against a live Vercel deployment** (can't run Edge
+  Middleware in this sandbox) — after the first deploy that includes it,
+  confirm a non-English `Accept-Language` request actually redirects, and
+  debug here if not.
+- `scripts/build-sitemap.ts` emits every page × every locale with
+  `<xhtml:link rel="alternate" hreflang="...">` annotations, so each
+  language version can be indexed and ranked in its own market.
+- The homepage is the one special case in the URL scheme: because of how
+  Astro's `build.format: 'file'` handles a nested index route, the
+  localized homepage is a flat `/ar.html` / `/fr.html` / `/ru.html` (not
+  `/ar/index.html`) — `localizePath()` already special-cases this, but
+  don't hand-build a homepage URL any other way.
+- Fonts: the Google Fonts link in `BaseLayout.astro` also loads Cairo +
+  Markazi Text (Arabic) and Manrope (Cyrillic fallback) alongside DM
+  Sans/Playfair Display, so glyphs render correctly without any per-locale
+  font-switching logic — just richer font-family fallback stacks in
+  `global.css`.
 
 ## Brand system
 
@@ -116,8 +194,12 @@ markup to fall out of sync.
   Blocked on: (a) the exact names of the specific hotel properties they
   have real documented relationships with, (b) the actual approved logo
   files. Do not fabricate trademarked logos or invent partnership claims.
-- **Arabic version of the site** — raised as a low-priority audit item,
-  deferred pending a decision on URL structure/scope/translation source.
+- **4-language site (EN/AR/FR/RU)** — owner decided the URL structure
+  (locale-prefixed paths, e.g. `/ar/about.html`, auto-detected via
+  `Accept-Language`, English default unprefixed) on 2026-09-18. Phase 1
+  (routing/RTL/switcher/middleware) is done; translating the remaining page
+  bodies, all 23 products and all 10 articles is in progress — see
+  "Internationalization (i18n)" above for exactly what's left.
 - **Google Analytics** — deferred ("خليها مرحلة اخرى"), no GA4 ID yet.
 - **Certifications / testimonials sections** — owner confirmed no real
   content exists yet; do not fabricate.

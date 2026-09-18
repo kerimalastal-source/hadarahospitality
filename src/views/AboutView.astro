@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getDictionary, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const a = t.about;
+const p = (path: string) => localizePath(locale, path);
+---
+<BaseLayout title={a.title} description={a.description} path="/about.html" locale={locale} active="about">
+  <main>
+    <section class="about-hero"><div class="wrap"><p class="eyebrow light">{a.hero.eyebrow}</p><h1>{a.hero.headingLead} <em>{a.hero.headingEmphasis}</em></h1></div></section>
+    <section class="about-intro wrap">
+      <div><p class="eyebrow">{a.intro.eyebrow}</p><h2>{a.intro.heading1}<br /><em>{a.intro.heading2}</em></h2></div>
+      <div>
+        {a.intro.paragraphs.map((para) => <p>{para}</p>)}
+      </div>
+    </section>
+    <section class="about-focus">
+      <div class="wrap about-story">
+        <div><p class="eyebrow">{a.partnerships.eyebrow}</p><h2>{a.partnerships.heading1} <em>{a.partnerships.heading2}</em></h2></div>
+        <div>
+          {a.partnerships.paragraphs.map((para) => <p>{para}</p>)}
+        </div>
+      </div>
+    </section>
+    <section class="about-outro wrap">
+      <div><p class="eyebrow">{a.outro.eyebrow}</p><h2>{a.outro.heading1}<br /><em>{a.outro.heading2}</em></h2></div>
+      <div>
+        <p>{a.outro.paragraph}</p>
+        <a class="button button-gold" href={p('/get-a-quote.html')}>{a.outro.cta} <span>↗</span></a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

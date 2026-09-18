@@ -1,0 +1,19 @@
+---
+import ArticleView from '../../../views/ArticleView.astro';
+import { ARTICLES, type Article } from '../../../data/blog';
+import { NON_DEFAULT_LOCALES, type Locale } from '../../../i18n';
+
+export function getStaticPaths() {
+  return NON_DEFAULT_LOCALES.flatMap((locale) =>
+    ARTICLES.map((article) => ({ params: { locale, slug: article.slug }, props: { article, locale } })),
+  );
+}
+
+interface Props {
+  article: Article;
+  locale: Locale;
+}
+
+const { article, locale } = Astro.props;
+---
+<ArticleView article={article} locale={locale} />

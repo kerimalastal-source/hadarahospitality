@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ARTICLES, type Article } from '../data/blog';
+import { getDictionary, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  article: Article;
+  locale: Locale;
+}
+
+const { article, locale } = Astro.props;
+const t = getDictionary(locale);
+const ad = t.articleDetail;
+const p = (path: string) => localizePath(locale, path);
+
+const DATE_LOCALE: Record<Locale, string> = { en: 'en-US', ar: 'ar', fr: 'fr-FR', ru: 'ru-RU' };
+function formatDate(iso: string) {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(DATE_LOCALE[locale], { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+}
+
+const related = ARTICLES.filter((a) => a.category === article.category && a.slug !== article.slug).slice(0, 3);
+const relatedPool = related.length ? related : ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 3);
+---
+<BaseLayout
+  title={`${article.title} | HADARA Hospitality`}
+  description={article.excerpt}
+  path={`/blog/${article.slug}.html`}
+  locale={locale}
+  ogType="article"
+  ogImage={article.hero}
+  active="blog"
+>
+  <main>
+    <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/blog.html')}>{t.common.nav.blog}</a><span>/</span>{article.title}</p><p class="eyebrow light">{article.category.toUpperCase()}</p><h1>{article.title}</h1><p class="article-meta-line">{formatDate(article.date)} <span>·</span> {article.readTime} <span>·</span> {ad.by}</p></div></section>
+    <figure class="article-cover-figure"><img class="article-cover" src={article.hero} alt={article.heroAlt} /></figure>
+    <article class="article-body wrap">
+      {article.body.map((block) => {
+        if (block.type === 'p') return <p>{block.text}</p>;
+        if (block.type === 'h2') return <h2>{block.text}</h2>;
+        if (block.type === 'ul') return <ul>{block.items.map((item) => <li>{item}</li>)}</ul>;
+        if (block.type === 'image') return <figure class="article-figure"><img src={article.inlineImage} alt={article.inlineAlt} loading="lazy" /></figure>;
+        return null;
+      })}
+    </article>
+    <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>{ad.readyToTalk1}<br /><em>{ad.readyToTalk2}</em></h2></div><a class="button button-gold" href={p('/get-a-quote.html')}>{t.common.requestTailoredQuote} <span>↗</span></a></div></section>
+    <section class="pdp-related wrap">
+      <p class="eyebrow">{ad.youMayAlsoLike}</p>
+      <h2>{ad.moreFrom} <em>HADARA journal.</em></h2>
+      <div class="related-grid">
+        {relatedPool.map((a) => (
+          <a class="related-card" href={p(`/blog/${a.slug}.html`)} data-bg={a.hero}><span>{a.title}</span></a>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

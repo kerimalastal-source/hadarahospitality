@@ -1,21 +1,4 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchView from '../views/SearchView.astro';
 ---
-<BaseLayout
-  title="Search | HADARA Hospitality"
-  description="Search HADARA Hospitality products, collections and articles."
-  noindex
->
-  <main>
-    <section class="pdp-hero"><div class="wrap"><p class="eyebrow light">SEARCH</p><h1>Find what<br /><em>you need.</em></h1><p class="pdp-tagline">Search across our products, collections and articles.</p>
-      <form class="search-form" id="search-form"><input type="text" name="q" id="search-input" placeholder="e.g. bath towel, GSM, spa..." aria-label="Search" autocomplete="off" /><button class="button button-gold" type="submit">Search <span>↗</span></button></form>
-    </div></section>
-    <section class="search-results wrap">
-      <p id="search-status" class="search-status"></p>
-      <div id="search-results-list"></div>
-    </section>
-  </main>
-  <script>
-    import '../scripts/search';
-  </script>
-</BaseLayout>
+<SearchView locale="en" />
