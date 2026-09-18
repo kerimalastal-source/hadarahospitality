@@ -130,7 +130,7 @@ async function notifyHadaraTeam(submission: RfqSubmission): Promise<void> {
     console.info('[rfq] notifyHadaraTeam: RESEND_API_KEY not set, skipping internal email', submission.system.reference);
     return;
   }
-  const subject = `New RFQ — ${submission.property.companyName} — ${submission.property.country} — ${submission.system.reference}`;
+  const subject = `New RFQ — ${submission.property.companyName} — ${submission.property.country || submission.project.deliveryCountry} — ${submission.system.reference}`;
   await sendEmail(process.env.RFQ_NOTIFY_EMAIL || CONTACT_EMAIL, subject, renderInternalEmail(submission));
 }
 
@@ -191,7 +191,6 @@ export default async function handler(request: Request): Promise<Response> {
   if (!workEmail) missing.push('workEmail');
   if (!companyName) missing.push('companyName');
   if (!propertyType) missing.push('propertyType');
-  if (!country) missing.push('country');
   if (!deliveryCountry) missing.push('deliveryCountry');
   if (categories.length === 0) missing.push('categories');
   if (missing.length > 0) {
@@ -241,7 +240,7 @@ export default async function handler(request: Request): Promise<Response> {
       propertyType,
       hotelCategory: str(formData, 'hotelCategory') || undefined,
       roomsKeys: str(formData, 'roomsKeys', 20) || undefined,
-      country,
+      country: country || undefined,
       city: str(formData, 'city') || undefined,
     },
     products: {

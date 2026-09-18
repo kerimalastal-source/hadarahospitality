@@ -137,6 +137,7 @@ export interface Dictionary {
       rooms: string;
       roomsHelp: string;
       country: string;
+      countryPlaceholder: string;
       city: string;
       preferredContact: string;
       preferredContactOptions: string[];

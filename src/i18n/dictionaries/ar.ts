@@ -244,6 +244,7 @@ export const ar: DeepPartial<Dictionary> = {
       rooms: 'عدد الغرف / المفاتيح',
       roomsHelp: 'العدد التقريبي لغرف الضيوف أو المفاتيح.',
       country: 'الدولة',
+      countryPlaceholder: 'اختر الدولة',
       city: 'المدينة',
       preferredContact: 'طريقة التواصل المفضلة',
       preferredContactOptions: ['البريد الإلكتروني', 'واتساب', 'الهاتف'],

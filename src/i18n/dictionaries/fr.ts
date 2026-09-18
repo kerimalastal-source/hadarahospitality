@@ -244,6 +244,7 @@ export const fr: DeepPartial<Dictionary> = {
       rooms: 'Nombre de chambres / clés',
       roomsHelp: 'Nombre approximatif de chambres ou de clés.',
       country: 'Pays',
+      countryPlaceholder: 'Sélectionnez le pays',
       city: 'Ville',
       preferredContact: 'Moyen de contact préféré',
       preferredContactOptions: ['E-mail', 'WhatsApp', 'Téléphone'],

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getDictionary, localizePath, type Locale } from '../i18n';
+import { WORLD_COUNTRIES } from '../data/countries';
 
 interface Props {
   locale: Locale;
@@ -57,7 +58,10 @@ const p = (path: string) => localizePath(locale, path);
               {f.hotelCategoryOptions.map((option) => <option value={option}>{option}</option>)}
             </select></label>
             <label>{f.rooms}<input name="roomsKeys" type="number" min="0" step="1" inputmode="numeric" /><small class="rfq-help">{f.roomsHelp}</small></label>
-            <label class="rfq-required">{f.country}<input name="country" required autocomplete="country-name" /></label>
+            <label>{f.country}<select name="country" autocomplete="country-name">
+              <option value="">{f.countryPlaceholder}</option>
+              {WORLD_COUNTRIES.map((country) => <option value={country}>{country}</option>)}
+            </select></label>
             <label>{f.city}<input name="city" autocomplete="address-level2" /></label>
           </div>
           <div class="rfq-field-block">

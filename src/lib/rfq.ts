@@ -29,7 +29,7 @@ export interface RfqSubmission {
     propertyType: string;
     hotelCategory?: string;
     roomsKeys?: string;
-    country: string;
+    country?: string;
     city?: string;
   };
   products: {
