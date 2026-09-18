@@ -35,6 +35,7 @@ export interface Dictionary {
     readArticle: string;
     requestTailoredQuote: string;
     home: string;
+    categoryLabels: Record<string, string>;
   };
   home: {
     title: string;

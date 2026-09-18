@@ -32,6 +32,14 @@ export const en: Dictionary = {
     readArticle: 'Read article',
     requestTailoredQuote: 'Request a tailored quote',
     home: 'Home',
+    categoryLabels: {
+      towels: 'Towels & Bath',
+      robes: 'Robes & Slippers',
+      'bed-linen': 'Bed Linen',
+      pillows: 'Pillows & Duvets',
+      protectors: 'Mattress Protectors',
+      amenities: 'Hotel Amenities',
+    },
   },
   home: {
     title: 'HADARA Hospitality | Hotel Textile Supply from Türkiye',
