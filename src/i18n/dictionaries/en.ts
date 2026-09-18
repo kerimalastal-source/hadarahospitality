@@ -277,6 +277,7 @@ export const en: Dictionary = {
       uploadRemove: 'Remove file',
       uploadErrorType: 'Unsupported file type. Please upload a PDF, XLS, XLSX, DOC or DOCX file.',
       uploadErrorSize: 'File is too large. Maximum size is 10 MB.',
+      uploadErrorFailed: "Couldn't attach your file, but the rest of your request will still be sent.",
       additionalMessage: 'Additional Message',
       additionalMessagePlaceholder: 'Tell us anything else that may help us prepare your quotation.',
 

@@ -48,9 +48,10 @@ export interface RfqSubmission {
   specifications: {
     notes?: string;
     additionalMessage?: string;
-    /** `url` is set only once BLOB_READ_WRITE_TOKEN is configured and the
-     * upload succeeded — see persistUploadedFile() in api/submit-quote.ts. */
-    uploadedFile?: { name: string; size: number; type: string; url?: string } | null;
+    /** `url` is set once the browser has uploaded the file directly to Vercel
+     * Blob and handed the resulting URL to /api/submit-quote — see
+     * "Client uploads" in src/scripts/rfq-form.ts and api/blob-upload.ts. */
+    uploadedFile?: { name: string; size: number; type: string; url: string } | null;
   };
   system: {
     submittedAt: string;
@@ -79,6 +80,17 @@ export function isValidRfqFile(file: { name: string; size: number; type: string 
 
 export function isValidWorkEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+/** Path prefix every RFQ upload is stored under in the Blob store, so
+ * blob-upload.ts can reject any client-requested pathname outside it. */
+export const RFQ_BLOB_PATH_PREFIX = 'rfq/';
+
+/** True for a URL that actually looks like a Vercel Blob public URL, so
+ * api/submit-quote.ts doesn't blindly trust a client-supplied "fileUrl"
+ * field and embed an arbitrary link in the internal notification email. */
+export function isValidRfqBlobUrl(url: string): boolean {
+  return /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\//i.test(url);
 }
 
 /** Maps a product page's legacy `?category=` value (CATEGORIES[key].formCategory

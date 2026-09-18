@@ -170,6 +170,7 @@ export interface Dictionary {
       uploadRemove: string;
       uploadErrorType: string;
       uploadErrorSize: string;
+      uploadErrorFailed: string;
       additionalMessage: string;
       additionalMessagePlaceholder: string;
 

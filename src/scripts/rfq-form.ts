@@ -2,7 +2,8 @@
 // pre-selection from URL params, drag-and-drop file upload, submission via
 // fetch (no more mailto:), and analytics event hooks. Guarded so this is a
 // no-op import on every other page.
-import { isValidRfqFile, RFQ_FILE_MAX_BYTES, LEGACY_CATEGORY_TO_RFQ_CATEGORY, type RfqProductMeta } from '../lib/rfq';
+import { isValidRfqFile, RFQ_FILE_MAX_BYTES, RFQ_BLOB_PATH_PREFIX, LEGACY_CATEGORY_TO_RFQ_CATEGORY, type RfqProductMeta } from '../lib/rfq';
+import { upload } from '@vercel/blob/client';
 
 const form = document.querySelector<HTMLFormElement>('#rfq-form');
 
@@ -117,7 +118,6 @@ if (form) {
     if (fileSizeEl) fileSizeEl.textContent = formatBytes(file.size);
     if (fileChip) fileChip.hidden = false;
     if (dropzone) dropzone.hidden = true;
-    track('rfq_file_uploaded', { name: file.name, size: file.size, type: file.type });
   }
 
   dropzone?.addEventListener('click', () => fileInput?.click());
@@ -181,6 +181,7 @@ if (form) {
 
     if (categoriesError) categoriesError.hidden = true;
     if (formError) formError.hidden = true;
+    if (uploadError) uploadError.hidden = true;
 
     if (!form.checkValidity()) {
       form.reportValidity();
@@ -198,11 +199,38 @@ if (form) {
 
     setSubmitting(true);
     track('quote_form_submitted');
+
+    // --- Client upload: the file goes straight to Blob storage from here,
+    // never through /api/submit-quote's own body — see that function's
+    // top comment for why. A failed upload doesn't abort the whole
+    // submission: the file was always optional, so the RFQ still goes
+    // through without its attachment rather than blocking the visitor.
+    data.delete('file');
+    const selectedFile = fileInput?.files?.[0];
+    if (selectedFile) {
+      try {
+        const blob = await upload(`${RFQ_BLOB_PATH_PREFIX}${selectedFile.name}`, selectedFile, {
+          access: 'public',
+          handleUploadUrl: '/api/blob-upload',
+        });
+        data.set('fileUrl', blob.url);
+        data.set('fileName', selectedFile.name);
+        data.set('fileSize', String(selectedFile.size));
+        data.set('fileType', selectedFile.type);
+        track('rfq_file_uploaded', { name: selectedFile.name, size: selectedFile.size, url: blob.url });
+      } catch (error) {
+        console.error('[rfq] file upload failed, continuing without attachment', error);
+        if (uploadError) {
+          uploadError.textContent = uploadError.dataset.errorUpload ?? '';
+          uploadError.hidden = false;
+        }
+      }
+    }
+
     try {
       const response = await fetch('/api/submit-quote', { method: 'POST', body: data });
       const result = await response.json().catch(() => null);
       if (!response.ok || !result?.ok) {
-        if (result?.error === 'invalid_file') showUploadError(result.message?.includes('10 MB') ? 'size' : 'type');
         if (formError) formError.hidden = false;
         setSubmitting(false);
         return;

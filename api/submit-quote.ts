@@ -7,15 +7,22 @@
 // runtime) gets us the standard Request/Response/FormData Web APIs for
 // free, so multipart parsing needs no extra dependency.
 //
-// What's real right now: full server-side validation, file type/size
-// checks, a lightweight anti-spam gate, and a generated RFQ reference
-// number returned to the caller. What's stubbed: the three integration
-// points below (email, HubSpot, file storage) are no-ops until their
-// environment variables are configured — each one logs what it *would*
-// do so this is easy to find and wire up later. See CLAUDE.md for the
-// exact env vars each one needs.
+// The uploaded RFQ file itself never passes through this function's body:
+// the browser uploads it directly to Vercel Blob storage before calling
+// this endpoint (see api/blob-upload.ts and the "Client uploads" section
+// of src/scripts/rfq-form.ts), and only the resulting URL + metadata are
+// submitted here as plain form fields. That split exists because
+// @vercel/blob needs the Node.js runtime, which this Edge function isn't —
+// see api/blob-upload.ts's top comment for the full story.
+//
+// What's real right now: full server-side validation, a lightweight
+// anti-spam gate, and a generated RFQ reference number returned to the
+// caller. What's stubbed: email and HubSpot sync are no-ops until their
+// environment variables are configured — each one logs what it *would* do
+// so this is easy to find and wire up later. See CLAUDE.md for the exact
+// env vars each one needs.
 
-import { isValidRfqFile, isValidWorkEmail, RFQ_FILE_MAX_BYTES, type RfqProductMeta, type RfqSubmission } from '../src/lib/rfq.js';
+import { isValidRfqBlobUrl, isValidWorkEmail, type RfqProductMeta, type RfqSubmission } from '../src/lib/rfq.js';
 import { CONTACT_EMAIL } from '../src/config.js';
 
 export const config = { runtime: 'edge' };
@@ -54,12 +61,10 @@ function row(label: string, value?: string): string {
   return `<tr><td style="padding:5px 16px 5px 0;color:#626a72;font-size:13px;white-space:nowrap;vertical-align:top">${escapeHtml(label)}</td><td style="padding:5px 0;font-size:13px;color:#1e2a38">${escapeHtml(value).replace(/\n/g, '<br>')}</td></tr>`;
 }
 
-function fileRow(file?: { name: string; size: number; url?: string } | null): string {
+function fileRow(file?: { name: string; size: number; url: string } | null): string {
   if (!file) return '';
   const sizeLabel = `${(file.size / 1024).toFixed(0)} KB`;
-  const value = file.url
-    ? `<a href="${escapeHtml(file.url)}" style="color:#8b6634">${escapeHtml(file.name)}</a> (${sizeLabel})`
-    : `${escapeHtml(file.name)} (${sizeLabel}) — not stored, storage not configured`;
+  const value = `<a href="${escapeHtml(file.url)}" style="color:#8b6634">${escapeHtml(file.name)}</a> (${sizeLabel})`;
   return `<tr><td style="padding:5px 16px 5px 0;color:#626a72;font-size:13px;white-space:nowrap;vertical-align:top">Attached file</td><td style="padding:5px 0;font-size:13px;color:#1e2a38">${value}</td></tr>`;
 }
 
@@ -147,28 +152,6 @@ async function syncToHubSpot(submission: RfqSubmission): Promise<void> {
   // TODO: Contact (email/name/phone) -> Company (companyName/country) -> Deal (reference, categories, notes).
 }
 
-/** Stub — persist the uploaded file once real storage is wired up. Until
- * then, the file is validated but its bytes are discarded after this
- * request; only its name/size/type are kept.
- *
- * NOT using @vercel/blob's `put()` here: this function runs on the Edge
- * runtime (see top of file for why), and `@vercel/blob` pulls in Node
- * built-ins (node:stream, node:net, node:tls, ...) that the Edge sandbox
- * rejects outright — a real attempt at this shipped as PR #26 and failed
- * to deploy (NOW_SANDBOX_WORKER_EDGE_FUNCTION_UNSUPPORTED_MODULES). Vercel
- * Blob's own recommended fix for exactly this situation is *client
- * uploads*: the browser uploads the file straight to Blob storage using a
- * short-lived token from a dedicated (Node-runtime) token endpoint,
- * bypassing this Edge function's body entirely — see `@vercel/blob/client`
- * and `handleUpload()`. That's a genuine restructure of the upload flow
- * (a two-phase submit: upload the file, then submit the form with the
- * resulting URL), not a drop-in fix, so it's left as a separate follow-up
- * rather than guessed at here. */
-async function persistUploadedFile(file: File, reference: string): Promise<{ stored: boolean; url?: string }> {
-  console.info('[rfq] persistUploadedFile: file storage not yet implemented, discarding file bytes', reference, file.name);
-  return { stored: false };
-}
-
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
     return json({ ok: false, error: 'method_not_allowed' }, 405);
@@ -218,24 +201,19 @@ export default async function handler(request: Request): Promise<Response> {
     return json({ ok: false, error: 'validation', fields: ['workEmail'] }, 400);
   }
 
-  // --- File validation (optional field) -----------------------------------
-  const fileEntry = formData.get('file');
-  let fileMeta: { name: string; size: number; type: string; url?: string } | null = null;
-  let uploadedFile: File | null = null;
-  if (fileEntry instanceof File && fileEntry.size > 0) {
-    if (!isValidRfqFile(fileEntry)) {
-      return json(
-        {
-          ok: false,
-          error: 'invalid_file',
-          message: fileEntry.size > RFQ_FILE_MAX_BYTES ? 'File exceeds the 10 MB limit.' : 'Unsupported file type.',
-        },
-        400,
-      );
-    }
-    uploadedFile = fileEntry;
-    fileMeta = { name: fileEntry.name, size: fileEntry.size, type: fileEntry.type };
-  }
+  // --- Uploaded file (optional field) --------------------------------------
+  // Already uploaded to Blob storage client-side by this point (see the
+  // top-of-file comment) — this is just the resulting metadata, sent as
+  // plain form fields. isValidRfqBlobUrl() guards against trusting an
+  // arbitrary client-supplied URL (e.g. embedding it in the internal email).
+  const fileUrl = str(formData, 'fileUrl', 2000);
+  const fileName = str(formData, 'fileName', 300);
+  const fileSize = Number(str(formData, 'fileSize', 20));
+  const fileType = str(formData, 'fileType', 200);
+  const fileMeta =
+    fileUrl && fileName && isValidRfqBlobUrl(fileUrl)
+      ? { name: fileName, size: Number.isFinite(fileSize) ? fileSize : 0, type: fileType, url: fileUrl }
+      : null;
 
   // --- Optional product metadata, passed through from a product page ------
   const productMetaRaw = str(formData, 'productMeta', 2000);
@@ -250,17 +228,6 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   const reference = generateReference();
-
-  // Store the file (if any) before building the emails below, so a
-  // successful upload's download link can be included in them.
-  if (uploadedFile && fileMeta) {
-    try {
-      const stored = await persistUploadedFile(uploadedFile, reference);
-      if (stored.url) fileMeta.url = stored.url;
-    } catch (error) {
-      console.error('[rfq] persistUploadedFile failed', reference, error);
-    }
-  }
 
   const submission: RfqSubmission = {
     contact: {
@@ -305,9 +272,7 @@ export default async function handler(request: Request): Promise<Response> {
 
   // allSettled, not all: one integration failing (e.g. email) must never stop
   // the others from running, and must never fail the submission itself — the
-  // RFQ was already validated and has a reference number. (File storage
-  // already ran above, before the emails were built, so its result could be
-  // included in them.)
+  // RFQ was already validated and has a reference number.
   const tasks: Promise<unknown>[] = [notifyHadaraTeam(submission), confirmToCustomer(submission), syncToHubSpot(submission)];
   const results = await Promise.allSettled(tasks);
   results.forEach((result) => {
