@@ -5,9 +5,14 @@ owner communicates in Arabic; reply to them in Arabic and keep this file's
 prose in English so it stays easy to scan.
 
 - **Repo**: `kerimalastal-source/hadarahospitality`
-- **Live**: https://hadarahospitality.vercel.app (Vercel auto-deploys `main`
-  on every push; no custom domain connected yet — deferred until the whole
-  site is finished)
+- **Live**: https://www.hadarahospitality.com (custom domain connected
+  2026-09-18; `hadarahospitality.com` apex 308-redirects to the `www`
+  subdomain, which is the canonical domain — `SITE_URL` in `src/config.ts`
+  and `site` in `astro.config.mjs` both point here, which is what every
+  canonical link, hreflang tag, OG/Twitter URL, JSON-LD, and the sitemap
+  are generated from). `https://hadarahospitality.vercel.app` still works
+  and auto-deploys `main` on every push, same as before — it's just no
+  longer the canonical URL for SEO purposes.
 - **Stack**: [Astro](https://astro.build) + TypeScript, static output. No
   framework runtime shipped to the browser, effectively no backend — the one
   exception is a single-purpose Vercel Edge Middleware for language
@@ -208,14 +213,15 @@ markup to fall out of sync.
 - **Self-hosting product/blog images off the Wix account** — flagged as a
   real business risk (single point of failure), not yet resolved; this
   sandbox can't fetch `static.wixstatic.com` to re-host the files locally.
-- **Custom domain** (`hadarahospitality.com` → Vercel) — deferred until the
-  whole site is finished.
 
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
-  `hadarahospitality.com` and most external domains is blocked. Wix API
-  calls route through Wix's own signed infrastructure and work fine.
-  `mcp__Vercel__web_fetch_vercel_url` works for verifying the live
-  `*.vercel.app` deployment. For local visual verification, use Playwright
+  `hadarahospitality.com` and most external domains is blocked via plain
+  `curl`/direct fetch. Wix API calls route through Wix's own signed
+  infrastructure and work fine. `mcp__Vercel__web_fetch_vercel_url` works
+  for verifying the live site on *either* `*.vercel.app` or the connected
+  `hadarahospitality.com`/`www.hadarahospitality.com` custom domain (it
+  goes through Vercel's own fetch path, not the sandbox's blocked egress).
+  For local visual verification, use Playwright
   with `page.route()` to stub blocked image requests.
