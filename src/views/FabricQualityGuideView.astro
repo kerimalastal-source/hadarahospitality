@@ -84,7 +84,7 @@ const tcRange = rangeOf(numbersFrom('Fabric Quality'));
           </div>
           <div class="quality-scale-endpoints"><span>{TC_SCALE.min} TC · {g.tc.scaleMin}</span><span>{TC_SCALE.max}+ TC · {g.tc.scaleMax}</span></div>
         </div>
-        <div class="quality-tiers" style="grid-template-columns:repeat(4,1fr)">
+        <div class="quality-tiers quality-tiers-4">
           {g.tc.tiers.map((tier) => (
             <div class="quality-tier"><span>{tier.range}</span><h4>{tier.title}</h4><p>{tier.body}</p></div>
           ))}

@@ -595,6 +595,87 @@ above, which is still English-only.
   product pages" above; every product page currently shows placeholder
   numbers the owner hasn't confirmed yet.
 
+## Full-site audit (2026-09-19)
+
+Owner asked to confirm the entire site works correctly across all 4
+locales. Ran three automated passes (scripts written ad hoc, not
+committed — see git history of this session if reconstructing them):
+1. A link checker crawling every built `dist/**/*.html` file (all 177
+   pages), resolving every `href`/`src`/`data-bg` starting with `/`
+   against the actual `dist` output (respecting `build.format:
+   'directory'`), flagging anything that doesn't resolve.
+2. A Playwright pass over a representative page set × all 4 locales,
+   checking HTTP status, `<html dir>`/`<html lang>` correctness,
+   `document.documentElement.scrollWidth` vs `innerWidth` (no horizontal
+   overflow), literal `"undefined"`/`"[object Object]"` leaking into
+   rendered text (an i18n-fallback bug signature), console/page errors,
+   and failed requests.
+3. A full mobile-width (390px, then re-verified at 320px) sweep of
+   **every** page × every locale (176 combinations) for horizontal
+   overflow specifically, since that class of bug (see the RFQ honeypot
+   RTL bug earlier in this file) tends to be viewport- and
+   content-length-dependent, not something a desktop-only check catches.
+
+Route parity was also confirmed structurally: all 4 locales build the
+exact same 44 routes (verified by diffing the route lists), plus English
+gets the one extra `404.html`.
+
+**Two real bugs found and fixed, both content-length/locale-dependent —
+neither reproduces in English, which is exactly why an all-4-locales
+pass matters and an English-only check would've missed both:**
+
+- **Dead links in the 404 page's language switcher.** `404.astro` is the
+  one intentionally-unlocalized page (see "Internationalization" above),
+  but `LanguageSwitcher.astro` blindly generated `localizePath(l, path)`
+  for every locale regardless of whether that locale actually has a page
+  at `path` — for `/404` specifically, that produced links to
+  `/ar/404`, `/fr/404`, `/ru/404`, none of which exist. Fixed with a
+  narrow, path-specific special-case in `LanguageSwitcher.astro`: when
+  `path === '/404'`, every locale link now points at that locale's
+  homepage instead. This is the one hardcoded exception because 404 is
+  the one hardcoded exception to "every page exists in all 4 locales."
+- **Horizontal mobile overflow on `/fr/blog`** (and, by the same root
+  cause, latent everywhere a sufficiently long single word could appear
+  in any locale's hero heading): the Blog listing page's hero `<h1>`
+  uses the shared `.products-hero` component, which — unlike the
+  homepage's `.hero h1` — had **no mobile font-size override** at all,
+  so it stayed at its desktop `clamp(52px,6.2vw,92px)` size (52px
+  minimum) even on a 390px phone. French's `"l'approvisionnement
+  hôtelier."` includes a 20-character unbreakable word (the apostrophe
+  isn't a break point) that doesn't fit in the resulting narrow column,
+  and CSS's default `overflow-wrap: normal` lets an unbreakable word
+  overflow its container rather than shrink or break — pushing the page
+  382px wider than the viewport. Fixed defensively rather than by
+  chasing every hero variant's missing breakpoint: added
+  `overflow-wrap:anywhere` to the base `h1` rule and the shared
+  `.hero h1,h2` rule (the latter's bare `,h2` already applies to every
+  `<h2>` on the site) in `global.css`. This is a universal, content-
+  agnostic safety net — it only ever engages when a single word actually
+  doesn't fit, so it doesn't change layout for any normal-width text,
+  and it protects every heading everywhere against a too-long word in
+  *any* locale, not just the one instance that happened to surface it
+  today. **Lesson for next time**: a font-size/layout fix verified only
+  in English (or only at desktop width) can hide for a long time — the
+  RFQ honeypot RTL bug earlier in this file and this one are the same
+  pattern: locale- or viewport-specific overflow that a same-language,
+  same-viewport check structurally cannot catch. When auditing layout
+  again, sweep every locale at mobile width, not just English at
+  desktop.
+- Also fixed as part of the same audit, found via the owner's own
+  browsing rather than the automated pass: the homepage's "Robes &
+  Slippers" collection card had a dead/orphaned Wix image ID — see
+  "Self-hosting product/blog images off the Wix account" above.
+
+Everything else came back clean: 0 broken internal links, 0 broken
+hreflang alternates (checked by the same link-checker, since
+`<link rel="alternate">` also has an `href`), 0 `astro check` errors, 0
+`[object Object]`/literal-`undefined` artifacts, correct `dir`/`lang` on
+every page in every locale, and no console/page errors beyond this
+sandbox's own known-blocked hosts (`fonts.googleapis.com` — the sandbox
+proxy's CA isn't trusted by a fresh headless browser, unrelated to the
+real site — and Google Maps embeds, both expected per "Sandbox quirks"
+below).
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
