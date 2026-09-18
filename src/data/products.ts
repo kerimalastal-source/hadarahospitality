@@ -68,6 +68,22 @@ export const PRODUCTS: Product[] = [
     gallery: ['https://static.wixstatic.com/media/3510f9_383c86f602ab4db3a9aa1a04ed0fe7f9~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_d4c7ad29d236402c80bb9349656237ed~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_845509d74baf4444b6504ffd68c458bd~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_0eef6acf5bef4ef9bdbe4b0749564c7d~mv2.jpg'],
   },
   {
+    // No product photography yet — same placeholder-gallery treatment as
+    // the rest of this file's unphotographed entries.
+    slug: 'hotel-bath-sheet-700-gsm',
+    name: 'Hotel Bath Sheet',
+    category: 'towels',
+    material: '100% hospitality-grade cotton',
+    suitableFor: '4★ & 5★ hotel segments',
+    specLabel: 'GSM',
+    specValues: ['500 GSM', '600 GSM', '700 GSM'],
+    customization: ['Custom Logo Embroidery', 'Custom Size Request', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: 'Premium oversized bath sheet designed for luxury hospitality environments, including hotels, resorts, and spa facilities. Larger than a standard bath towel, manufactured from high-quality cotton fabrics to provide full-body coverage, exceptional softness, and lasting absorbency for professional hospitality use.',
+    features: ['Oversized full-body coverage', '600 GSM premium hospitality quality', 'High absorbency & soft-touch texture', 'Durable for commercial laundry operations', 'Suitable for 4★ & 5★ hotel segments'],
+    main: '',
+    gallery: [],
+  },
+  {
     slug: 'hotel-hand-towel',
     name: 'Hotel Hand Towel',
     category: 'towels',
@@ -94,6 +110,22 @@ export const PRODUCTS: Product[] = [
     features: ['500 GSM hospitality-grade quality', 'Soft-touch & high absorbency', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments', 'Elegant white hospitality presentation'],
     main: 'https://static.wixstatic.com/media/3510f9_5e83f411e37e4dcd942f23465c007250~mv2.jpg',
     gallery: ['https://static.wixstatic.com/media/3510f9_5e83f411e37e4dcd942f23465c007250~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_5771c7b23a614390bd7b2f8551003ba1~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_b910500fa875415db60b4945ff730c67~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_cd269d83c63c47dc9225cc7840f04d79~mv2.jpg', 'https://static.wixstatic.com/media/3510f9_1e2e6c22b4884042b07badab80e43ab1~mv2.jpg'],
+  },
+  {
+    // No product photography yet — same placeholder-gallery treatment as
+    // the rest of this file's unphotographed entries.
+    slug: 'hotel-washcloth',
+    name: 'Hotel Washcloth',
+    category: 'towels',
+    material: '100% hospitality-grade cotton',
+    suitableFor: 'Hotels, resorts & serviced apartments',
+    specLabel: 'GSM',
+    specValues: ['350 GSM', '400 GSM', '450 GSM'],
+    customization: ['Custom Logo Embroidery', 'Custom Size Request', 'Hospitality Packaging', 'Bulk Order Production'],
+    overview: 'Compact hotel washcloth developed for hospitality bathrooms and guest room operations. Manufactured from high-quality cotton fabrics to provide a soft, practical everyday essential for washing and cleansing during a stay.',
+    features: ['Compact everyday cotton essential', '400 GSM hospitality-grade quality', 'Soft-touch & absorbent texture', 'Durable for commercial laundry operations', 'Suitable for hotels, resorts & serviced apartments'],
+    main: '',
+    gallery: [],
   },
   {
     slug: 'hotel-pool-towel-600-gsm',
