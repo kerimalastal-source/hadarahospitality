@@ -17,8 +17,9 @@ const nav = t.common.nav;
 const home = (p: string) => localizePath(locale, p);
 ---
 <header class="site-header" id="top">
-  <a class="brand" href={home('/')} aria-label="HADARA Hospitality home">
-    <img src="/assets/hadara-logo-black.svg" alt="HADARA Hospitality" class="hadara-header-logo" />
+  <a class="brand" href={home('/')}>
+    <img src="/assets/hadara-logo-black.png" alt="" class="hadara-header-logo" />
+    <span><strong>HADARA</strong><small>HOSPITALITY</small></span>
   </a>
   <button class="menu-toggle" aria-label={nav.openMenu} aria-expanded="false" aria-controls="navigation"><span></span><span></span><span></span></button>
   <nav id="navigation" aria-label="Main navigation">
