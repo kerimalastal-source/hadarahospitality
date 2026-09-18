@@ -148,7 +148,10 @@ const relatedLocalized = related.map((pr) => ({ ...pr, name: getProductTranslati
           <div class="spec-row"><dt>{specLabel}</dt><dd>{specValues.join(' / ')}</dd></div>
           <div class="spec-row"><dt>{pd.suitableFor}</dt><dd>{suitableFor}</dd></div>
           <div class="spec-row"><dt>{pd.customization}</dt><dd><ul class="chip-list">{customization.map((c) => <li>{c}</li>)}</ul></dd></div>
+          <div class="spec-row"><dt>{pd.moq}</dt><dd>{category.moq}</dd></div>
+          <div class="spec-row"><dt>{pd.leadTime}</dt><dd>{category.leadTime}</dd></div>
         </dl>
+        <p class="spec-note">{pd.moqNote}</p>
         <div class="info-box"><strong>{pd.productionSupply}</strong>{pd.productionSupplyBody}</div>
       </div>
     </section>

@@ -96,6 +96,9 @@ export interface Dictionary {
     category: string;
     suitableFor: string;
     customization: string;
+    moq: string;
+    leadTime: string;
+    moqNote: string;
     requestQuoteFor: string;
     specifications: string;
     technicalDetails1: string;

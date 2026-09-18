@@ -487,6 +487,28 @@ to English until translated" pattern as everything else.
   `repeat(5,1fr)` for the homepage's 5-step process) since this page's
   "how it works" only has 4 steps.
 
+## MOQ & lead time on product pages
+
+Every product page's spec table (`src/views/ProductView.astro`, the same
+`dl.spec-table` as Material/GSM/Category/etc.) now shows a **Minimum Order
+Quantity** and **Estimated Lead Time** row, with a small `.spec-note`
+underneath reading "Indicative — confirmed as part of your quotation...".
+
+- **These are placeholder figures, not confirmed by the owner** — set
+  category-by-category (`CATEGORIES[key].moq`/`.leadTime` in
+  `src/data/products.ts`, e.g. towels: "100 pieces per style" / "3–4
+  weeks"), not fabricated per-product, and not to be read as real
+  commitments. The owner asked for this feature with real numbers TBD
+  ("استخدم قيم مؤقتة منطقية لحد ما تراجعها" — use reasonable placeholder
+  values until reviewed) — **flag this to the owner and get the real
+  per-category (or per-product, if they turn out to actually vary that
+  granularly) numbers before this ships to a real customer negotiating
+  a contract on them.** Update `CATEGORIES` directly once confirmed — no
+  other wiring needed, every product in that category picks it up
+  automatically.
+- Dictionary keys: `productDetail.moq`, `.leadTime`, `.moqNote` (English
+  only so far — same fallback-to-English pattern as everything else).
+
 ## Pending / deferred (owner-blocked, don't guess)
 
 - **"شركاء النجاح" (Partners of Success) homepage section** — 10 hotel-chain
@@ -500,6 +522,9 @@ to English until translated" pattern as everything else.
 - **Self-hosting product/blog images off the Wix account** — flagged as a
   real business risk (single point of failure), not yet resolved; this
   sandbox can't fetch `static.wixstatic.com` to re-host the files locally.
+- **Real MOQ / lead-time figures per category** — see "MOQ & lead time on
+  product pages" above; every product page currently shows placeholder
+  numbers the owner hasn't confirmed yet.
 
 ## Sandbox quirks
 
