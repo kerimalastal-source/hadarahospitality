@@ -188,7 +188,7 @@
 .rfq-form{max-width:820px;margin:0 auto}
 .rfq-intro p:not(.eyebrow){max-width:520px;color:var(--muted);line-height:1.8;margin:14px 0 0}
 .rfq-intro h2{font-size:clamp(30px,3.2vw,42px)}
-.rfq-honeypot{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.rfq-honeypot{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 
 .rfq-selected-product{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--cream);border:1px solid #e3dfd6;padding:16px 20px;margin:28px 0}
 .rfq-selected-product[hidden],.rfq-file-chip[hidden]{display:none}

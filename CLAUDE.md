@@ -336,16 +336,33 @@ form. Added 2026-09-18.
   inputs don't have this problem (`display:none !important` in the browser's
   own UA stylesheet) — only the boolean `hidden` attribute does. Watch for
   this pattern anywhere else `hidden` gets toggled on a flex/grid element.
-- **i18n**: the dictionary's new granular field labels/placeholders/option
-  lists under `getAQuote.form` are English-only for now (fall back per the
-  usual mechanism) — only the hero, trust bullets, section intro copy,
-  submit button and success-state copy were translated into ar/fr/ru. Fill
-  in the rest incrementally the same way as everything else in this file.
+- **i18n**: fully translated into ar/fr/ru as of 2026-09-18 — every field
+  label, placeholder, dropdown/chip/segmented option, validation message
+  and success-state string under `getAQuote.form`. Same fallback mechanism
+  as the rest of the site still applies to anything added later.
+- **A real RTL layout bug this surfaced, not just a screenshot artifact**:
+  the honeypot field (`.rfq-honeypot`) used `position:absolute;
+  left:-9999px` to hide it off-screen — standard-looking, but in a
+  `dir="rtl"` document, browsers include negatively-offset absolutely
+  positioned descendants in the *document's* horizontal scrollable area
+  (unlike LTR, where they're simply clipped and ignored). Confirmed via
+  `document.documentElement.scrollWidth` (11199px in `ar`, a correct
+  1200px in `en`, same page, same viewport — `document.body.scrollWidth`
+  stayed 1200 in both, which is why this is easy to miss testing only
+  `body`). A real Arabic visitor could scroll the page sideways into a
+  huge empty area. Fixed by dropping the offset entirely — `.rfq-honeypot`
+  now uses the standard `clip: rect(0,0,0,0)` visually-hidden pattern
+  (1×1px, `overflow:hidden`, no position offset needed) instead of moving
+  it off-canvas. **Lesson**: never hide an off-screen element with a large
+  negative `left`/`top`/`right`/`bottom` offset on a page that has (or
+  might later have) an RTL variant — use `clip`/`clip-path` sizing
+  instead, and when testing a new RTL page, check
+  `document.documentElement.scrollWidth` at a few viewport widths, not
+  just eyeballing a screenshot (a `fullPage` Playwright screenshot only
+  happens to visually reveal this exact bug by accident).
 
 ## Pending / deferred (owner-blocked, don't guess)
 
-- **RFQ field label translations** (ar/fr/ru) — see "RFQ system" above;
-  currently English-only, falls back gracefully, not blocking.
 - **"شركاء النجاح" (Partners of Success) homepage section** — 10 hotel-chain
   logos. Explicitly deferred by the owner ("خلص سيبك منه بنعمله بعدين").
   Blocked on: (a) the exact names of the specific hotel properties they
