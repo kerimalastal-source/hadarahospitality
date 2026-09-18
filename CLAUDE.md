@@ -593,15 +593,21 @@ member approves it.
   already downloadable from each product page, linked from
   `/portal/documents` instead of duplicated); multi-user-per-company
   invites (one Clerk user = one `portal_users` row today).
-- **Not verified against a live Vercel deployment yet** — same caveat as the
-  i18n middleware: this sandbox has no real Clerk keys or Postgres database,
-  so only structural checks were possible (`npm run build` producing the
-  same 169 static pages + one Function, `npm run check` clean, and
-  `astro dev` with dummy env vars confirming the auth-gate redirects fire
-  correctly on every `/portal/*` route). After the owner creates the Clerk
-  app and Neon database and sets the three env vars above, walk the real
-  flow once end-to-end (sign up → approve → staff creates an order → add a
-  status event → customer sees it) before calling this done.
+- **Not verified end-to-end yet** — this sandbox has no real Clerk keys or
+  Postgres database, so only structural checks were possible: `npm run
+  build`, `npm run check`, and `astro dev` with dummy env vars confirming
+  the auth-gate redirects fire correctly on every `/portal/*` route. Once
+  rebased onto `main` (2026-09-19), the branch's actual Vercel preview
+  deployment was checked too (via the Vercel MCP tools) — build succeeded,
+  the static/Function split held (Astro still emits one `_render.func` and
+  every other route stayed static), and hitting `/portal/sign-in` on that
+  preview returned a 500 whose runtime log is exactly Clerk's "Publishable
+  key is missing" error — i.e. the code path is wired correctly and the
+  *only* thing blocking it is the still-unset env vars below, not a bug.
+  After the owner creates the Clerk app and Neon database and sets the
+  three env vars, walk the real flow once end-to-end (sign up → approve →
+  staff creates an order → add a status event → customer sees it) before
+  calling this done.
 
 ## Hotel Opening Package (`/hotel-opening-package`)
 
