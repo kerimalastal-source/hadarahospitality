@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://hadarahospitality.com',
+  site: 'https://www.hadarahospitality.com',
   trailingSlash: 'never',
   build: {
     format: 'file',

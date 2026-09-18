@@ -1,4 +1,4 @@
-export const SITE_URL = 'https://hadarahospitality.com';
+export const SITE_URL = 'https://www.hadarahospitality.com';
 export const SITE_NAME = 'HADARA Hospitality';
 export const CONTACT_EMAIL = 'partnerships@hadarahospitality.com';
 export const CONTACT_PHONE = '+90 531 930 92 14';
