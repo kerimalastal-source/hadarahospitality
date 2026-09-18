@@ -144,9 +144,9 @@
 @media(max-width:500px){.not-found-grid{grid-template-columns:1fr}}
 .featured-products{background:var(--cream);padding:100px 0}
 .featured-carousel{position:relative;margin-top:10px}
-.featured-track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none}
+.featured-track{display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none}
 .featured-track::-webkit-scrollbar{display:none}
-.featured-card{display:block;flex:0 0 calc((100% - 4*16px)/5);scroll-snap-align:start;background:#fff;border:1px solid #e3dfd6;transition:box-shadow .25s}
+.featured-card{display:block;flex:0 0 calc((100% - 4*16px)/5);background:#fff;border:1px solid #e3dfd6;transition:box-shadow .25s}
 .featured-card:hover{box-shadow:0 14px 28px #1e2a3814}
 .featured-card-image{height:190px;background-color:var(--cream);background-size:cover;background-position:center}
 .featured-card-body{padding:16px 15px}
