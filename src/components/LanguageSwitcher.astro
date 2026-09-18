@@ -8,6 +8,11 @@ interface Props {
 }
 
 const { locale, path } = Astro.props;
+
+// 404.astro is the one intentionally-unlocalized page on the site (see
+// CLAUDE.md), so it has no /ar, /fr or /ru equivalent to link to — send
+// the switcher to that locale's homepage instead of a dead link.
+const targetPath = path === '/404' ? '/' : path;
 ---
 <div class="lang-switcher">
   <button type="button" class="lang-switcher-toggle" aria-haspopup="true" aria-expanded="false" data-lang-toggle>
@@ -17,7 +22,7 @@ const { locale, path } = Astro.props;
   <ul class="lang-switcher-menu" data-lang-menu>
     {LOCALES.map((l) => (
       <li>
-        <a href={localizePath(l, path)} aria-current={l === locale ? 'true' : undefined}>{LOCALE_LABELS[l]}</a>
+        <a href={localizePath(l, targetPath)} aria-current={l === locale ? 'true' : undefined}>{LOCALE_LABELS[l]}</a>
       </li>
     ))}
   </ul>
