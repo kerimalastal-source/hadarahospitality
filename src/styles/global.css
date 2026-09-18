@@ -49,6 +49,7 @@
 .spec-row:last-child{border-bottom:0}
 .spec-row dt{font-size:11px;font-weight:700;letter-spacing:.1em;color:#795b32;margin:0}
 .spec-row dd{margin:0;font-size:14px;color:var(--ink);line-height:1.7}
+.spec-note{font-size:11px;color:var(--muted);line-height:1.6;margin:14px 2px 0;font-style:italic}
 .chip-list{list-style:none;display:flex;flex-wrap:wrap;gap:9px;padding:0;margin:0}
 .chip-list li{border:1px solid var(--gold);color:#795b32;font-size:11px;font-weight:600;padding:8px 14px}
 .info-box{background:#fff;border-left:3px solid var(--gold);padding:24px 28px;margin-top:36px;font-size:13px;line-height:1.8;color:var(--muted)}

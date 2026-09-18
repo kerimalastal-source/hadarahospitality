@@ -8,15 +8,22 @@ export type CategoryKey = 'towels' | 'robes' | 'bed-linen' | 'pillows' | 'protec
 export interface Category {
   label: string;
   formCategory: string;
+  /** Category-level placeholder figures shown on every product page in this
+   * category (src/views/ProductView.astro's spec table) until the owner
+   * confirms real per-category numbers — see the "tentative" note shown
+   * alongside them (productDetail.moqNote in the dictionary). Never treat
+   * these as confirmed pricing/ordering terms. */
+  moq: string;
+  leadTime: string;
 }
 
 export const CATEGORIES: Record<CategoryKey, Category> = {
-  towels: { label: 'Towels & Bath', formCategory: 'Towels & bath' },
-  robes: { label: 'Robes & Slippers', formCategory: 'Robes & slippers' },
-  'bed-linen': { label: 'Bed Linen', formCategory: 'Bed linen & bedding' },
-  pillows: { label: 'Pillows & Duvets', formCategory: 'Pillows & duvets' },
-  protectors: { label: 'Mattress Protectors', formCategory: 'Mattress protectors' },
-  amenities: { label: 'Hotel Amenities', formCategory: 'Other hospitality essentials' },
+  towels: { label: 'Towels & Bath', formCategory: 'Towels & bath', moq: '100 pieces per style', leadTime: '3–4 weeks' },
+  robes: { label: 'Robes & Slippers', formCategory: 'Robes & slippers', moq: '50 pieces per style', leadTime: '4–5 weeks' },
+  'bed-linen': { label: 'Bed Linen', formCategory: 'Bed linen & bedding', moq: '100 sets per style', leadTime: '4–5 weeks' },
+  pillows: { label: 'Pillows & Duvets', formCategory: 'Pillows & duvets', moq: '100 pieces per style', leadTime: '3–4 weeks' },
+  protectors: { label: 'Mattress Protectors', formCategory: 'Mattress protectors', moq: '100 pieces per style', leadTime: '3–4 weeks' },
+  amenities: { label: 'Hotel Amenities', formCategory: 'Other hospitality essentials', moq: '500 pieces per style', leadTime: '3–5 weeks' },
 };
 
 // Category display order used on the products listing page and the jump nav.
