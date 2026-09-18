@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { ARTICLES, type Article } from '../data/blog';
 import { getArticleTranslation } from '../data/blog.i18n';
+import { SITE_URL, SITE_NAME } from '../config';
 import { getDictionary, localizePath, type Locale } from '../i18n';
 
 interface Props {
@@ -24,6 +25,7 @@ const excerpt = tr?.excerpt ?? article.excerpt;
 const heroAlt = tr?.heroAlt ?? article.heroAlt;
 const inlineAlt = tr?.inlineAlt ?? article.inlineAlt;
 const body = tr?.body ?? article.body;
+const metaDescription = excerpt.length > 158 ? `${excerpt.slice(0, 158).replace(/\s+\S*$/, '')}…` : excerpt;
 
 const DATE_LOCALE: Record<Locale, string> = { en: 'en-US', ar: 'ar', fr: 'fr-FR', ru: 'ru-RU' };
 function formatDate(iso: string) {
@@ -33,16 +35,43 @@ function formatDate(iso: string) {
 const related = ARTICLES.filter((a) => a.category === article.category && a.slug !== article.slug).slice(0, 3);
 const relatedPool = related.length ? related : ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 3);
 const relatedLocalized = relatedPool.map((a) => ({ ...a, title: getArticleTranslation(locale, a.slug)?.title ?? a.title }));
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description: excerpt,
+  image: article.hero || undefined,
+  datePublished: article.date,
+  dateModified: article.date,
+  url: `${SITE_URL}${localizePath(locale, `/blog/${article.slug}.html`)}`,
+  author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+  publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL, logo: { '@type': 'ImageObject', url: `${SITE_URL}/assets/hadara-logo-black.svg` } },
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: t.common.home, item: `${SITE_URL}${p('/')}` },
+    { '@type': 'ListItem', position: 2, name: t.common.nav.blog, item: `${SITE_URL}${p('/blog.html')}` },
+    { '@type': 'ListItem', position: 3, name: title, item: `${SITE_URL}${localizePath(locale, `/blog/${article.slug}.html`)}` },
+  ],
+};
 ---
 <BaseLayout
   title={`${title} | HADARA Hospitality`}
-  description={excerpt}
+  description={metaDescription}
   path={`/blog/${article.slug}.html`}
   locale={locale}
   ogType="article"
   ogImage={article.hero}
   active="blog"
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  </Fragment>
   <main>
     <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/blog.html')}>{t.common.nav.blog}</a><span>/</span>{title}</p><p class="eyebrow light">{category.toUpperCase()}</p><h1>{title}</h1><p class="article-meta-line">{formatDate(article.date)} <span>·</span> {readTime} <span>·</span> {ad.by}</p></div></section>
     <figure class="article-cover-figure"><img class="article-cover" src={article.hero} alt={heroAlt} /></figure>
