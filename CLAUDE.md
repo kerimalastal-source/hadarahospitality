@@ -181,6 +181,22 @@ than breaking anything, so translation work can always ship incrementally.
 - Nav search icon and WhatsApp float icon are shared inline-SVG components
   (`src/components/icons/`), used consistently everywhere — see the
   resolved known issue note below.
+- `src/components/icons/TurkeyFlagIcon.astro` (added 2026-09-19, owner's
+  request) is a small inline-SVG Turkish flag, hand-drawn (not a raster
+  asset) so it stays crisp at any size and needs no external file. Sits in
+  the top announcement bar (`BaseLayout.astro`, every page) right next to
+  the "ISTANBUL, TÜRKIYE" text, with a 1px translucent gold `outline`
+  (`.flag-icon` in `global.css`) so the flag's own red/white reads as a
+  deliberate badge against the navy bar rather than a clashing color, in
+  keeping with the site's navy/gold/cream palette. Positioned via a
+  same-line `.announcement-location` wrapper span (not raw flex-gap on the
+  bar's three top-level chunks) so its spacing to the location text is
+  independent of the existing gap between the location/star/tagline
+  groups. Verified RTL: `document.documentElement.scrollWidth` still
+  equals `innerWidth` on `/ar` with the flag in place, and it lands at the
+  visual start of the bar (the right edge in `dir="rtl"`) the same way it
+  lands at the start (the left edge) in LTR, since it's the first child of
+  a `display:flex` container that already respects `dir`.
 - `public/assets/hadara-logo-black.png` (2026-09-18) is the real "HE"
   calligraphic monogram, supplied by the owner via Google Drive and cropped/
   background-removed here. The original conversion's
