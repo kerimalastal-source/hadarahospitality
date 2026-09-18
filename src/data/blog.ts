@@ -1,0 +1,231 @@
+// Source content for every article under /blog. Add a new article by adding
+// an entry to ARTICLES below — Astro generates its page and the blog listing
+// automatically at build time. No separate generator script needed.
+
+export type ArticleBlock =
+  | { type: 'p'; text: string }
+  | { type: 'h2'; text: string }
+  | { type: 'ul'; items: string[] }
+  | { type: 'image' };
+
+export interface Article {
+  slug: string;
+  title: string;
+  category: string;
+  date: string;
+  readTime: string;
+  excerpt: string;
+  hero: string;
+  heroAlt: string;
+  inlineImage: string;
+  inlineAlt: string;
+  body: ArticleBlock[];
+}
+
+export const ARTICLES: Article[] = [
+  {
+    slug: 'thread-count-explained',
+    title: 'Thread Count Explained: What Hotels Should Actually Look For',
+    category: 'Bed Linen',
+    date: '2026-08-03',
+    readTime: '4 min read',
+    excerpt: 'A higher number on the label doesn’t always mean a better night’s sleep. Here’s what actually determines the feel and durability of hotel bed linen.',
+    hero: 'https://static.wixstatic.com/media/3510f9_9107a234593345f9abd26328f523bdcf~mv2.jpg',
+    heroAlt: 'Folded white hotel bed linen',
+    inlineImage: 'https://static.wixstatic.com/media/3510f9_078056a0a70e4302ba7f495493deb3c6~mv2.jpg',
+    inlineAlt: 'Crisp white duvet and bedding on a hotel bed',
+    body: [
+      { type: 'p', text: 'Thread count has become the number hotels reach for first when comparing bed linen, but it only tells part of the story. Two sheets with the same thread count can feel completely different once they reach the guest room — and different again after fifty commercial washes.' },
+      { type: 'h2', text: 'What thread count actually measures' },
+      { type: 'p', text: 'Thread count is the number of horizontal and vertical threads woven into one square inch of fabric. In principle, more threads mean a denser, smoother weave. In practice, some manufacturers inflate the number by counting multi-ply yarns as several threads, so a sheet listed at 800 can perform worse than an honestly counted 300.' },
+      { type: 'h2', text: 'What matters more for hospitality use' },
+      { type: 'p', text: 'For hotel operations, fiber quality, weave type and finishing usually matter more than the number on the label. Long-staple cotton woven at 200–300 TC, in a percale or sateen weave, typically outperforms a higher, inflated count in both feel and laundry durability.' },
+      { type: 'image' },
+      { type: 'ul', items: ['Ask for the fiber source, not just the thread count', 'Request a physical sample and put it through your own laundry cycle', 'Compare weave type — percale for a crisp finish, sateen for a softer drape', 'Confirm the count is independently verified, not marketing-rounded'] },
+      { type: 'p', text: 'Every bed linen specification we quote at HADARA Hospitality is backed by a sample you can test under your own laundry conditions before committing to a bulk order.' },
+    ],
+  },
+  {
+    slug: 'choosing-the-right-gsm-for-hotel-towels',
+    title: 'Choosing the Right GSM for Hotel Towels',
+    category: 'Towels & Bath',
+    date: '2026-08-10',
+    readTime: '4 min read',
+    excerpt: 'GSM drives absorbency, weight and laundry cost all at once. Here’s how to match it to the segment and use case rather than just picking the highest number.',
+    hero: 'https://static.wixstatic.com/media/3510f9_64e4d5bf01d347bba5b26b2e14db43c0~mv2.jpg',
+    heroAlt: 'Stacked hotel bath towels',
+    inlineImage: 'https://static.wixstatic.com/media/3510f9_383c86f602ab4db3a9aa1a04ed0fe7f9~mv2.jpg',
+    inlineAlt: 'Rolled hotel towels on a bathroom shelf',
+    body: [
+      { type: 'p', text: 'GSM (grams per square meter) is the standard measure of towel density, and it’s tempting to treat a higher GSM as simply "better." In a hospitality operation, that assumption gets expensive fast.' },
+      { type: 'h2', text: 'What GSM changes in practice' },
+      { type: 'p', text: 'Higher GSM towels are thicker, more absorbent and feel more luxurious — but they also take longer to dry between guest turnovers, cost more to launder, and add weight to linen shipments. A 900 GSM towel in a 3-star property’s high-turnover bathroom can become a housekeeping bottleneck rather than a guest benefit.' },
+      { type: 'h2', text: 'Matching GSM to the segment' },
+      { type: 'image' },
+      { type: 'ul', items: ['400–500 GSM: hand towels, face towels and high-frequency turnover items', '500–600 GSM: everyday bath towels for 3–4 star properties', '600–700 GSM: bath towels and bath mats for 4–5 star properties', '700–800+ GSM: spa towels, pool towels and signature guest experiences'] },
+      { type: 'p', text: 'The right specification balances guest-facing quality against your laundry cycle time, dryer capacity and replacement budget — not just the number on the swing tag. We help properties model that trade-off against their own occupancy and laundry setup before finalizing an order.' },
+    ],
+  },
+  {
+    slug: 'from-sample-to-supply',
+    title: 'From Sample to Supply: How Hotel Procurement Really Works',
+    category: 'Sourcing',
+    date: '2026-08-17',
+    readTime: '5 min read',
+    excerpt: 'Ordering hotel textiles is rarely a single transaction. Here’s what a well-run sourcing process looks like from first inquiry to a landed delivery.',
+    hero: 'https://static.wixstatic.com/media/3510f9_5771c7b23a614390bd7b2f8551003ba1~mv2.jpg',
+    heroAlt: 'Folded hotel linen and towels prepared for housekeeping',
+    inlineImage: 'https://static.wixstatic.com/media/3510f9_7a03bed51df940c0bfacf3ce24114b75~mv2.jpg',
+    inlineAlt: 'Table set with hospitality linens and tableware',
+    body: [
+      { type: 'p', text: 'Textile procurement for a hotel is rarely as simple as picking a product and placing an order. Specifications need to be confirmed, samples tested, and production coordinated against a real delivery deadline — often across a language and a border.' },
+      { type: 'h2', text: 'The five stages that matter' },
+      { type: 'ul', items: ['Inquiry — sharing your property type, room count and the categories you need', 'Sampling — reviewing physical samples against your own quality and laundry standards', 'Approval — locking specifications, quantities and commercial terms in writing', 'Production — manufacturing with regular progress updates, not a single delivery surprise', 'Delivery — export documentation and logistics coordinated to your destination'] },
+      { type: 'image' },
+      { type: 'h2', text: 'Where most delays actually happen' },
+      { type: 'p', text: 'In our experience, delays rarely come from the factory floor — they come from specifications that were approved verbally instead of in writing, or samples that were never physically tested under real laundry conditions before a bulk order was placed.' },
+      { type: 'p', text: 'A supplier who insists on a documented sampling and approval step before production isn’t slowing you down — they’re removing the single biggest source of costly reorders.' },
+    ],
+  },
+  {
+    slug: 'commercial-laundry-durability',
+    title: 'Commercial Laundry Durability: What to Ask Your Textile Supplier',
+    category: 'Operations',
+    date: '2026-08-24',
+    readTime: '4 min read',
+    excerpt: 'A textile that looks great on day one but breaks down after twenty industrial wash cycles is the most expensive kind of "affordable" purchase.',
+    hero: 'https://static.wixstatic.com/media/3510f9_726c0826d58e43cbb6c99d8a067c9383~mv2.jpg',
+    heroAlt: 'Hotel textiles on a clothing rack in a laundry room',
+    inlineImage: 'https://static.wixstatic.com/media/3510f9_cd269d83c63c47dc9225cc7840f04d79~mv2.jpg',
+    inlineAlt: 'Close-up of woven hotel towel fabric',
+    body: [
+      { type: 'p', text: 'Hotel and resort linens go through commercial laundering far more aggressively than anything in a domestic setting — higher temperatures, industrial detergents, and dozens of cycles a month. A textile that isn’t built for that environment fails fast, and the replacement cost quietly erodes any saving on the original purchase price.' },
+      { type: 'h2', text: 'Questions worth asking before you order' },
+      { type: 'ul', items: ['How many industrial wash cycles was this fabric tested against?', 'What is the expected shrinkage after the first five washes?', 'Is the dye colorfast against commercial bleach and hot water?', 'What is the seam and hem construction rated for under repeated tumble drying?'] },
+      { type: 'image' },
+      { type: 'h2', text: 'Durability is a specification, not a guess' },
+      { type: 'p', text: 'A supplier who can answer these questions with real production data — rather than reassurance — is one who understands that hospitality textiles are operational equipment, not just soft furnishings. We build laundry durability into every specification we quote, because a linen program is only as good as its performance after month six.' },
+    ],
+  },
+  {
+    slug: 'sustainable-textile-sourcing',
+    title: 'Sustainable Textile Sourcing for Modern Hotels',
+    category: 'Sustainability',
+    date: '2026-08-31',
+    readTime: '4 min read',
+    excerpt: 'Guests and ownership groups are both asking harder questions about where hotel textiles come from. Here’s what a credible answer looks like.',
+    hero: 'https://static.wixstatic.com/media/3510f9_2e8c8d52d7044181903aad951a21b63b~mv2.jpg',
+    heroAlt: 'Natural, sustainably sourced spa and body care products',
+    inlineImage: 'https://static.wixstatic.com/media/3510f9_9408505de6554d6ab16b78b7ae8fc02d~mv2.jpg',
+    inlineAlt: 'Spa amenities arranged on a hospitality bathroom counter',
+    body: [
+      { type: 'p', text: 'Sustainability in hotel textile sourcing has moved from a marketing line to a genuine procurement criterion, driven as much by ownership groups tracking operational cost as by guest expectations.' },
+      { type: 'h2', text: 'Where sustainability actually shows up' },
+      { type: 'p', text: 'For textiles specifically, the meaningful levers are fiber sourcing, dye and finishing processes, manufacturing partner standards, and product lifespan — a durable towel that survives 150 wash cycles has a smaller footprint than a cheaper one replaced three times over the same period.' },
+      { type: 'image' },
+      { type: 'ul', items: ['Ask where the raw fiber is grown and processed, not just where it was sewn', 'Prioritize durability — fewer replacement cycles is itself a sustainability outcome', 'Ask about water and dye discharge practices at the manufacturing partner', 'Look for consolidated shipments over frequent small reorders'] },
+      { type: 'h2', text: 'A practical starting point' },
+      { type: 'p', text: 'You don’t need to overhaul your entire linen program at once. Starting with your highest-volume categories — towels and bed linen — and asking your supplier for real answers on fiber origin and durability is a credible first step that ownership and guests can both see.' },
+    ],
+  },
+  {
+    slug: 'guest-room-amenities-that-elevate-the-stay',
+    title: 'Guest Room Amenities That Elevate the Stay',
+    category: 'Guest Experience',
+    date: '2026-09-07',
+    readTime: '4 min read',
+    excerpt: 'Amenities are one of the few guest touchpoints a hotel fully controls. Small, well-chosen details do more for guest perception than their cost suggests.',
+    hero: 'https://static.wixstatic.com/media/3510f9_8adcef9e2a50494ba00f781e2f42ab08~mv2.png',
+    heroAlt: 'Guest room amenity essentials arranged for a hotel bathroom',
+    inlineImage: 'https://static.wixstatic.com/media/3510f9_aba2f5ec5d1e40168e6b7e97409dd8d5~mv2.jpg',
+    inlineAlt: 'Coffee and tea service prepared for a hotel guest room',
+    body: [
+      { type: 'p', text: 'Guests rarely mention the amenities that worked exactly as expected — but they remember, and mention in reviews, the ones that didn’t. A missing sewing kit or a shower cap that tears on first use costs far more in guest perception than it saves in unit price.' },
+      { type: 'h2', text: 'Where amenities earn their keep' },
+      { type: 'p', text: 'The amenities that move guest satisfaction scores tend to be practical rather than decorative: a genuinely useful dental kit, a laundry bag that’s easy to find and use, a robe hanger that keeps the bathroom tidy between uses. These are small operational details that guests interpret as a sign of overall property standards.' },
+      { type: 'image' },
+      { type: 'h2', text: 'Consistency over novelty' },
+      { type: 'p', text: 'A consistent, well-labeled amenity set across every room does more for brand perception than a rotating selection of novelty items. It also simplifies housekeeping restocking and reduces the chance of an empty amenity tray reaching a guest room.' },
+    ],
+  },
+  {
+    slug: 'private-labeling-and-custom-branding',
+    title: 'Private Labeling & Custom Branding for Hotel Textiles',
+    category: 'Branding',
+    date: '2026-09-10',
+    readTime: '3 min read',
+    excerpt: 'A logo on a robe or an embroidered monogram on a towel is a small production detail with an outsized effect on how a property is remembered.',
+    hero: 'https://static.wixstatic.com/media/3510f9_d58993bfdcfb4d578920ffe6508fc6ff~mv2.png',
+    heroAlt: 'Branded hospitality amenity products arranged for a guest room',
+    inlineImage: 'https://static.wixstatic.com/media/3510f9_e334fadc9f214cc7bbe0bb1050b9125c~mv2.png',
+    inlineAlt: 'Hospitality robes and slippers ready for guest room presentation',
+    body: [
+      { type: 'p', text: 'Custom branding on hotel textiles — an embroidered logo on a robe, a woven monogram on a towel border, a labeled amenity bottle — is one of the lowest-cost ways to make a generic product feel like it belongs to your property specifically.' },
+      { type: 'h2', text: 'What’s usually possible' },
+      { type: 'ul', items: ['Embroidered or woven logos on robes, towels and bedding', 'Custom labeling on amenity bottles and guest room consumables', 'Property-specific packaging for welcome and gift sets', 'Color and trim customization within a manufacturer’s standard range'] },
+      { type: 'image' },
+      { type: 'h2', text: 'Plan branding into the production timeline, not after it' },
+      { type: 'p', text: 'Custom branding adds a production step, so it needs to be part of the sampling and approval stage — not requested after a standard order has already been confirmed. Building it in early keeps lead times predictable and avoids a rushed, lower-quality result.' },
+    ],
+  },
+  {
+    slug: 'spa-and-wellness-textiles',
+    title: 'Spa & Wellness Textiles: Choosing Robes and Towels That Last',
+    category: 'Spa & Wellness',
+    date: '2026-09-12',
+    readTime: '4 min read',
+    excerpt: 'Spa textiles face a harder combination of demands than almost any other hotel category: constant moisture, frequent laundering, and a guest experience that has to feel indulgent every time.',
+    hero: 'https://static.wixstatic.com/media/3510f9_c149a939b7cd40ddb717033660ab0a5c~mv2.jpg',
+    heroAlt: 'Bathrobe and towels hung in a spa-style bathroom',
+    inlineImage: 'https://static.wixstatic.com/media/3510f9_d0d5af94559848feaa9da1204445b52f~mv2.jpg',
+    inlineAlt: 'Waffle-weave spa bathrobe folded on a shelf',
+    body: [
+      { type: 'p', text: 'Spa and wellness textiles carry a harder combination of demands than almost any other hotel category: they need to feel indulgent on first touch, survive far more frequent laundering than a standard guest room towel, and hold their shape and softness through it.' },
+      { type: 'h2', text: 'Terry vs. waffle: different jobs' },
+      { type: 'p', text: 'Terry cotton robes and towels offer maximum absorbency and a familiar, plush feel — the right choice for pool and bath-focused properties. Waffle-weave textiles are lighter, faster-drying and better suited to warmer climates and treatment-focused spa environments where guests move between wet and dry areas often.' },
+      { type: 'image' },
+      { type: 'h2', text: 'What to specify for high-frequency use' },
+      { type: 'ul', items: ['Higher GSM (700–800) for spa towels that need to outlast frequent washing', 'Reinforced seams on robes for repeated commercial laundering', 'Fabric that resists pilling after high-heat industrial drying', 'A consistent supplier so replacement stock matches existing texture and color'] },
+    ],
+  },
+  {
+    slug: 'the-real-cost-of-low-quality-hotel-bedding',
+    title: 'The Real Cost of Low-Quality Hotel Bedding',
+    category: 'Procurement',
+    date: '2026-09-14',
+    readTime: '4 min read',
+    excerpt: 'A cheaper unit price rarely stays cheap once you account for early replacement, guest complaints and housekeeping time. Here’s how to see the full picture.',
+    hero: 'https://static.wixstatic.com/media/3510f9_b5dcd096900744fa9ec5a4d37a60cec1~mv2.jpg',
+    heroAlt: 'Hotel room with a view and made bed',
+    inlineImage: 'https://static.wixstatic.com/media/3510f9_5a17dd20c565442ba925a1f833da32cd~mv2.jpg',
+    inlineAlt: 'Hotel guestroom with headboard and bedding detail',
+    body: [
+      { type: 'p', text: 'It’s easy to compare hotel bedding on unit price alone. It’s much harder — and far more useful — to compare it on cost per guest-night over the product’s actual working life, once replacement frequency and guest complaints are factored in.' },
+      { type: 'h2', text: 'Where the hidden costs show up' },
+      { type: 'ul', items: ['Faster pilling and graying means earlier replacement, often within a year', 'Guest complaints about linen quality affect review scores directly', 'Inconsistent shrinkage after laundering disrupts fitted sheet performance', 'Housekeeping spends more time managing linens that don’t hold their shape'] },
+      { type: 'image' },
+      { type: 'h2', text: 'A better way to compare quotes' },
+      { type: 'p', text: 'Divide the total cost of an order by its realistic number of wash cycles before replacement, not by the number of pieces. A linen program priced this way usually points toward a mid-range, laundry-tested specification rather than the cheapest or the most expensive option on the table.' },
+    ],
+  },
+  {
+    slug: 'how-housekeeping-teams-choose-hotel-linen',
+    title: 'How Housekeeping Teams Choose the Right Hotel Linen',
+    category: 'Operations',
+    date: '2026-09-16',
+    readTime: '4 min read',
+    excerpt: 'The people who handle your linens every day notice quality and practicality issues long before they show up in a guest review. Here’s what they actually look for.',
+    hero: 'https://static.wixstatic.com/media/3510f9_55726e0cce1046e8abcc0791b90fd912~mv2.jpg',
+    heroAlt: 'Made hotel bed with mattress and bedding',
+    inlineImage: 'https://static.wixstatic.com/media/3510f9_6dc42ab823134fdc9e2e981269c3843a~mv2.jpg',
+    inlineAlt: 'Hotel pillow and duvet detail on a made bed',
+    body: [
+      { type: 'p', text: 'Procurement decisions are usually made by management, but it’s the housekeeping team who handles a linen program every single day — folding it, laundering it, and noticing the moment it stops performing. Involving them earlier tends to prevent expensive mistakes.' },
+      { type: 'h2', text: 'What housekeeping teams actually flag' },
+      { type: 'ul', items: ['How quickly a fitted sheet loses its shape after repeated laundering', 'Whether a duvet cover closure survives commercial washing without failing', 'How efficiently a towel or sheet folds and stacks for storage', 'How consistently a supplier’s stock matches color and texture between reorders'] },
+      { type: 'image' },
+      { type: 'h2', text: 'A simple process improvement' },
+      { type: 'p', text: 'Before finalizing a bulk order, have your housekeeping supervisor put a sample through a real working shift — laundering, folding, and making up a room with it. Issues that never show up in a showroom sample surface almost immediately in daily use, and it’s far cheaper to catch them before a container ships.' },
+    ],
+  },
+];

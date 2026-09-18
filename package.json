@@ -1,1 +1,25 @@
-{"name":"hadara-hospitality","version":"1.0.0","private":true,"scripts":{"generate:products":"node scripts/build-products.mjs","generate:technical-sheets":"node scripts/build-technical-sheets.mjs","generate:blog":"node scripts/build-blog.mjs","generate:sitemap":"node scripts/build-sitemap.mjs","generate:search":"node scripts/build-search-index.mjs","generate":"npm run generate:products && npm run generate:technical-sheets && npm run generate:blog && npm run generate:sitemap && npm run generate:search","predev":"npm run generate","dev":"vite --host 0.0.0.0","prebuild":"npm run generate","build":"vite build","preview":"vite preview --host 0.0.0.0"},"devDependencies":{"vite":"^7.1.0"}}
+{
+  "name": "hadara-hospitality",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate:sitemap": "tsx scripts/build-sitemap.ts",
+    "generate:search": "tsx scripts/build-search-index.ts",
+    "generate:technical-sheets": "tsx scripts/build-technical-sheets.ts",
+    "generate": "npm run generate:sitemap && npm run generate:search && npm run generate:technical-sheets",
+    "predev": "npm run generate",
+    "dev": "astro dev --host 0.0.0.0",
+    "prebuild": "npm run generate",
+    "build": "astro build",
+    "preview": "astro preview --host 0.0.0.0",
+    "check": "astro check"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^26.6.1",
+    "astro": "^7.3.3",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3"
+  }
+}

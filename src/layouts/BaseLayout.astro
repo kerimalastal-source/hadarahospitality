@@ -1,0 +1,77 @@
+---
+import Header, { type NavKey } from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+import '../styles/global.css';
+import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE } from '../config';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Site-root path used for the canonical link and og:url, e.g. "/about.html". Omit for utility pages (search, 404) that carry no canonical/OG tags. */
+  canonicalPath?: string;
+  ogType?: 'website' | 'product' | 'article';
+  ogImage?: string;
+  noindex?: boolean;
+  active?: NavKey;
+  showWhatsApp?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonicalPath,
+  ogType = 'website',
+  ogImage = DEFAULT_OG_IMAGE,
+  noindex = false,
+  active,
+  showWhatsApp = true,
+} = Astro.props;
+
+const canonicalUrl = canonicalPath ? `${SITE_URL}${canonicalPath}` : undefined;
+const absoluteOgImage = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#1e2a38" />
+  {noindex && <meta name="robots" content="noindex" />}
+  <meta name="description" content={description} />
+  <title>{title}</title>
+  {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  {canonicalUrl && (
+    <>
+      <meta property="og:type" content={ogType} />
+      <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:image" content={absoluteOgImage} />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={absoluteOgImage} />
+    </>
+  )}
+  <slot name="head" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="announcement">ISTANBUL, TÜRKIYE <span>✦</span> HOTEL TEXTILE PROCUREMENT &amp; SUPPLY</div>
+  <Header active={active} />
+  <slot />
+  <Footer />
+  {showWhatsApp && <WhatsAppFloat />}
+  <script>
+    import '../scripts/site';
+  </script>
+</body>
+</html>
