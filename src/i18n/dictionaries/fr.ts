@@ -5,6 +5,7 @@ export const fr: DeepPartial<Dictionary> = {
     announcement: { location: 'ISTANBUL, TURQUIE', tagline: "APPROVISIONNEMENT EN LINGE D'HÔTEL" },
     nav: {
       products: 'Produits',
+      aboutMenu: 'À propos',
       approach: 'Notre approche',
       process: 'Comment ça marche',
       about: 'À propos',

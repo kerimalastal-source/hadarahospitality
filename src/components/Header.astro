@@ -54,9 +54,18 @@ const home = (p: string) => localizePath(locale, p);
           ))}
         </div>
       </div>
-      <a href={`${home('/')}#approach`}>{nav.approach}</a>
-      <a href={`${home('/')}#process`}>{nav.process}</a>
-      <a href={home('/about')} aria-current={active === 'about' ? 'page' : undefined}>{nav.about}</a>
+      <div class="nav-about-item">
+        <a href={home('/about')} aria-current={active === 'about' ? 'page' : undefined}>
+          {nav.aboutMenu}
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+        </a>
+        <div class="nav-about-menu">
+          <a href={home('/about')}>{nav.about}</a>
+          <a href={`${home('/')}#approach`}>{nav.approach}</a>
+          <a href={`${home('/')}#process`}>{nav.process}</a>
+          <a href={home('/faq')}>FAQ</a>
+        </div>
+      </div>
       <a href={home('/blog')} aria-current={active === 'blog' ? 'page' : undefined}>{nav.blog}</a>
       <a href={home('/contact')} aria-current={active === 'contact' ? 'page' : undefined}>{nav.contact}</a>
     </div>

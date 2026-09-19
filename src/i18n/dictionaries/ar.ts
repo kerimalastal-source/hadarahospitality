@@ -5,6 +5,7 @@ export const ar: DeepPartial<Dictionary> = {
     announcement: { location: 'إسطنبول، تركيا', tagline: 'توريد وتزويد مناشف وأقمشة الفنادق' },
     nav: {
       products: 'المنتجات',
+      aboutMenu: 'من نحن',
       approach: 'منهجيتنا',
       process: 'آلية العمل',
       about: 'من نحن',

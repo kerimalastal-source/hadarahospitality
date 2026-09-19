@@ -13,6 +13,7 @@ export interface Dictionary {
     announcement: { location: string; tagline: string };
     nav: {
       products: string;
+      aboutMenu: string;
       approach: string;
       process: string;
       about: string;

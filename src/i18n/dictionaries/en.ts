@@ -5,6 +5,7 @@ export const en: Dictionary = {
     announcement: { location: 'ISTANBUL, TÜRKIYE', tagline: 'HOTEL TEXTILE PROCUREMENT & SUPPLY' },
     nav: {
       products: 'Products',
+      aboutMenu: 'About',
       approach: 'Our approach',
       process: 'How it works',
       about: 'About us',
