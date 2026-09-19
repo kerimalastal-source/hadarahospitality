@@ -38,6 +38,28 @@ if (form) {
   const productMetaField = form.querySelector<HTMLInputElement>('#rfq-product-meta');
   let autoCheckedCategory: HTMLInputElement | null = null;
 
+  // --- Category product pickers -------------------------------------------
+  // Each category chip that has real catalog products gets its own picker
+  // panel (data-category-products, server-rendered by GetAQuoteView.astro
+  // from RFQ_CATEGORY_PRODUCTS) revealed only while that chip is checked —
+  // unchecking it also clears any products picked from it, so a hidden
+  // panel never silently keeps stale selections in the submitted form data.
+  function syncCategoryProductsPanel(checkbox: HTMLInputElement) {
+    const panel = form!.querySelector<HTMLElement>(`[data-category-products="${CSS.escape(checkbox.value)}"]`);
+    if (!panel) return;
+    panel.hidden = !checkbox.checked;
+    if (!checkbox.checked) {
+      panel.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach((input) => (input.checked = false));
+    }
+  }
+  form.querySelectorAll<HTMLInputElement>('input[data-category-checkbox]').forEach((checkbox) => {
+    syncCategoryProductsPanel(checkbox);
+    checkbox.addEventListener('change', () => {
+      syncCategoryProductsPanel(checkbox);
+      track('product_category_expanded', { category: checkbox.value, expanded: checkbox.checked });
+    });
+  });
+
   function applyProductFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const name = params.get('product');
@@ -65,6 +87,12 @@ if (form) {
       if (checkbox && !checkbox.checked) {
         checkbox.checked = true;
         autoCheckedCategory = checkbox;
+        syncCategoryProductsPanel(checkbox);
+        // Also pre-select the exact product, if this category's picker has it.
+        if (meta.slug) {
+          const productCheckbox = form?.querySelector<HTMLInputElement>(`input[name="products"][data-slug="${CSS.escape(meta.slug)}"]`);
+          if (productCheckbox) productCheckbox.checked = true;
+        }
       }
     }
     track('product_selected', meta);
@@ -89,6 +117,7 @@ if (form) {
     if (productMetaField) productMetaField.value = '';
     if (autoCheckedCategory) {
       autoCheckedCategory.checked = false;
+      syncCategoryProductsPanel(autoCheckedCategory);
       autoCheckedCategory = null;
     }
   });

@@ -474,3 +474,33 @@ export const PRODUCTS: Product[] = [
     gallery: [],
   },
 ];
+
+/** Maps each "Product Categories" chip on /get-a-quote (the exact English
+ * strings in en.getAQuote.form.productCategories) to the specific catalog
+ * products a customer can pick from once they check that chip. Most chips
+ * are just a CategoryKey filter, but "Towels & Bath Linen"/"Pool & Beach
+ * Towels" split the `towels` category and "Bathrobes"/"Hotel Slippers"
+ * split `robes` — finer than CategoryKey can express — so those four are
+ * hand-curated by slug instead. 'Other' intentionally has no products (a
+ * free-text catch-all chip). Read by GetAQuoteView.astro to render each
+ * chip's product picker server-side — see the "Specific products under
+ * each RFQ category" note in CLAUDE.md. */
+const POOL_AND_SPA_TOWEL_SLUGS = ['hotel-pool-towel-600-gsm', 'luxury-spa-towel-700-gsm'];
+const BATHROBE_SLUGS = ['luxury-terry-bathrobe', 'luxury-waffle-bathrobe'];
+const SLIPPER_SLUGS = ['luxury-hotel-slippers'];
+
+function slugsFor(category: CategoryKey, exclude: string[] = []): string[] {
+  return PRODUCTS.filter((p) => p.category === category && !exclude.includes(p.slug)).map((p) => p.slug);
+}
+
+export const RFQ_CATEGORY_PRODUCTS: Record<string, string[]> = {
+  'Bed Linen': slugsFor('bed-linen'),
+  'Towels & Bath Linen': slugsFor('towels', POOL_AND_SPA_TOWEL_SLUGS),
+  'Bathrobes': BATHROBE_SLUGS,
+  'Hotel Slippers': SLIPPER_SLUGS,
+  'Pillows & Duvets': slugsFor('pillows'),
+  'Mattress Protectors': slugsFor('protectors'),
+  'Pool & Beach Towels': POOL_AND_SPA_TOWEL_SLUGS,
+  'Guest Room Accessories': slugsFor('amenities'),
+  Other: [],
+};

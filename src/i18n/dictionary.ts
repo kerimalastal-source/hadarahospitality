@@ -189,6 +189,7 @@ export interface Dictionary {
       errorEmail: string;
       errorProducts: string;
       errorGeneric: string;
+      specificProductsLabel: string;
 
       successHeading: string;
       successMessage: string;

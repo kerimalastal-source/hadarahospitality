@@ -34,6 +34,11 @@ export interface RfqSubmission {
   };
   products: {
     categories: string[];
+    /** Specific catalog products picked from a category's picker panel on
+     * /get-a-quote (see RFQ_CATEGORY_PRODUCTS in src/data/products.ts) —
+     * names, not slugs, since this only ever needs to be read by a human
+     * (the internal email, the linked portal order's notes). */
+    specificProducts?: string[];
     selectedProduct?: RfqProductMeta;
     estimatedQuantity?: string;
   };

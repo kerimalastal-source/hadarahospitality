@@ -3,6 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getDictionary, localizePath, type Locale } from '../i18n';
 import { en } from '../i18n/dictionaries/en';
 import { WORLD_COUNTRIES } from '../data/countries';
+import { PRODUCTS, RFQ_CATEGORY_PRODUCTS } from '../data/products';
+import { getProductTranslation } from '../data/products.i18n';
 
 interface Props {
   locale: Locale;
@@ -23,6 +25,25 @@ const p = (path: string) => localizePath(locale, path);
 const productCategoryOptions = en.getAQuote.form.productCategories.map((value, i) => ({
   value,
   label: f.productCategories[i] ?? value,
+}));
+
+// Each category chip that maps to real catalog products (see
+// RFQ_CATEGORY_PRODUCTS's own doc comment) gets its own picker panel,
+// revealed client-side once that chip is checked — see the
+// data-category-products wiring in src/scripts/rfq-form.ts. Slug is always
+// the stable submitted value; the display name follows the visitor's
+// locale the same way ProductView.astro does (falls back to English).
+const categoryProducts = productCategoryOptions.map(({ value, label }) => ({
+  value,
+  label,
+  products: (RFQ_CATEGORY_PRODUCTS[value] ?? [])
+    .map((slug) => PRODUCTS.find((product) => product.slug === slug))
+    .filter((product) => product !== undefined)
+    .map((product) => ({
+      slug: product.slug,
+      name: product.name,
+      localizedName: getProductTranslation(locale, product.slug)?.name ?? product.name,
+    })),
 }));
 ---
 <BaseLayout title={q.title} description={q.description} path="/get-a-quote" locale={locale}>
@@ -94,10 +115,20 @@ const productCategoryOptions = en.getAQuote.form.productCategories.map((value, i
             <span class="rfq-label rfq-required">{f.productsRequired}</span>
             <div class="rfq-chip-grid" role="group" aria-label={f.productsRequired}>
               {productCategoryOptions.map(({ value, label }) => (
-                <label class="rfq-chip"><input type="checkbox" name="categories" value={value} /><span>{label}</span></label>
+                <label class="rfq-chip"><input type="checkbox" name="categories" value={value} data-category-checkbox /><span>{label}</span></label>
               ))}
             </div>
             <p class="rfq-error" id="rfq-categories-error" role="alert" hidden>{f.errorProducts}</p>
+            {categoryProducts.map(({ value, label, products }) => products.length > 0 && (
+              <div class="rfq-category-products" data-category-products={value} hidden>
+                <p class="rfq-category-products-label">{f.specificProductsLabel} — {label}</p>
+                <div class="rfq-product-grid">
+                  {products.map(({ slug, name, localizedName }) => (
+                    <label class="rfq-product-chip"><input type="checkbox" name="products" value={name} data-slug={slug} /><span>{localizedName}</span></label>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
           <label>{f.estimatedQuantity}<input name="estimatedQuantity" placeholder={f.estimatedQuantityPlaceholder} /></label>
         </fieldset>

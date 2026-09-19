@@ -351,6 +351,34 @@ form. Added 2026-09-18.
   Verified the fix pre-checks correctly in all 4 locales while each
   locale's submitted category value stays the same stable English string
   the owner's notification email already expects.
+- **Specific products under each category, added 2026-09-19**: checking a
+  "Product Categories" chip (e.g. "Bed Linen", "Bathrobes") now reveals a
+  panel right below the chip grid listing that category's actual catalog
+  products as checkboxes, so a customer can name exactly which items they
+  want instead of only a broad category — owner's request, after noticing
+  a category alone was "too general." `RFQ_CATEGORY_PRODUCTS` in
+  `src/data/products.ts` maps each of the 9 chip values to specific product
+  slugs; most are a plain `CategoryKey` filter, but "Towels & Bath
+  Linen"/"Pool & Beach Towels" split the `towels` category and
+  "Bathrobes"/"Hotel Slippers" split `robes` — finer than `CategoryKey` can
+  express — so those four are hand-curated by slug instead ('Other' has no
+  products, it's a free-text catch-all). `GetAQuoteView.astro` renders
+  every panel server-side (hidden by default) with each product's
+  locale-aware name (`getProductTranslation`); `src/scripts/rfq-form.ts`'s
+  `syncCategoryProductsPanel()` just toggles `hidden` on `change` — no
+  client-side catalog data or fetch needed. Unchecking a category clears
+  any products picked from its panel, so a hidden panel never silently
+  keeps a stale selection in the submitted `FormData`. Arriving from a
+  product page (`applyProductFromUrl()`) now also pre-checks that exact
+  product inside its category's panel, not just the category chip.
+  Submitted product values are the stable English product name (matching
+  the categories' own "stable English value" convention) with the slug
+  kept only in a `data-slug` attribute for the pre-check lookup — so the
+  owner's internal notification email and a linked portal Order's notes
+  (see the RFQ→Order linking note under "Partner Portal" below) both read
+  a plain human name, never a slug. New dictionary key:
+  `getAQuote.form.specificProductsLabel` (English only so far, same
+  fallback-to-English pattern as everything else).
 - **What's fully functional now**: end-to-end client + server validation,
   file type/size checks, honeypot + minimum-time-on-form anti-spam gate (a
   submission that trips either one gets a fake-success response so a bot
@@ -810,6 +838,37 @@ above, which is still English-only.
   as `.featured-track`.
 - New CSS in `global.css`: `.quality-section`/`.quality-intro`/
   `.quality-scale-*`/`.quality-tiers`/`.quality-tier`.
+
+## Known issue: Clerk throws a console error on every static page
+
+Found 2026-09-19 while Playwright-testing the RFQ category-products
+feature (unrelated) — not a regression from that work, this has existed
+since the Partner Portal first shipped (PR #43) and was never caught
+because no earlier check opened a static page's browser console.
+`@clerk/astro`'s `clerk()` Astro integration (`astro.config.mjs`) injects
+its client bootstrap script (`/_astro/page.<hash>.js`) into **every** page
+of the site, not just `/portal/*` — confirmed on the live homepage's own
+`<head>`, same script tag as on `/portal/sign-in`. There's no route
+include/exclude option in `AstroClerkIntegrationParams` (checked the
+installed `@clerk/astro@4.1.3` types directly) to scope this, so it's an
+upstream limitation, not something wired wrong on our end. On a static
+page this script has no `__CLERK_ASTRO_SAFE_VARS__` container to read
+(that's only rendered by Clerk's own Astro *middleware*, which only runs
+for `/portal/*`'s dynamic routes), so it throws `@clerk/astro: Missing
+publishableKey` as an unhandled promise rejection in the console on every
+single page load, site-wide.
+**Impact is cosmetic, not functional**: the thrown error is in its own
+independent `<script type="module">`, so it doesn't block or interfere
+with any other script on the page (verified — the RFQ form's own
+category/product-picker JS on `/get-a-quote` worked perfectly despite this
+error firing first); the injected script itself is tiny (~2KB) and,
+because it throws before reaching that point, never goes on to fetch the
+much heavier `clerk-js` SDK bundle that real portal pages load. Still,
+it's a real console error on every marketing page a visitor or search
+engine might inspect, and contradicts this file's own "every other page
+is untouched" framing above — worth fixing properly (or upgrading
+`@clerk/astro` if a later version adds route scoping) next time this area
+gets touched, rather than living with it indefinitely.
 
 ## Pending / deferred (owner-blocked, don't guess)
 

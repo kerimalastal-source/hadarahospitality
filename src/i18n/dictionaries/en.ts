@@ -301,6 +301,7 @@ export const en: Dictionary = {
       errorEmail: 'Please enter a valid work email address.',
       errorProducts: 'Please select at least one product category.',
       errorGeneric: "Something went wrong sending your request. Please try again, or email us directly.",
+      specificProductsLabel: 'Select specific products (optional)',
 
       successHeading: 'Quote Request Received',
       successMessage: 'Thank you for contacting HADARA Hospitality. Our team will review your requirements and contact you shortly.',
