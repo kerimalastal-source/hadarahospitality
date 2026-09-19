@@ -1297,6 +1297,27 @@ opening each product page separately.
   `selectedCount`, `clear`, `requestQuote`), translated into ar/fr/ru at
   the same time it was added.
 
+## FAQPage structured data on `/faq` (2026-09-19)
+
+Cheap SEO win — the FAQ content already existed in all 4 locales, this
+just describes it to search engines. `src/views/FaqView.astro` builds a
+`FAQPage`/`Question`/`Answer` JSON-LD block straight from `faq.items`
+(the same array the page already renders as `<details>` accordions) and
+emits it via the existing `<Fragment slot="head">` pattern other pages
+already use for their own schema (see `ProductView.astro`). No new
+content, no new dictionary keys — it's just structured markup of what
+was already on the page. Verified: valid JSON parses out of the built
+HTML with all 9 questions in each of the 4 locales (Arabic's own
+translated Q&A included, not just English), and a Playwright pass found
+no console errors or layout regressions on any of them.
+
+Worth knowing if this ever gets revisited: Google restricted which sites
+get the actual FAQ rich-result treatment in search results a while back
+(mostly well-known/authoritative sites now), so this may not visibly
+change how the page appears in Google search results — but the markup
+itself is still correct, free to add, and other engines/consumers of
+structured data can still use it, so there's no downside to having it.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,

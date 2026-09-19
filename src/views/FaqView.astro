@@ -10,8 +10,21 @@ const { locale } = Astro.props;
 const t = getDictionary(locale);
 const faq = t.faq;
 const p = (path: string) => localizePath(locale, path);
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.items.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: { '@type': 'Answer', text: item.a },
+  })),
+};
 ---
 <BaseLayout title={faq.title} description={faq.description} path="/faq" locale={locale}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </Fragment>
   <main>
     <section class="pdp-hero"><div class="wrap"><p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>FAQ</p><p class="eyebrow light">{faq.hero.eyebrow}</p><h1>{faq.hero.heading1} <em>{faq.hero.heading2}</em></h1><p class="pdp-tagline">{faq.hero.body}</p></div></section>
     <section class="faq-list wrap">
