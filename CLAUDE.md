@@ -505,7 +505,7 @@ integration), so the portal has a small staff side too. Customer accounts are
 member approves it.
 
 - **This is the one part of the site that isn't static.** Everything under
-  `src/pages/portal/**/*.astro` and `src/pages/api/portal/**/*.ts` has
+  `src/pages/portal/**/*.astro` and `src/pages/portal-actions/*.ts` has
   `export const prerender = false` and runs as a real Vercel Function via the
   `@astrojs/vercel` adapter (`adapter: vercel()` in `astro.config.mjs`,
   `integrations: [clerk()]`). Every other page is untouched and still
@@ -530,7 +530,7 @@ member approves it.
 - **Sign-up flow**: Clerk's own `<SignUp />`/`<SignIn />` components
   (`src/pages/portal/sign-up.astro` / `sign-in.astro`) only create the
   *person*. Right after, `src/pages/portal/onboarding.astro` collects the
-  company name/country and `POST /api/portal/complete-onboarding` creates
+  company name/country and `POST /portal-actions/complete-onboarding` creates
   the `companies` + `portal_users` (`status: 'pending'`) rows — a signed-in
   user with no `portal_users` row yet always lands here first.
 - **Database**: Postgres via Neon (`@neondatabase/serverless` +
@@ -555,12 +555,43 @@ member approves it.
   applies that prefix's own size/type limits. `src/scripts/portal-
   documents.ts` (customer document upload) and `src/scripts/portal-admin-
   quote.ts` (staff quote-PDF attach) both follow it.
-- **Route namespacing**: root `/api/*.ts` (outside `src/`, `submit-quote.ts`
-  and `blob-upload.ts`) is Vercel's own zero-config Functions folder,
-  unrelated to Astro. Portal API endpoints live under
-  `src/pages/api/portal/*.ts` instead (e.g. `/api/portal/create-order`) —
-  same URL namespace in principle, but no path collision as long as new
-  Astro API routes don't reuse `submit-quote`/`blob-upload` as names.
+- **Route namespacing — real production outage, fixed 2026-09-19**: portal
+  API endpoints originally lived under `src/pages/api/portal/*.ts` (e.g.
+  `/api/portal/create-order`), on the assumption from the original design
+  that avoiding an exact filename collision with root `/api/*.ts`
+  (`submit-quote.ts`, `blob-upload.ts`) was enough to share the `/api/*`
+  namespace safely. It wasn't: the moment the project has **any** file
+  directly under a root-level `/api/` folder, Vercel treats the entire
+  `/api/*` URL prefix as reserved for its classic zero-config Functions
+  feature, platform-wide — every request under `/api/*` that doesn't match
+  an actual physical file in that root folder gets a genuine
+  platform-level 404 (`x-vercel-error: NOT_FOUND`, Vercel's own plain-text
+  error body) **before it ever reaches Astro's router**, regardless of what
+  the framework's own Build Output `config.json` says. This is invisible
+  locally: `npm run build`'s generated `.vercel/output/config.json`
+  correctly lists `^/api/portal/...$ → _render`, `astro check` is clean,
+  and `astro dev` happily serves the routes — the reservation is a
+  Vercel-platform routing behavior that only manifests on an actual Vercel
+  deployment, so it silently broke every portal POST action (sign-up,
+  approve, create order, status update, attach quote, uploads) the moment
+  PR #43 hit production, discovered only when the owner tried a real
+  sign-up and hit a 404 on `/api/portal/complete-onboarding`. **Fixed** by
+  moving every portal API route out of the `/api/*` prefix entirely, to
+  `src/pages/portal-actions/*.ts` (`/portal-actions/create-order`, etc.) —
+  deliberately *not* `/portal/api/*`, to avoid also picking up
+  `src/middleware.ts`'s `/portal/*` Clerk-redirect gating as an unplanned
+  side effect (each handler already does its own `context.locals.auth()`
+  check). Root `/api/*.ts` (`submit-quote.ts`, `blob-upload.ts`) is
+  untouched and still correctly Vercel Functions — this only affects
+  routes Astro itself owns. **Lesson**: never add a new Astro
+  (`src/pages/**`) route under `/api/*` in this project, full stop, as
+  long as the root `/api/` zero-config Functions folder exists — the two
+  systems cannot coexist under the same prefix no matter how the paths are
+  named, and this class of bug cannot be caught by `npm run build`/`astro
+  check`/`astro dev` alone; it only ever shows up on a real Vercel
+  deployment (same root cause category as the Edge-sandbox
+  Node-built-in-modules issue documented above — "looks fine locally,
+  Vercel's platform behaves differently").
 - **Email notifications** (`src/lib/portal-email.ts`) go out through the
   same Resend setup as the RFQ system — `sendEmail()`/`escapeHtml()` were
   pulled out of `api/submit-quote.ts` into a shared `src/lib/email.ts` so

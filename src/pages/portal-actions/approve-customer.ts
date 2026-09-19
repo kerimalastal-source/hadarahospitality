@@ -1,9 +1,9 @@
 import type { APIRoute } from 'astro';
 import { eq } from 'drizzle-orm';
-import { db } from '../../../db/client';
-import { portalUsers } from '../../../db/schema';
-import { requireStaff } from '../../../lib/portal-auth';
-import { notifyAccountApproved } from '../../../lib/portal-email';
+import { db } from '../../db/client';
+import { portalUsers } from '../../db/schema';
+import { requireStaff } from '../../lib/portal-auth';
+import { notifyAccountApproved } from '../../lib/portal-email';
 
 export const prerender = false;
 

@@ -1,6 +1,6 @@
 // Staff-side quote-PDF upload on an order's admin edit page — same
 // client-upload pattern as src/scripts/portal-documents.ts, posting to
-// /api/portal/attach-quote once the file is in Blob storage.
+// /portal-actions/attach-quote once the file is in Blob storage.
 import { upload } from '@vercel/blob/client';
 import { PORTAL_BLOB_PATH_PREFIX } from '../lib/portal';
 
@@ -25,7 +25,7 @@ if (form && input && orderIdField) {
         access: 'public',
         handleUploadUrl: '/api/blob-upload',
       });
-      const response = await fetch('/api/portal/attach-quote', {
+      const response = await fetch('/portal-actions/attach-quote', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({

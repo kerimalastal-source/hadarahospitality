@@ -1,10 +1,10 @@
 import type { APIRoute } from 'astro';
 import { eq, and } from 'drizzle-orm';
-import { db } from '../../../db/client';
-import { quotes, orders, portalUsers } from '../../../db/schema';
-import { requireStaff } from '../../../lib/portal-auth';
-import { isValidPortalBlobUrl } from '../../../lib/portal';
-import { notifyNewQuote } from '../../../lib/portal-email';
+import { db } from '../../db/client';
+import { quotes, orders, portalUsers } from '../../db/schema';
+import { requireStaff } from '../../lib/portal-auth';
+import { isValidPortalBlobUrl } from '../../lib/portal';
+import { notifyNewQuote } from '../../lib/portal-email';
 
 export const prerender = false;
 

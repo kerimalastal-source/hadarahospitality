@@ -3,9 +3,9 @@
 // here. A signed-in user with no portal_users row yet lands here first;
 // this is what actually puts them in the approval queue.
 import type { APIRoute } from 'astro';
-import { db } from '../../../db/client';
-import { companies, portalUsers } from '../../../db/schema';
-import { getPortalIdentity } from '../../../lib/portal-auth';
+import { db } from '../../db/client';
+import { companies, portalUsers } from '../../db/schema';
+import { getPortalIdentity } from '../../lib/portal-auth';
 
 export const prerender = false;
 
