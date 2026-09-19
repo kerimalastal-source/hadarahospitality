@@ -1612,6 +1612,51 @@ category they want instead of always landing on the top of `/products`.
   mirror correctly); spot-checked the live built HTML on the production
   domain after merge.
 
+**Upgraded to a two-level mega menu the same day**: owner liked the
+category dropdown and asked to go further — hovering (or selecting) a
+category should show that category's actual products, not just the
+category name. `Header.astro`'s markup changed from a flat list of
+category links to a list of `.nav-products-cat-item`s, each nesting its
+own `.nav-products-panel` right after the category link — a flyout
+previewing up to 6 of that category's real products (via the new
+`getCategoryPreviewProducts()` in `src/data/products.ts`, photographed
+ones sorted first, same precedent as `getRelatedProducts()`'s own
+photographed-first fallback sort), each linking straight to its product
+page, plus a `.nav-products-viewall` link back to `/products#<category>`
+for the rest.
+
+- **Desktop stays pure CSS** — nesting the panel inside each
+  `.nav-products-cat-item` (itself `position:relative`) means the same
+  `:hover`/`:focus-within` trick that showed the outer dropdown also
+  drives the inner flyout, with zero JS needed for switching between
+  categories. `[dir="rtl"] .nav-products-panel{left:auto;right:100%}`
+  flips the flyout to the correct side in Arabic.
+- **Mobile needed real JS this time**, unlike the flat-list version above
+  — there's no hover to fall back on, so tapping a category now expands
+  its own panel inline as a single-open accordion (`site.ts`, toggles an
+  `.open` class, closing any other open category first) instead of
+  navigating straight to `/products#<category>` the way the mobile flat
+  list previously did.
+- **A real conflict this surfaced**: `site.ts` already had a generic
+  "clicking any link inside `#navigation` closes the whole mobile nav"
+  handler (registered on every `nav a`). Since `.nav-products-cat` links
+  are inside nav too, that handler would fire on the same tap and
+  immediately collapse the whole mobile menu before the accordion had a
+  chance to visibly open. Fixed by excluding `.nav-products-cat`
+  specifically from that generic handler — every other link inside the
+  panel (an actual product, or "View all products") still closes the
+  mobile nav on click as before, since navigating away should close it.
+- Verified: `npm run build`/`npm run check` clean; Playwright confirms
+  each category's flyout on desktop shows the right locale-translated
+  product names/links plus a working "View all products" link, across
+  all 4 locales; on mobile, tapping a category expands it inline without
+  prematurely closing the hamburger nav, and tapping a product inside
+  correctly navigates and closes it; no horizontal overflow at 1280px or
+  390px on any locale including `/ar` (RTL, flyout correctly mirrors);
+  spot-checked the live built HTML on the production domain after merge.
+- New dictionary key `common.nav.viewAllProducts`, translated into
+  ar/fr/ru at the same time it was added (no English-first gap).
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
