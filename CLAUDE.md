@@ -1741,6 +1741,100 @@ test would never catch. `page.click()` in Playwright doesn't reproduce
 this (no real touch, focus behaves differently) — this class of bug
 needs an actual touch-emulated tap to catch.
 
+## Live visitor tracking (2026-09-19)
+
+Owner wanted real-time visibility into who's browsing the site right
+now — page by page — plus a mobile notification the moment a new
+visitor arrives or submits an RFQ. Explicitly **not** personal
+identification: anonymous session tracking only (no name/email/phone
+unless the visitor submits a form or signs into the Partner Portal
+through the existing, separate flows) — confirmed directly with the
+owner before building anything, given how easily "visitor tracking"
+can slide into something that needs a cookie-consent banner or worse.
+
+- **`visitorEvents`** (`src/db/schema.ts`, migration
+  `drizzle/0002_green_vindicator.sql`, **not yet run against the real
+  database — do this via Neon's SQL Editor same as the previous two**):
+  one row per page view. `sessionId` is a random UUID the client
+  generates once and keeps only in `sessionStorage` (cleared the moment
+  the browser tab closes — never a persistent cookie); `country`/`city`
+  come from Vercel's edge geo headers (`x-vercel-ip-country`,
+  `x-vercel-ip-city`), never a raw IP address, which this table never
+  stores at all.
+- **`src/scripts/visitor-track.ts`**, loaded globally from
+  `BaseLayout.astro` (same pattern as `portal-nav-name.ts`), fires a
+  `fetch` beacon to `portal-actions/track-visit.ts` on every page load
+  — deliberately skips any path starting with `/portal`, since an
+  authenticated staff/customer browsing the portal isn't the anonymous
+  visitor this feature is about, and would otherwise show the owner's
+  own admin session inside their own live feed (including this very
+  tracking page, which would be a confusing loop).
+- **`portal-actions/track-visit.ts`** needs no auth (despite living
+  under `portal-actions/` — that's only to reuse the existing
+  non-`/api/`, non-`/portal/*`-gated route namespace documented in the
+  RFQ→Order section above, nothing to do with the Partner Portal
+  itself). It checks whether the session already has any prior events
+  before inserting the new one — a session with none is a brand-new
+  visitor, which triggers the Telegram ping described below. Also does
+  cheap probabilistic housekeeping (1% chance per request) deleting
+  events older than 30 days, since this table has no other retention
+  job and would otherwise grow forever.
+- **`src/pages/portal/admin/live-visitors.astro`** (staff-only, linked
+  from `PortalShell.astro`'s nav) polls
+  `portal-actions/live-visitors.ts` every 5 seconds
+  (`src/scripts/portal-live-visitors.ts`). That endpoint groups the
+  last hour of events by `sessionId` with one raw SQL query
+  (`array_agg(path order by created_at)` gives each session's full
+  ordered page trail in one shot — no per-session subqueries needed),
+  and the page renders each session's country/city, page trail, first/
+  last-seen time, and an "online now" dot if active within the last 2
+  minutes.
+- **`src/lib/telegram.ts`** is a small Telegram Bot API sender, same
+  silent-no-op-until-configured convention as `src/lib/email.ts` — a
+  missing `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` must never break the
+  feature calling it. **Two triggers only, both fire-and-forget**,
+  deliberately not every page view (which would be far too noisy to be
+  useful): a brand-new visitor session (`track-visit.ts`) and a new RFQ
+  submission (`api/submit-quote.ts`, alongside the existing email
+  notification — same `Promise.allSettled` task list, so a failed
+  Telegram send can't block the email or the submission itself).
+- **Setup still needed before this is fully live**: (1) run
+  `drizzle/0002_green_vindicator.sql` via Neon's SQL Editor; (2) create
+  a Telegram bot via [@BotFather](https://t.me/BotFather), message it
+  once, then read the chat id from
+  `https://api.telegram.org/bot<TOKEN>/getUpdates`; (3) set
+  `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` in Vercel's env vars. Until
+  all three are done, page views simply aren't recorded (the client
+  beacon's `fetch` fails silently — verified this degrades cleanly with
+  no console/page error, since `portal-actions/track-visit.ts` can't
+  insert into a table that doesn't exist yet) and no Telegram messages
+  send, but nothing else on the site is affected either way.
+- **Privacy Policy updated in all 4 locales** to describe this
+  accurately — and, in the process, to fix two claims that were already
+  false and predate this feature: "this website does not run a
+  server-side database" (untrue since the RFQ backend and Partner
+  Portal shipped 2026-09-18) and "every form on this site... simply
+  prepares an email" (only true of the Contact form — Request a Quote
+  has been fully server-processed since the RFQ system shipped). Left
+  the Contact form's own description untouched since it genuinely is
+  still client-only `mailto:` (verified in `site.ts` before writing
+  anything about it).
+- Verified: `npm run build`/`npm run check`/`npx tsc --noEmit -p .`
+  clean; Playwright confirms the tracking beacon fires with the correct
+  session id (persists across page loads within a tab, per
+  `sessionStorage`'s own semantics), path and locale on every marketing
+  page, is correctly skipped on `/portal/*`, and never throws a page
+  error even when the endpoint 404s (as it does under a plain static
+  preview server, since Vercel Functions don't run there); Privacy
+  Policy renders cleanly in all 4 locales with no horizontal overflow
+  at 390px including `/ar` (RTL) and no `undefined`/`[object Object]`
+  artifacts. **Not verifiable from this sandbox** (no live Postgres or
+  Telegram connection): the actual DB writes, the live-visitors grouped
+  query, and Telegram delivery — confirm these against the live site
+  once the three setup steps above are done, the same "can't be
+  emulated locally" caveat as Edge Middleware and other Vercel-platform
+  behavior documented elsewhere in this file.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
