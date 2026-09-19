@@ -28,6 +28,17 @@ const p = (path: string) => localizePath(locale, path);
         </div>
       </div>
     </section>
+    <section class="about-sustainability wrap">
+      <div class="section-head">
+        <div><p class="eyebrow">{a.sustainability.eyebrow}</p><h2>{a.sustainability.heading1}<br /><em>{a.sustainability.heading2}</em></h2></div>
+        <p>{a.sustainability.intro}</p>
+      </div>
+      <div class="sustainability-grid">
+        {a.sustainability.items.map((item, i) => (
+          <article><span>{String(i + 1).padStart(2, '0')}</span><h3>{item.title}</h3><p>{item.body}</p></article>
+        ))}
+      </div>
+    </section>
     <section class="about-outro wrap">
       <div><p class="eyebrow">{a.outro.eyebrow}</p><h2>{a.outro.heading1}<br /><em>{a.outro.heading2}</em></h2></div>
       <div>
