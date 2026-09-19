@@ -715,20 +715,29 @@ member approves it.
   or sets a status (`ORDER_STATUS_STAGES.map(...)` dropdowns, `ORDER_STATUS_LABELS[...]`
   displays) reads from these two constants, so no page template needed
   touching.
-- **Signed-in name in the site header, added 2026-09-19**: the top-nav
-  "Partner Portal" link becomes the signed-in person's name (e.g. "Kerim
-  Alastal") while they're anywhere under `/portal/*`, so it's obvious
-  they're logged in without having to look at the sidebar. Deliberately
-  scoped to portal pages only, not site-wide — every `/portal/*` page
-  already resolves `identity` via `requireApprovedPortalUser`/`requireStaff`/
-  `getPortalIdentity` before rendering, so this is just a `portalUserName`
-  prop threaded through `BaseLayout.astro` → `Header.astro` on those pages
-  (`.nav-portal-signed-in` in `global.css`) — no extra Clerk JS or auth
-  check needed, and every marketing/static page is completely unaffected
-  (prop stays `undefined`, link stays "Partner Portal" exactly as before).
-  Loading Clerk site-wide just to change this one link on static pages
-  would have meant shipping auth JS on every page load for a cosmetic
-  win — not worth it.
+- **Signed-in name in the site header, added 2026-09-19, made site-wide the
+  same day**: the top-nav "Partner Portal" link becomes the signed-in
+  person's name (e.g. "Kerim Alastal") once they're logged in, everywhere
+  on the site, not just under `/portal/*`. First shipped scoped to
+  `/portal/*` only (a `portalUserName` prop threaded through
+  `BaseLayout.astro` → `Header.astro`, since every portal page already
+  resolves `identity` server-side before rendering) — but the owner tested
+  it and pointed out the name disappeared the moment they clicked to any
+  other page, which wasn't the ask ("تضل ظاهرة" — stays visible). A static
+  marketing page has no server-side auth context of its own to render this
+  synchronously (that's the whole point of it staying static), so the fix
+  adds a client-side top-up: `src/pages/portal-actions/whoami.ts` (a tiny
+  `GET` endpoint, `getPortalIdentity()` → `{ name }`) plus
+  `src/scripts/portal-nav-name.ts`, imported globally from
+  `BaseLayout.astro` on every page. It finds the `/portal/dashboard` nav
+  link and, only if it doesn't already carry `.nav-portal-signed-in` (i.e.
+  only on a page where the name *wasn't* already server-rendered), fetches
+  `whoami` and swaps the text in if signed in. Cheap for the anonymous
+  majority — `getPortalIdentity()` returns immediately with no DB query
+  when there's no Clerk session at all — and the portal pages' own
+  server-rendered name is untouched, so there's no flash there; a static
+  page does show "Partner Portal" for a brief moment before the fetch
+  resolves, which is an acceptable tradeoff for a cosmetic label.
 - **Company profile fields expanded, added 2026-09-19**: `companies` gained
   `city` (cascading from `country` via the same `CITIES_BY_COUNTRY`
   dropdown pattern as the RFQ form — factored out into
