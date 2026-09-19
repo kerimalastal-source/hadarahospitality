@@ -153,6 +153,7 @@ export const fr: DeepPartial<Dictionary> = {
     moq: 'Quantité minimale de commande',
     leadTime: 'Délai de livraison estimé',
     moqNote: 'Valeurs indicatives — confirmées dans votre devis selon votre spécification exacte et la destination.',
+    recentlyViewed: { eyebrow: 'VU RÉCEMMENT', heading: 'Reprenez là où vous en étiez.' },
   },
   articleDetail: {
     by: "L'équipe HADARA Hospitality",

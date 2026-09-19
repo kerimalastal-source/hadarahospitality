@@ -212,6 +212,7 @@ export const en: Dictionary = {
     completeTheRoom: 'Complete the room.',
     lookingFor1: 'Looking for a particular',
     lookingFor2: 'specification?',
+    recentlyViewed: { eyebrow: 'RECENTLY VIEWED', heading: 'Pick up where you left off.' },
   },
   blogPage: {
     title: 'Blog | HADARA Hospitality',

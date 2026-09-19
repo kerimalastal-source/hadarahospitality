@@ -1318,6 +1318,57 @@ change how the page appears in Google search results — but the markup
 itself is still correct, free to add, and other engines/consumers of
 structured data can still use it, so there's no downside to having it.
 
+## "Recently viewed" strip on product pages (2026-09-19)
+
+A purely client-side browsing-history strip — `src/scripts/recently-
+viewed.ts` (loaded only from `ProductView.astro`) stores the last 6
+products a visitor viewed in `localStorage['hadara_recently_viewed']`
+(never sent to or read by a server) and renders the 3 most recent
+*other* ones (never the product page you're currently on) into a
+`#recently-viewed-section`/`#recently-viewed-grid` pair right below "You
+may also like," reusing that section's `.related-card`/`.related-card-
+placeholder` styling exactly — no new CSS needed. Hidden by default via
+the plain `hidden` attribute and only unhidden once there's something to
+show (a first-ever product view shows nothing, since there's no history
+yet — expected).
+
+- **Deliberately skips the `data-bg` lazy-load path** `src/scripts/
+  site.ts` uses for every other image on the site: that script's
+  `IntersectionObserver` only ever queries the DOM once, at its own
+  init time, so elements a *later*-running script injects (these cards
+  don't exist until `recently-viewed.ts` builds them from localStorage)
+  would never get observed or loaded. Sets the background image
+  directly via `style.setProperty('--card-image', ...)` instead — the
+  same fallback `site.ts` itself uses when `IntersectionObserver` isn't
+  available at all — which is fine here since it's at most 3 small
+  thumbnails, not a full page of images.
+- **A real TypeScript collision this caught**: `src/scripts/product-
+  selection.ts` and this new file both declared their own top-level
+  `const STORAGE_KEY` — harmless at runtime (each only ever runs on its
+  own page, `/products` vs. a product detail page), but `astro check`
+  failed with "Cannot redeclare block-scoped variable" because neither
+  file has any top-level `import`/`export` of its own, which makes
+  TypeScript treat each as a global **script** rather than a module —
+  so their top-level names collide in one shared ambient scope even
+  though nothing about how they're actually loaded conflicts. Fixed by
+  adding a no-op `export {};` to the top of both files, which forces
+  module scope. **Watch for this pattern with any future page-scoped
+  script that has no real imports of its own** — it's invisible until a
+  second such script happens to reuse the same top-level name.
+- Verified end-to-end with Playwright: visiting product A then B shows A
+  in B's strip; visiting C shows B then A (most recent first); revisiting
+  A directly correctly excludes itself and shows C then B. RTL-checked
+  on `/ar` — correct Arabic product names, correct `/ar/products/...`
+  links (locale prefix read from the current page's own URL), no
+  horizontal overflow.
+- New dictionary key `productDetail.recentlyViewed` (`eyebrow`,
+  `heading`), translated into ar/fr/ru at the same time it was added.
+- **A known, accepted rough edge**: a stored entry's `name` is whatever
+  locale was active the moment that product was viewed, so switching
+  languages mid-session can show a strip with mixed-language names.
+  Acceptable for a browser-local convenience feature — not worth adding
+  a locale-aware re-translation lookup for.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
