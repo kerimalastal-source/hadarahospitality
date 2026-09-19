@@ -1,8 +1,11 @@
-// Drizzle schema for the HADARA Partner Portal (/portal/*).
-// The rest of the site has no database — this is the one place data lives,
-// used only by portal pages/API routes under src/pages/portal/ and
-// src/pages/portal-actions/. See CLAUDE.md's "Partner Portal" section.
-import { pgTable, uuid, text, integer, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+// Drizzle schema for the HADARA Partner Portal (/portal/*) and the
+// anonymous live-visitor tracking feature (see visitorEvents below — the
+// one table here that isn't portal-specific, but lives in this same file/DB
+// since it's the site's only database). Used by portal pages/API routes
+// under src/pages/portal/ and src/pages/portal-actions/, plus
+// api/submit-quote.ts and portal-actions/track-visit.ts for visitorEvents.
+// See CLAUDE.md's "Partner Portal" and "Live visitor tracking" sections.
+import { pgTable, uuid, text, integer, timestamp, pgEnum, index } from 'drizzle-orm/pg-core';
 
 export const portalUserRole = pgEnum('portal_user_role', ['customer', 'staff']);
 export const portalUserStatus = pgEnum('portal_user_status', ['pending', 'approved', 'rejected']);
@@ -85,3 +88,26 @@ export const portalDocuments = pgTable('portal_documents', {
   kind: documentKind('kind').notNull().default('customer_upload'),
   uploadedAt: timestamp('uploaded_at', { withTimezone: true }).defaultNow().notNull(),
 });
+
+// One row per page view from an anonymous site visitor (never the Partner
+// Portal itself — see track-visit.ts). Deliberately holds no PII: sessionId
+// is a random UUID generated client-side and kept only in sessionStorage
+// (cleared when the browser tab closes, never a persistent cookie);
+// country/city are derived from Vercel's edge geo headers, never a raw IP.
+// A visitor who submits an RFQ or signs up for the Partner Portal is
+// identified through those existing, separate flows — this table only ever
+// answers "where are anonymous visitors coming from and where do they go."
+export const visitorEvents = pgTable(
+  'visitor_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sessionId: text('session_id').notNull(),
+    path: text('path').notNull(),
+    locale: text('locale'),
+    referrer: text('referrer'),
+    country: text('country'),
+    city: text('city'),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [index('visitor_events_session_id_idx').on(table.sessionId), index('visitor_events_created_at_idx').on(table.createdAt)],
+);

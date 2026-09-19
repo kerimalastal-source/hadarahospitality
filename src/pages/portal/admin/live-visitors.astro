@@ -1,0 +1,31 @@
+---
+// Real-time (polled) feed of anonymous site visitors and the page trail
+// each one has followed in the last hour — see src/pages/portal-actions/
+// live-visitors.ts for the query and CLAUDE.md's "Live visitor tracking"
+// section for the full feature.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PortalShell from '../../../components/PortalShell.astro';
+import { requireStaff } from '../../../lib/portal-auth';
+
+export const prerender = false;
+
+const result = await requireStaff(Astro);
+if (result instanceof Response) return result;
+const identity = result;
+---
+<BaseLayout title="Live visitors | HADARA Partner Portal" description="Real-time anonymous visitor activity on the public site." path="/portal/admin/live-visitors" noindex portalUserName={identity.fullName}>
+  <PortalShell identity={identity} active="admin-live-visitors">
+    <div class="portal-page-head">
+      <h1>Live visitors</h1>
+      <span id="live-visitors-count" class="portal-empty"></span>
+    </div>
+    <p class="portal-empty" style="margin-top:-20px;margin-bottom:24px">Anonymous, session-only — no names, emails or phone numbers. A session appears here the moment it visits any public page, and drops off an hour after it goes quiet.</p>
+    <div class="portal-card" id="live-visitors-root">
+      <p class="portal-empty">Loading…</p>
+    </div>
+  </PortalShell>
+
+  <script>
+    import '../../../scripts/portal-live-visitors';
+  </script>
+</BaseLayout>

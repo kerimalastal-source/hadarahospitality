@@ -410,11 +410,11 @@ export const fr: DeepPartial<Dictionary> = {
     sections: [
       {
         heading: 'La version courte',
-        body: "Ce site ne fait pas fonctionner de base de données côté serveur et n'utilise ni cookies ni scripts d'analyse. Chaque formulaire de ce site — la demande de devis et le formulaire de contact — prépare simplement un e-mail et l'ouvre dans votre propre application e-mail lorsque vous appuyez sur envoyer. Rien de ce que vous saisissez n'est transmis à, ni stocké sur, un serveur que nous exploitons.",
+        body: "Le formulaire Demander un devis est traité sur notre propre serveur, afin que nous puissions enregistrer votre demande, générer un numéro de référence, et informer notre équipe ainsi que vous-même par e-mail — voir « Quelles informations sont concernées » ci-dessous. Le formulaire de contact fonctionne toujours simplement : il prépare un e-mail et l'ouvre dans votre propre application e-mail lorsque vous appuyez sur envoyer, et rien de ce que vous y saisissez n'atteint notre serveur. Nous n'utilisons pas de cookies publicitaires ou d'analyse, mais nous collectons une activité de visite anonyme et non identifiante (voir « Cookies et suivi » ci-dessous), et nous exploitons un Portail Partenaires réservé aux membres, avec son propre système de comptes pour les clients professionnels approuvés.",
       },
       {
         heading: 'Quelles informations sont concernées',
-        body: "Lorsque vous soumettez le formulaire de devis ou de contact, les détails que vous saisissez (nom, e-mail, entreprise, pays et votre message) sont utilisés uniquement pour composer un e-mail adressé à partnerships@hadarahospitality.com. Cet e-mail est envoyé depuis votre propre appareil via votre propre fournisseur de messagerie, comme si vous l'aviez écrit vous-même. Nous ne voyons que les informations que vous choisissez de nous envoyer ainsi, ou lorsque vous nous contactez directement par téléphone, WhatsApp ou e-mail.",
+        body: "Lorsque vous soumettez le formulaire Demander un devis, les détails que vous saisissez (vos coordonnées, les détails de votre établissement et vos besoins en produits, ainsi qu'un fichier joint facultatif) sont enregistrés sur notre serveur le temps nécessaire pour traiter votre demande, et utilisés pour envoyer une notification interne à notre équipe et une confirmation par e-mail. Le formulaire de contact fonctionne différemment : il ouvre votre propre application e-mail avec votre message pré-rempli et est envoyé depuis votre propre appareil via votre propre fournisseur de messagerie — nous ne le voyons qu'une fois que vous envoyez cet e-mail vous-même. Si vous créez un compte sur le Portail Partenaires, nous stockons votre nom, votre e-mail professionnel, les détails de votre entreprise et votre historique de commandes afin que vous puissiez les suivre ; ce compte est protégé par notre fournisseur d'authentification (Clerk) et n'est accessible qu'à vous et à notre équipe.",
       },
       {
         heading: 'Comment nous les utilisons',
@@ -422,7 +422,7 @@ export const fr: DeepPartial<Dictionary> = {
       },
       {
         heading: 'Cookies et suivi',
-        body: "Ce site n'utilise actuellement ni cookies, ni analyses, ni scripts de suivi tiers. Si cela change à l'avenir, cette page sera mise à jour en conséquence.",
+        body: "Nous n'utilisons pas de cookies publicitaires ni de scripts d'analyse tiers (par exemple Google Analytics). Nous collectons une activité de visite anonyme — les pages consultées lors d'une visite, dans quel ordre, et un pays/ville approximatif déduit de votre connexion — afin de comprendre l'usage du site et de permettre à notre équipe de voir l'activité du site en temps réel. Ceci n'est rattaché qu'à un code aléatoire généré dans votre propre navigateur et conservé dans un stockage de session temporaire, qui s'efface de lui-même à la fermeture de votre onglet plutôt que de persister comme un cookie ; nous ne stockons jamais votre adresse IP elle-même, et rien de tout cela ne peut vous être rattaché à moins que vous ne soumettiez séparément un formulaire ou ne vous connectiez au Portail Partenaires. Si cela évolue davantage, cette page sera mise à jour en conséquence.",
       },
       {
         heading: 'Liens et intégrations tiers',
@@ -430,7 +430,7 @@ export const fr: DeepPartial<Dictionary> = {
       },
       {
         heading: 'Vos choix',
-        body: "Comme nous ne stockons pas nous-mêmes les soumissions de formulaires, il n'y a pas de compte ou de profil stocké à consulter, corriger ou supprimer. Si vous nous avez déjà envoyé un e-mail et souhaitez que cette correspondance soit traitée d'une manière particulière, faites-le-nous simplement savoir à partnerships@hadarahospitality.com.",
+        body: "Pour l'activité de visite anonyme, il n'y a pas de compte ou de profil à consulter, corriger ou supprimer, puisqu'elle n'a jamais été rattachée à vous. Si vous avez un compte sur le Portail Partenaires, vous pouvez consulter et modifier les détails de votre entreprise depuis votre page de profil à tout moment, ou nous demander de fermer votre compte. Pour tout ce que vous nous avez envoyé par formulaire ou e-mail, faites-le-nous simplement savoir à partnerships@hadarahospitality.com et nous le traiterons comme vous le souhaitez.",
       },
       {
         heading: 'Contact',

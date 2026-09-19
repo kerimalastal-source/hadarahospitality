@@ -25,6 +25,7 @@
 import { isValidRfqBlobUrl, isValidWorkEmail, type RfqProductMeta, type RfqSubmission } from '../src/lib/rfq.js';
 import { CONTACT_EMAIL } from '../src/config.js';
 import { sendEmail, escapeHtml, hasResendConfigured } from '../src/lib/email.js';
+import { hasTelegramConfigured, sendTelegramMessage } from '../src/lib/telegram.js';
 
 export const config = { runtime: 'edge' };
 
@@ -122,6 +123,21 @@ async function confirmToCustomer(submission: RfqSubmission): Promise<void> {
     return;
   }
   await sendEmail(submission.contact.workEmail, `We've received your request — ${submission.system.reference}`, renderCustomerEmail(submission));
+}
+
+/** Sends a real-time Telegram alert for the new RFQ once TELEGRAM_BOT_TOKEN/
+ * TELEGRAM_CHAT_ID are configured — a no-op until then, same as email. */
+async function notifyTelegramNewRfq(submission: RfqSubmission): Promise<void> {
+  if (!hasTelegramConfigured()) return;
+  const where = [submission.property.city, submission.property.country || submission.project.deliveryCountry].filter(Boolean).join(', ') || 'غير معروف';
+  const lines = [
+    '📩 <b>طلب عرض سعر جديد</b>',
+    `🏢 ${escapeHtml(submission.property.companyName)}`,
+    `📍 ${escapeHtml(where)}`,
+    `📦 ${escapeHtml(submission.products.categories.join(', '))}`,
+    `🔖 ${submission.system.reference}`,
+  ];
+  await sendTelegramMessage(lines.join('\n'));
 }
 
 /** Stub — create/update Contact, Company and a Deal in HubSpot once configured. */
@@ -255,7 +271,7 @@ export default async function handler(request: Request): Promise<Response> {
   // allSettled, not all: one integration failing (e.g. email) must never stop
   // the others from running, and must never fail the submission itself — the
   // RFQ was already validated and has a reference number.
-  const tasks: Promise<unknown>[] = [notifyHadaraTeam(submission), confirmToCustomer(submission), syncToHubSpot(submission)];
+  const tasks: Promise<unknown>[] = [notifyHadaraTeam(submission), confirmToCustomer(submission), syncToHubSpot(submission), notifyTelegramNewRfq(submission)];
   const results = await Promise.allSettled(tasks);
   results.forEach((result) => {
     if (result.status === 'rejected') console.error('[rfq] post-submission integration error', reference, result.reason);
