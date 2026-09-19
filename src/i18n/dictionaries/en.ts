@@ -181,6 +181,12 @@ export const en: Dictionary = {
     sourcingHeading1: 'Looking for a particular',
     sourcingHeading2: 'specification?',
     tailoredQuote: 'Request a tailored quote',
+    selection: {
+      addLabel: 'Add to quote request',
+      selectedCount: 'selected for your quote request',
+      clear: 'Clear',
+      requestQuote: 'Request a quote for selected products',
+    },
   },
   productDetail: {
     overview: 'OVERVIEW',

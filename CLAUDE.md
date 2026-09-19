@@ -1239,6 +1239,64 @@ each — it could show as few as 1 suggestion, or none.
   ar/fr/ru at the same time it was added (no English-first gap this
   time). RTL-verified at 390px on `/ar` — no horizontal overflow.
 
+## Multi-product selection on `/products` (2026-09-19)
+
+Owner liked the idea of picking several products straight from the
+listing page and requesting a quote for all of them in one go, instead of
+opening each product page separately.
+
+- **`src/scripts/product-selection.ts`** (loaded only from
+  `ProductsListView.astro`, so it's page-scoped, not global) wires a
+  checkbox next to every product link in `/products`' category lists.
+  Checking one stores `{slug, name, category}` in
+  `sessionStorage['hadara_rfq_selection']` (`category` is the *exact* RFQ
+  chip value — see `getRfqCategoryForSlug()` below, not the coarser
+  `formCategory` — so a pool towel or a pair of slippers resolves to the
+  right chip even though `CategoryKey` can't tell them apart from a
+  regular towel/bathrobe). A fixed `.selection-bar` at the bottom of the
+  page shows the running count and a "Request a quote for selected
+  products" button (`href="/get-a-quote?fromSelection=1"`) once at least
+  one is picked; `body.has-selection-bar` nudges the WhatsApp float and
+  back-to-top button up so the new bar doesn't cover them.
+- **`getRfqCategoryForSlug(slug)`** in `src/data/products.ts` is a
+  slug→RFQ-chip reverse index built from the existing
+  `RFQ_CATEGORY_PRODUCTS` map (added for the "specific products under
+  each category" RFQ feature above) — precise where the older
+  `LEGACY_CATEGORY_TO_RFQ_CATEGORY` (`src/lib/rfq.ts`, used for a single
+  product page's `?category=` hand-off) is coarse, since that one can
+  only resolve to `formCategory` and has no way to tell a pool towel from
+  a regular one or a slipper from a bathrobe.
+- **`applySelectionFromSession()`** in `src/scripts/rfq-form.ts` is the
+  landing side: gated on `?fromSelection=1` (so leftover sessionStorage
+  from earlier browsing never silently pre-checks anything on an
+  unrelated later visit to `/get-a-quote`), it checks each selected
+  product's category chip — revealing that chip's picker panel via the
+  same `syncCategoryProductsPanel()` used elsewhere — then checks that
+  exact product's checkbox inside it, and clears the sessionStorage entry
+  once applied. Reuses the RFQ form's existing category/specific-product
+  checkbox mechanism entirely; no new form fields were needed.
+- **A real bug caught before shipping**: the checkbox's data attribute is
+  `data-rfq-category`, which JS's `dataset` API exposes as
+  `dataset.rfqCategory` — not `dataset.category`. The first pass
+  destructured `{ slug, name, category }` from `dataset` directly, so
+  `category` was always `undefined` and the guard clause silently
+  dropped every selection (bar never appeared, sessionStorage stayed
+  empty). Caught by an end-to-end Playwright run (check two products,
+  submit, verify what's checked on `/get-a-quote`) before merging, not by
+  `astro check`/`npm run build` — a client-side `dataset` key mismatch
+  like this is invisible to both, so anything using `dataset` off a
+  multi-word `data-*` attribute is worth an actual runtime check, not
+  just a type-check pass.
+- **Verified end-to-end**: selecting a bath towel + a bathrobe from
+  `/products` (English and `/ar`) and clicking through correctly checks
+  both category chips ("Towels & Bath Linen", "Bathrobes"), reveals both
+  panels, and checks both specific-product checkboxes, with
+  `sessionStorage` cleared after. RTL-checked at 390px on `/ar/products`
+  — no horizontal overflow with the selection bar open.
+- New dictionary key `productsPage.selection` (`addLabel`,
+  `selectedCount`, `clear`, `requestQuote`), translated into ar/fr/ru at
+  the same time it was added.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,

@@ -213,6 +213,12 @@ export const ar: DeepPartial<Dictionary> = {
     sourcingHeading1: 'تبحث عن',
     sourcingHeading2: 'مواصفة معينة؟',
     tailoredQuote: 'اطلب عرض سعر مخصص',
+    selection: {
+      addLabel: 'أضف لطلب عرض السعر',
+      selectedCount: 'محدد لطلب عرض السعر',
+      clear: 'مسح التحديد',
+      requestQuote: 'اطلب عرض سعر للمنتجات المحددة',
+    },
   },
   blogPage: {
     title: 'المدونة | HADARA Hospitality',
