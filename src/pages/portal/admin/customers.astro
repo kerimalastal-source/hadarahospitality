@@ -38,7 +38,7 @@ const others = rows.filter((r) => r.user.status !== 'pending');
                 <td>{user.fullName}</td>
                 <td>{company?.name}{company?.country ? ` · ${company.country}` : ''}</td>
                 <td>{user.email}</td>
-                <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                <td>{new Date(user.createdAt).toLocaleString()}</td>
                 <td style="display:flex;gap:10px">
                   <form method="post" action="/portal-actions/approve-customer">
                     <input type="hidden" name="userId" value={user.id} />

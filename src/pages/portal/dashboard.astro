@@ -45,7 +45,7 @@ const latestQuotes = latestOrderIds.length
         <ul style="list-style:none;padding:0;margin:12px 0 0">
           {latestQuotes.map((q) => (
             <li style="padding:10px 0;border-bottom:1px solid #f1ebe4">
-              <a class="text-link" href={q.fileUrl} target="_blank" rel="noopener">Quote from {new Date(q.sentAt).toLocaleDateString()}</a>
+              <a class="text-link" href={q.fileUrl} target="_blank" rel="noopener">Quote from {new Date(q.sentAt).toLocaleString()}</a>
             </li>
           ))}
         </ul>
@@ -63,7 +63,7 @@ const latestQuotes = latestOrderIds.length
               <tr>
                 <td><a class="text-link" href={`/portal/orders/${o.id}`}>{o.reference}</a></td>
                 <td><span class="portal-status" class:list={{ 'portal-status-delivered': o.status === 'delivered' }}>{ORDER_STATUS_LABELS[o.status]}</span></td>
-                <td>{new Date(o.updatedAt).toLocaleDateString()}</td>
+                <td>{new Date(o.updatedAt).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>

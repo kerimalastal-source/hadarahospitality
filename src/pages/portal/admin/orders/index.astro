@@ -37,7 +37,7 @@ const rows = await db
                 <td>{order.reference}</td>
                 <td>{company?.name ?? '—'}</td>
                 <td><span class="portal-status" class:list={{ 'portal-status-delivered': order.status === 'delivered' }}>{ORDER_STATUS_LABELS[order.status]}</span></td>
-                <td>{new Date(order.updatedAt).toLocaleDateString()}</td>
+                <td>{new Date(order.updatedAt).toLocaleString()}</td>
                 <td><a class="text-link" href={`/portal/admin/orders/${order.id}/edit`}>Manage →</a></td>
               </tr>
             ))}
