@@ -117,6 +117,7 @@ export interface Dictionary {
     completeTheRoom: string;
     lookingFor1: string;
     lookingFor2: string;
+    recentlyViewed: { eyebrow: string; heading: string };
   };
   blogPage: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; questionHeading1: string; questionHeading2: string };
   articleDetail: { by: string; youMayAlsoLike: string; moreFrom: string; readyToTalk1: string; readyToTalk2: string };

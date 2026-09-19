@@ -4,6 +4,14 @@
 // src/scripts/rfq-form.ts's applySelectionFromSession() pre-checks the
 // matching category chips + specific-product checkboxes. Only imported
 // from ProductsListView.astro, so this only ever runs on /products.
+// The `export {}` keeps this file's top-level names (STORAGE_KEY, etc.)
+// scoped to itself for TypeScript — with no import/export of its own, tsc
+// otherwise treats a .ts file as a global script and its top-level
+// consts collide with same-named ones in any other script-mode file
+// (see recently-viewed.ts's own STORAGE_KEY, a completely unrelated
+// feature that happened to pick the same name).
+export {};
+
 const STORAGE_KEY = 'hadara_rfq_selection';
 
 interface SelectedProduct {

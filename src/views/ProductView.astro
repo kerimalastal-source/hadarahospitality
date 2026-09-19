@@ -177,6 +177,19 @@ const relatedLocalized = related.map((pr) => ({
         </div>
       </section>
     )}
+    <section
+      class="pdp-related wrap"
+      id="recently-viewed-section"
+      data-current-slug={product.slug}
+      data-current-name={name}
+      data-current-image={product.main}
+      hidden
+    >
+      <p class="eyebrow">{pd.recentlyViewed.eyebrow}</p>
+      <h2>{pd.recentlyViewed.heading}</h2>
+      <div class="related-grid" id="recently-viewed-grid"></div>
+    </section>
     <section class="products-cta"><div class="wrap"><div><p class="eyebrow light">SOURCING SUPPORT</p><h2>{pd.lookingFor1}<br /><em>{pd.lookingFor2}</em></h2></div><a class="button button-gold" href={quoteLink}>{t.common.requestTailoredQuote} <span>↗</span></a></div></section>
   </main>
+  <script>import '../scripts/recently-viewed';</script>
 </BaseLayout>
