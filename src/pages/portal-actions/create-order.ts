@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
-import { db } from '../../../db/client';
-import { orders, orderStatusEvents } from '../../../db/schema';
-import { requireStaff } from '../../../lib/portal-auth';
-import { ORDER_STATUS_STAGES, type OrderStatus } from '../../../lib/portal';
+import { db } from '../../db/client';
+import { orders, orderStatusEvents } from '../../db/schema';
+import { requireStaff } from '../../lib/portal-auth';
+import { ORDER_STATUS_STAGES, type OrderStatus } from '../../lib/portal';
 
 export const prerender = false;
 

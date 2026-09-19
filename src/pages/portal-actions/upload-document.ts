@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
-import { db } from '../../../db/client';
-import { portalDocuments } from '../../../db/schema';
-import { requireApprovedPortalUser } from '../../../lib/portal-auth';
-import { isValidPortalBlobUrl } from '../../../lib/portal';
+import { db } from '../../db/client';
+import { portalDocuments } from '../../db/schema';
+import { requireApprovedPortalUser } from '../../lib/portal-auth';
+import { isValidPortalBlobUrl } from '../../lib/portal';
 
 export const prerender = false;
 

@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
 import { eq } from 'drizzle-orm';
-import { db } from '../../../db/client';
-import { companies } from '../../../db/schema';
-import { requireApprovedPortalUser } from '../../../lib/portal-auth';
+import { db } from '../../db/client';
+import { companies } from '../../db/schema';
+import { requireApprovedPortalUser } from '../../lib/portal-auth';
 
 export const prerender = false;
 

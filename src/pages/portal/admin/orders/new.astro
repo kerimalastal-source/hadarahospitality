@@ -19,7 +19,7 @@ const allCompanies = await db.select().from(companies).orderBy(asc(companies.nam
   <PortalShell identity={identity} active="admin-orders">
     <div class="portal-page-head"><h1>New order</h1></div>
     <div class="portal-card">
-      <form class="portal-form" method="post" action="/api/portal/create-order">
+      <form class="portal-form" method="post" action="/portal-actions/create-order">
         <label>Company<select name="companyId" required>
           <option value="">Select a company</option>
           {allCompanies.map((c) => <option value={c.id}>{c.name}</option>)}

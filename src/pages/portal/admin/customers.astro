@@ -40,12 +40,12 @@ const others = rows.filter((r) => r.user.status !== 'pending');
                 <td>{user.email}</td>
                 <td>{new Date(user.createdAt).toLocaleDateString()}</td>
                 <td style="display:flex;gap:10px">
-                  <form method="post" action="/api/portal/approve-customer">
+                  <form method="post" action="/portal-actions/approve-customer">
                     <input type="hidden" name="userId" value={user.id} />
                     <input type="hidden" name="decision" value="approved" />
                     <button class="button button-gold" type="submit" style="min-height:36px;padding:0 14px">Approve</button>
                   </form>
-                  <form method="post" action="/api/portal/approve-customer">
+                  <form method="post" action="/portal-actions/approve-customer">
                     <input type="hidden" name="userId" value={user.id} />
                     <input type="hidden" name="decision" value="rejected" />
                     <button class="button button-dark" type="submit" style="min-height:36px;padding:0 14px">Reject</button>

@@ -17,7 +17,7 @@ export interface PortalIdentity {
 }
 
 /** Structural shape shared by both the `Astro` global (in .astro frontmatter)
- * and a real `APIContext` (in src/pages/api/portal/*.ts), so these helpers
+ * and a real `APIContext` (in src/pages/portal-actions/*.ts), so these helpers
  * work in either. */
 interface PortalAuthContext {
   locals: App.Locals;

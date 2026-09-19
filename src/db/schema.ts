@@ -1,7 +1,7 @@
 // Drizzle schema for the HADARA Partner Portal (/portal/*).
 // The rest of the site has no database — this is the one place data lives,
 // used only by portal pages/API routes under src/pages/portal/ and
-// src/pages/api/portal/. See CLAUDE.md's "Partner Portal" section.
+// src/pages/portal-actions/. See CLAUDE.md's "Partner Portal" section.
 import { pgTable, uuid, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
 
 export const portalUserRole = pgEnum('portal_user_role', ['customer', 'staff']);

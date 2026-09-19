@@ -23,7 +23,7 @@ if (form && input) {
         access: 'public',
         handleUploadUrl: '/api/blob-upload',
       });
-      const response = await fetch('/api/portal/upload-document', {
+      const response = await fetch('/portal-actions/upload-document', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ fileUrl: blob.url, fileName: file.name }),

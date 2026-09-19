@@ -27,7 +27,7 @@ const [company] = identity.companyId ? await db.select().from(companies).where(e
 
     <div class="portal-card">
       <p class="eyebrow">Company</p>
-      <form class="portal-form" method="post" action="/api/portal/update-company">
+      <form class="portal-form" method="post" action="/portal-actions/update-company">
         <label>Company name<input name="name" required value={company?.name ?? ''} /></label>
         <label>Country<select name="country">
           <option value="">Select a country</option>
