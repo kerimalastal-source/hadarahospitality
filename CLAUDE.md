@@ -642,21 +642,78 @@ member approves it.
   already downloadable from each product page, linked from
   `/portal/documents` instead of duplicated); multi-user-per-company
   invites (one Clerk user = one `portal_users` row today).
-- **Not verified end-to-end yet** — this sandbox has no real Clerk keys or
-  Postgres database, so only structural checks were possible: `npm run
-  build`, `npm run check`, and `astro dev` with dummy env vars confirming
-  the auth-gate redirects fire correctly on every `/portal/*` route. Once
-  rebased onto `main` (2026-09-19), the branch's actual Vercel preview
-  deployment was checked too (via the Vercel MCP tools) — build succeeded,
-  the static/Function split held (Astro still emits one `_render.func` and
-  every other route stayed static), and hitting `/portal/sign-in` on that
-  preview returned a 500 whose runtime log is exactly Clerk's "Publishable
-  key is missing" error — i.e. the code path is wired correctly and the
-  *only* thing blocking it is the still-unset env vars below, not a bug.
-  After the owner creates the Clerk app and Neon database and sets the
-  three env vars, walk the real flow once end-to-end (sign up → approve →
-  staff creates an order → add a status event → customer sees it) before
-  calling this done.
+- **Live and verified end-to-end as of 2026-09-19**: `PUBLIC_CLERK_PUBLISHABLE_KEY`,
+  `CLERK_SECRET_KEY` and `POSTGRES_URL` are all set in Vercel, the
+  `drizzle/0000_fearless_silverclaw.sql` migration has been run against the
+  real Neon database (via its SQL Editor — no CLI access from this
+  sandbox), and the owner walked the full flow themselves on the live site:
+  Google-OAuth sign-up → onboarding → staff approval → `/portal/admin`.
+  Two real bugs surfaced by that first real walkthrough, both fixed the
+  same day and worth knowing about if something in this area regresses:
+  1. Every portal write route 404'd in production only (never locally) —
+     see "Route namespacing" below the file list above; fixed by moving
+     `/api/portal/*` to `/portal-actions/*`.
+  2. A brand-new Google sign-up landed on the homepage instead of
+     onboarding — see the `signUpForceRedirectUrl` note in "Sign-up flow"
+     above.
+- **Orders now populate automatically from "Request a quote," added
+  2026-09-19**: previously `/get-a-quote` and the portal's `orders` table
+  were completely disconnected — a signed-in customer submitting an RFQ saw
+  it vanish into an email with no trace in their own dashboard. Fixed with
+  `src/pages/portal-actions/link-quote-request.ts`, called from
+  `src/scripts/rfq-form.ts` right after a successful `/api/submit-quote`
+  (best-effort, fire-and-forget, never awaited or allowed to affect the
+  RFQ form's own success/error UX). It resolves the caller's Clerk session
+  via `getPortalIdentity()`; for an anonymous visitor, or a signed-in user
+  with no `companyId` yet, it silently no-ops (`{ok:true,linked:false}`) —
+  only a real signed-in portal customer gets an `orders` row (status
+  `quote_requested`, `notes` built from the RFQ's categories/quantity/
+  delivery/notes fields so staff have context) plus its first
+  `order_status_events` entry. Everything downstream (dashboard's "Orders"
+  count and "Recent activity" table, `/portal/orders`, the order detail
+  timeline) needed zero changes — they already read live from the `orders`
+  table.
+- **Richer order-status lifecycle, added 2026-09-19**: `ORDER_STATUS_STAGES`
+  in `src/lib/portal.ts` grew from 6 to 8 stages (owner's wording), adding
+  `samples_sent` and `quote_in_preparation` between the existing
+  `quote_requested` and `quoted`: **Received / under review → Samples
+  sent → Quote in preparation → Quote sent → Confirmed → In production →
+  Shipped → Delivered**. Needed a schema migration
+  (`drizzle/0001_last_omega_flight.sql`, `ALTER TYPE "order_status" ADD
+  VALUE ...` — Postgres enums can only grow, never rename/reorder existing
+  values in place, which is why the existing `quote_requested`/`quoted`
+  values were kept and just relabeled rather than replaced) — run this one
+  the same way as the first, via Neon's SQL Editor. Every page that lists
+  or sets a status (`ORDER_STATUS_STAGES.map(...)` dropdowns, `ORDER_STATUS_LABELS[...]`
+  displays) reads from these two constants, so no page template needed
+  touching.
+- **Signed-in name in the site header, added 2026-09-19**: the top-nav
+  "Partner Portal" link becomes the signed-in person's name (e.g. "Kerim
+  Alastal") while they're anywhere under `/portal/*`, so it's obvious
+  they're logged in without having to look at the sidebar. Deliberately
+  scoped to portal pages only, not site-wide — every `/portal/*` page
+  already resolves `identity` via `requireApprovedPortalUser`/`requireStaff`/
+  `getPortalIdentity` before rendering, so this is just a `portalUserName`
+  prop threaded through `BaseLayout.astro` → `Header.astro` on those pages
+  (`.nav-portal-signed-in` in `global.css`) — no extra Clerk JS or auth
+  check needed, and every marketing/static page is completely unaffected
+  (prop stays `undefined`, link stays "Partner Portal" exactly as before).
+  Loading Clerk site-wide just to change this one link on static pages
+  would have meant shipping auth JS on every page load for a cosmetic
+  win — not worth it.
+- **Company profile fields expanded, added 2026-09-19**: `companies` gained
+  `city` (cascading from `country` via the same `CITIES_BY_COUNTRY`
+  dropdown pattern as the RFQ form — factored out into
+  `src/scripts/country-city.ts`, now shared by `rfq-form.ts` and the new
+  `src/scripts/portal-company-fields.ts`), `roomCount` and
+  `annualGuestsEstimate` (both nullable integers, parsed via
+  `parsePositiveInt()` in `src/lib/portal.ts` — blank/invalid input stays
+  `null`, never `0`). Collected on `/portal/onboarding` at sign-up time and
+  editable afterward on `/portal/profile`; both post through the same
+  `portal-actions/complete-onboarding.ts` / `update-company.ts` endpoints,
+  just with the new fields added to what they persist. Same migration file
+  as the order-status change above (`drizzle/0001_last_omega_flight.sql`
+  also has the three `ALTER TABLE "companies" ADD COLUMN` statements).
 
 ## Hotel Opening Package (`/hotel-opening-package`)
 

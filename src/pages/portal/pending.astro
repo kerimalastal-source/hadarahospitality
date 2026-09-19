@@ -11,7 +11,7 @@ const identity = await getPortalIdentity(Astro);
 if (!identity) return Astro.redirect('/portal/onboarding');
 if (identity.status === 'approved') return Astro.redirect('/portal/dashboard');
 ---
-<BaseLayout title="Account pending review | HADARA Partner Portal" description="Your partner portal account is awaiting approval." path="/portal/pending" noindex>
+<BaseLayout title="Account pending review | HADARA Partner Portal" description="Your partner portal account is awaiting approval." path="/portal/pending" noindex portalUserName={identity.fullName}>
   <main class="portal-pending">
     <h1>Thanks, {identity.fullName.split(' ')[0]}.</h1>
     {identity.status === 'rejected' ? (

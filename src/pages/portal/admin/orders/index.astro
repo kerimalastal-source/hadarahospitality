@@ -19,7 +19,7 @@ const rows = await db
   .leftJoin(companies, eq(orders.companyId, companies.id))
   .orderBy(desc(orders.updatedAt));
 ---
-<BaseLayout title="Manage orders | HADARA Partner Portal" description="Create and update partner portal orders." path="/portal/admin/orders" noindex>
+<BaseLayout title="Manage orders | HADARA Partner Portal" description="Create and update partner portal orders." path="/portal/admin/orders" noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="admin-orders">
     <div class="portal-page-head">
       <h1>Orders</h1>

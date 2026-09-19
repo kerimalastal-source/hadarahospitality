@@ -6,6 +6,7 @@ import type { APIRoute } from 'astro';
 import { db } from '../../db/client';
 import { companies, portalUsers } from '../../db/schema';
 import { getPortalIdentity } from '../../lib/portal-auth';
+import { parsePositiveInt } from '../../lib/portal';
 
 export const prerender = false;
 
@@ -21,12 +22,18 @@ export const POST: APIRoute = async (context) => {
   const email = String(form.get('email') ?? '').trim();
   const companyName = String(form.get('companyName') ?? '').trim();
   const country = String(form.get('country') ?? '').trim();
+  const city = String(form.get('city') ?? '').trim();
+  const roomCount = parsePositiveInt(form.get('roomCount'));
+  const annualGuestsEstimate = parsePositiveInt(form.get('annualGuestsEstimate'));
 
   if (!fullName || !email || !companyName || !country) {
     return new Response('Missing required fields', { status: 400 });
   }
 
-  const [company] = await db.insert(companies).values({ name: companyName, country }).returning({ id: companies.id });
+  const [company] = await db
+    .insert(companies)
+    .values({ name: companyName, country, city: city || null, roomCount, annualGuestsEstimate })
+    .returning({ id: companies.id });
   await db.insert(portalUsers).values({
     clerkUserId: userId,
     companyId: company.id,

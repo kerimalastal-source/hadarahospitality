@@ -23,7 +23,7 @@ const { order, company } = row;
 const events = await db.select().from(orderStatusEvents).where(eq(orderStatusEvents.orderId, order.id)).orderBy(asc(orderStatusEvents.createdAt));
 const orderQuotes = await db.select().from(quotes).where(eq(quotes.orderId, order.id)).orderBy(desc(quotes.sentAt));
 ---
-<BaseLayout title={`Manage ${order.reference} | HADARA Partner Portal`} description="Update order status and attach quotes." path={`/portal/admin/orders/${order.id}/edit`} noindex>
+<BaseLayout title={`Manage ${order.reference} | HADARA Partner Portal`} description="Update order status and attach quotes." path={`/portal/admin/orders/${order.id}/edit`} noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="admin-orders">
     <div class="portal-page-head">
       <h1>{order.reference}</h1>

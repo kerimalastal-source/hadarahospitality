@@ -2,12 +2,14 @@
 // The rest of the site has no database — this is the one place data lives,
 // used only by portal pages/API routes under src/pages/portal/ and
 // src/pages/portal-actions/. See CLAUDE.md's "Partner Portal" section.
-import { pgTable, uuid, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, integer, timestamp, pgEnum } from 'drizzle-orm/pg-core';
 
 export const portalUserRole = pgEnum('portal_user_role', ['customer', 'staff']);
 export const portalUserStatus = pgEnum('portal_user_status', ['pending', 'approved', 'rejected']);
 export const orderStatus = pgEnum('order_status', [
   'quote_requested',
+  'samples_sent',
+  'quote_in_preparation',
   'quoted',
   'confirmed',
   'in_production',
@@ -20,6 +22,9 @@ export const companies = pgTable('companies', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   country: text('country'),
+  city: text('city'),
+  roomCount: integer('room_count'),
+  annualGuestsEstimate: integer('annual_guests_estimate'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 

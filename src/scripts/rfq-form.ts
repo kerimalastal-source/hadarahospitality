@@ -3,7 +3,7 @@
 // fetch (no more mailto:), and analytics event hooks. Guarded so this is a
 // no-op import on every other page.
 import { isValidRfqFile, RFQ_FILE_MAX_BYTES, RFQ_BLOB_PATH_PREFIX, LEGACY_CATEGORY_TO_RFQ_CATEGORY, type RfqProductMeta } from '../lib/rfq';
-import { CITIES_BY_COUNTRY } from '../data/cities';
+import { wireCountryCity } from './country-city';
 import { upload } from '@vercel/blob/client';
 
 const form = document.querySelector<HTMLFormElement>('#rfq-form');
@@ -94,31 +94,8 @@ if (form) {
   });
 
   // --- Country -> City cascading dropdowns --------------------------------
-  // The City select starts disabled with a "select a country first" option;
-  // choosing a country repopulates it with just that country's cities (from
-  // CITIES_BY_COUNTRY) and enables it. Applies to both the Country/City pair
-  // (section 1) and the Required Delivery Country/City pair (section 3).
-  function wireCountryCity(countrySelect: HTMLSelectElement | null, citySelect: HTMLSelectElement | null) {
-    if (!countrySelect || !citySelect) return;
-    const lockedPlaceholder = citySelect.querySelector<HTMLOptionElement>('option[value=""]')?.textContent ?? '';
-    const readyPlaceholder = citySelect.dataset.readyPlaceholder ?? lockedPlaceholder;
-
-    countrySelect.addEventListener('change', () => {
-      const cities = CITIES_BY_COUNTRY[countrySelect.value] ?? [];
-      citySelect.innerHTML = '';
-      const placeholderOption = document.createElement('option');
-      placeholderOption.value = '';
-      placeholderOption.textContent = cities.length ? readyPlaceholder : lockedPlaceholder;
-      citySelect.appendChild(placeholderOption);
-      for (const city of cities) {
-        const option = document.createElement('option');
-        option.value = city;
-        option.textContent = city;
-        citySelect.appendChild(option);
-      }
-      citySelect.disabled = cities.length === 0;
-    });
-  }
+  // Applies to both the Country/City pair (section 1) and the Required
+  // Delivery Country/City pair (section 3). See src/scripts/country-city.ts.
   wireCountryCity(form.querySelector<HTMLSelectElement>('#rfq-country'), form.querySelector<HTMLSelectElement>('#rfq-city'));
   wireCountryCity(form.querySelector<HTMLSelectElement>('#rfq-delivery-country'), form.querySelector<HTMLSelectElement>('#rfq-delivery-city'));
 
@@ -279,6 +256,13 @@ if (form) {
         return;
       }
       showSuccess(result.reference as string);
+
+      // Best-effort: if this visitor is a signed-in, onboarded portal
+      // customer, also create a linked Order in their dashboard. Silently
+      // no-ops for everyone else — never awaited, never blocks the success
+      // state above either way.
+      data.set('reference', result.reference as string);
+      fetch('/portal-actions/link-quote-request', { method: 'POST', body: data }).catch(() => {});
     } catch {
       if (formError) formError.hidden = false;
       setSubmitting(false);

@@ -6,6 +6,7 @@ import { db } from '../../db/client';
 import { companies } from '../../db/schema';
 import { eq } from 'drizzle-orm';
 import { WORLD_COUNTRIES } from '../../data/countries';
+import { CITIES_BY_COUNTRY } from '../../data/cities';
 
 export const prerender = false;
 
@@ -15,8 +16,9 @@ const identity = result;
 if (identity.role === 'staff') return Astro.redirect('/portal/admin');
 
 const [company] = identity.companyId ? await db.select().from(companies).where(eq(companies.id, identity.companyId)).limit(1) : [];
+const citiesForCountry = company?.country ? (CITIES_BY_COUNTRY[company.country] ?? []) : [];
 ---
-<BaseLayout title="Company profile | HADARA Partner Portal" description="Your company's profile in the HADARA partner portal." path="/portal/profile" noindex>
+<BaseLayout title="Company profile | HADARA Partner Portal" description="Your company's profile in the HADARA partner portal." path="/portal/profile" noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="profile">
     <div class="portal-page-head"><h1>Company profile</h1></div>
 
@@ -29,12 +31,21 @@ const [company] = identity.companyId ? await db.select().from(companies).where(e
       <p class="eyebrow">Company</p>
       <form class="portal-form" method="post" action="/portal-actions/update-company">
         <label>Company name<input name="name" required value={company?.name ?? ''} /></label>
-        <label>Country<select name="country">
+        <label>Country<select id="portal-country" name="country">
           <option value="">Select a country</option>
           {WORLD_COUNTRIES.map((c) => <option value={c} selected={c === company?.country}>{c}</option>)}
         </select></label>
+        <label>City<select id="portal-city" name="city" disabled={!company?.country} data-ready-placeholder="Select a city">
+          <option value="">{company?.country ? 'Select a city' : 'Select a country first'}</option>
+          {citiesForCountry.map((c) => <option value={c} selected={c === company?.city}>{c}</option>)}
+        </select></label>
+        <label>Number of rooms (approx.)<input name="roomCount" type="number" min="1" step="1" value={company?.roomCount ?? ''} /></label>
+        <label>Annual guests (approx.)<input name="annualGuestsEstimate" type="number" min="1" step="1" value={company?.annualGuestsEstimate ?? ''} /></label>
         <button class="button button-gold" type="submit">Save changes <span>→</span></button>
       </form>
     </div>
   </PortalShell>
+  <script>
+    import '../../scripts/portal-company-fields';
+  </script>
 </BaseLayout>

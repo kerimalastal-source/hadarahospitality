@@ -21,7 +21,7 @@ const rows = await db
 const pending = rows.filter((r) => r.user.status === 'pending');
 const others = rows.filter((r) => r.user.status !== 'pending');
 ---
-<BaseLayout title="Customer approvals | HADARA Partner Portal" description="Approve or reject partner portal sign-ups." path="/portal/admin/customers" noindex>
+<BaseLayout title="Customer approvals | HADARA Partner Portal" description="Approve or reject partner portal sign-ups." path="/portal/admin/customers" noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="admin-customers">
     <div class="portal-page-head"><h1>Customer approvals</h1></div>
 

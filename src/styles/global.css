@@ -358,3 +358,6 @@
 /* Turkish flag badge in the top announcement bar */
 .announcement-location{display:inline-flex;align-items:center;gap:8px}
 .flag-icon{flex:none;display:block;outline:1px solid rgba(197,160,89,.45);outline-offset:1px}
+
+/* Signed-in portal customer/staff name in the header nav, replacing "Partner Portal" */
+.nav-portal-signed-in{color:#987342;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle}

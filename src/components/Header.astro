@@ -10,9 +10,14 @@ interface Props {
   locale: Locale;
   t: Dictionary;
   path: string;
+  /** Signed-in portal customer/staff's display name — only ever passed by
+   * /portal/* pages, which already resolve this via requireApprovedPortalUser
+   * / requireStaff before rendering. Every other page leaves this undefined
+   * and gets the plain "Partner Portal" link, unchanged. */
+  portalUserName?: string;
 }
 
-const { active, locale, t, path } = Astro.props;
+const { active, locale, t, path, portalUserName } = Astro.props;
 const nav = t.common.nav;
 const home = (p: string) => localizePath(locale, p);
 ---
@@ -35,7 +40,7 @@ const home = (p: string) => localizePath(locale, p);
     <div class="nav-utils">
       <a class="nav-search" href={home('/search')} aria-label={nav.search}><SearchIcon /></a>
       <LanguageSwitcher locale={locale} path={path} />
-      <a href="/portal/dashboard">Partner Portal</a>
+      <a href="/portal/dashboard" class:list={{ 'nav-portal-signed-in': portalUserName }}>{portalUserName || 'Partner Portal'}</a>
       <a class="nav-quote" href={home('/get-a-quote')}>{nav.requestQuote} <span>↗</span></a>
     </div>
   </nav>
