@@ -1491,6 +1491,51 @@ only the *entry point* into that one form changed.
   to confirm the RFQ form actually arrives with the right radio/dropdown
   pre-set in every case.
 
+## RFQ form section headings were glued to the wrong content (2026-09-19)
+
+Owner reported each of the 4 section headings ("Contact & Property,"
+"Products Required," "Project & Delivery," "Specifications & Documents")
+looked stuck to the paragraph *above* them and oddly far from their own
+fields *below* — confirmed and measured before touching any CSS
+(Playwright, comparing each `legend`'s actual bounding box against its
+fieldset's siblings) rather than guessing from the stylesheet numbers,
+since they looked reasonable on paper (52px top padding, 26px margin
+below the legend).
+
+**Root cause — a genuine `<fieldset>`/`<legend>` browser quirk, not a
+typo**: `.rfq-section{padding:52px 0 0}` intended that 52px as space
+*above* each legend, separating it from the previous section. But a
+`<legend>` is positioned flush at its fieldset's block-start edge
+regardless of the fieldset's own `padding-top` — confirmed by measuring
+`legend.getBoundingClientRect().top === fieldset.getBoundingClientRect().
+top` exactly, with the fieldset's declared 52px padding nowhere above it.
+Setting `display:flex` on the legend (already done, for the step-number-
+plus-text layout) doesn't change this — legends keep their special
+block-start positioning independent of `display`. The 52px didn't
+disappear, though: it reappeared *below* the legend, stacking with the
+legend's own `margin-bottom:26px` and the first field's `margin-top` to
+produce a 78–98px gap before the section's actual content — the exact
+"glued above, far below" the owner described.
+
+**Fix**: moved the spacing from the fieldset's `padding-top` to its own
+`margin-top` (`.rfq-section{padding:0;margin:52px 0 0}`, same change to
+the `:first-of-type` and mobile-breakpoint rules) — a fieldset's outer
+margin against its previous sibling isn't subject to the same quirk,
+only its padding/border relative to its own legend is. Verified by
+re-measuring: every legend now sits a consistent 52px below the previous
+section and 26px above its own first field (one section's gap reads
+46px instead of 26px — a secondary, much smaller margin-collapse
+difference depending on that section's first child, not worth chasing
+further). Re-verified in `/ar` (RTL) with the same measurements and no
+horizontal overflow.
+
+**Lesson**: never put a `<fieldset>`'s "space before this section"
+spacing in its own `padding-top` (or `border`) when it has a `<legend>`
+as first child — the legend ignores both regardless of the legend's own
+`display` value. Use `margin-top` on the fieldset itself instead. Watch
+for this anywhere else a `<fieldset>`+`<legend>` pair gets spacing via
+padding rather than margin.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
