@@ -26,6 +26,8 @@ export function isValidPortalBlobUrl(url: string): boolean {
 
 export const ORDER_STATUS_STAGES = [
   'quote_requested',
+  'samples_sent',
+  'quote_in_preparation',
   'quoted',
   'confirmed',
   'in_production',
@@ -36,10 +38,21 @@ export const ORDER_STATUS_STAGES = [
 export type OrderStatus = (typeof ORDER_STATUS_STAGES)[number];
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
-  quote_requested: 'Quote requested',
-  quoted: 'Quoted',
+  quote_requested: 'Received / under review',
+  samples_sent: 'Samples sent',
+  quote_in_preparation: 'Quote in preparation',
+  quoted: 'Quote sent',
   confirmed: 'Confirmed',
   in_production: 'In production',
   shipped: 'Shipped',
   delivered: 'Delivered',
 };
+
+/** Parses an optional numeric form field (room count, annual guests
+ * estimate) into a positive integer, or null when blank/invalid — these
+ * columns are nullable, so "not provided" must stay null rather than 0. */
+export function parsePositiveInt(value: FormDataEntryValue | null): number | null {
+  if (typeof value !== 'string' || value.trim() === '') return null;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}

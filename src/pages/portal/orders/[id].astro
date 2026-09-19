@@ -22,7 +22,7 @@ if (!order || order.companyId !== identity.companyId) {
 const events = await db.select().from(orderStatusEvents).where(eq(orderStatusEvents.orderId, order.id)).orderBy(asc(orderStatusEvents.createdAt));
 const orderQuotes = await db.select().from(quotes).where(eq(quotes.orderId, order.id)).orderBy(desc(quotes.sentAt));
 ---
-<BaseLayout title={`${order.reference} | HADARA Partner Portal`} description="Order status and timeline." path={`/portal/orders/${order.id}`} noindex>
+<BaseLayout title={`${order.reference} | HADARA Partner Portal`} description="Order status and timeline." path={`/portal/orders/${order.id}`} noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="orders">
     <div class="portal-page-head">
       <h1>{order.reference}</h1>

@@ -22,7 +22,7 @@ const rows = identity.companyId
       .orderBy(desc(quotes.sentAt))
   : [];
 ---
-<BaseLayout title="Quotes | HADARA Partner Portal" description="Pricing and quotes received from HADARA Hospitality." path="/portal/quotes" noindex>
+<BaseLayout title="Quotes | HADARA Partner Portal" description="Pricing and quotes received from HADARA Hospitality." path="/portal/quotes" noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="quotes">
     <div class="portal-page-head"><h1>Quotes</h1></div>
     {rows.length === 0 ? (

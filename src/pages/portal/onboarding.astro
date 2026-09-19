@@ -21,7 +21,7 @@ const user = await Astro.locals.currentUser();
 const defaultName = user ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() : '';
 const defaultEmail = user?.emailAddresses?.[0]?.emailAddress ?? '';
 ---
-<BaseLayout title="Complete your account | HADARA Partner Portal" description="Tell us about your company to finish setting up your partner portal account." path="/portal/onboarding" noindex>
+<BaseLayout title="Complete your account | HADARA Partner Portal" description="Tell us about your company to finish setting up your partner portal account." path="/portal/onboarding" noindex portalUserName={defaultName || undefined}>
   <main class="portal-auth-page">
     <div class="portal-auth-card portal-card" style="background:#fff">
       <h2 style="font:26px 'Playfair Display','Markazi Text',serif;margin:0 0 8px">One more step</h2>
@@ -30,12 +30,20 @@ const defaultEmail = user?.emailAddresses?.[0]?.emailAddress ?? '';
         <label>Full name<input name="fullName" required value={defaultName} /></label>
         <label>Work email<input name="email" type="email" required value={defaultEmail} /></label>
         <label>Company / hotel name<input name="companyName" required /></label>
-        <label>Country<select name="country" required>
+        <label>Country<select id="portal-country" name="country" required>
           <option value="">Select a country</option>
           {WORLD_COUNTRIES.map((country) => <option value={country}>{country}</option>)}
         </select></label>
+        <label>City<select id="portal-city" name="city" disabled data-ready-placeholder="Select a city">
+          <option value="">Select a country first</option>
+        </select></label>
+        <label>Number of rooms (approx.)<input name="roomCount" type="number" min="1" step="1" /></label>
+        <label>Annual guests (approx.)<input name="annualGuestsEstimate" type="number" min="1" step="1" /></label>
         <button class="button button-gold" type="submit" style="width:100%">Submit for review <span>→</span></button>
       </form>
     </div>
   </main>
+  <script>
+    import '../../scripts/portal-company-fields';
+  </script>
 </BaseLayout>

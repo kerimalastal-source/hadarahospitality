@@ -17,7 +17,7 @@ const documents = identity.companyId
   ? await db.select().from(portalDocuments).where(eq(portalDocuments.companyId, identity.companyId)).orderBy(desc(portalDocuments.uploadedAt))
   : [];
 ---
-<BaseLayout title="Documents | HADARA Partner Portal" description="Upload and manage documents shared with HADARA Hospitality." path="/portal/documents" noindex>
+<BaseLayout title="Documents | HADARA Partner Portal" description="Upload and manage documents shared with HADARA Hospitality." path="/portal/documents" noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="documents">
     <div class="portal-page-head"><h1>Documents</h1></div>
 

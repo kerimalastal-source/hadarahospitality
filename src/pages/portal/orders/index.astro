@@ -18,7 +18,7 @@ const companyOrders = identity.companyId
   ? await db.select().from(orders).where(eq(orders.companyId, identity.companyId)).orderBy(desc(orders.updatedAt))
   : [];
 ---
-<BaseLayout title="Orders | HADARA Partner Portal" description="Track your HADARA Hospitality orders." path="/portal/orders" noindex>
+<BaseLayout title="Orders | HADARA Partner Portal" description="Track your HADARA Hospitality orders." path="/portal/orders" noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="orders">
     <div class="portal-page-head"><h1>Orders</h1></div>
     {companyOrders.length === 0 ? (

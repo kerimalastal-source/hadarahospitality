@@ -15,7 +15,7 @@ const identity = result;
 
 const allCompanies = await db.select().from(companies).orderBy(asc(companies.name));
 ---
-<BaseLayout title="New order | HADARA Partner Portal" description="Create a new partner portal order." path="/portal/admin/orders/new" noindex>
+<BaseLayout title="New order | HADARA Partner Portal" description="Create a new partner portal order." path="/portal/admin/orders/new" noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="admin-orders">
     <div class="portal-page-head"><h1>New order</h1></div>
     <div class="portal-card">

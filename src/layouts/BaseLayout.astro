@@ -19,6 +19,8 @@ interface Props {
   noindex?: boolean;
   active?: NavKey;
   showWhatsApp?: boolean;
+  /** See Header.astro's own prop doc — only passed by /portal/* pages. */
+  portalUserName?: string;
 }
 
 const {
@@ -31,6 +33,7 @@ const {
   noindex = false,
   active,
   showWhatsApp = true,
+  portalUserName,
 } = Astro.props;
 
 const t = getDictionary(locale);
@@ -75,7 +78,7 @@ const absoluteOgImage = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogI
 </head>
 <body>
   <div class="announcement"><span class="announcement-location"><TurkeyFlagIcon />{t.common.announcement.location}</span> <span>✦</span> {t.common.announcement.tagline}</div>
-  <Header active={active} locale={locale} t={t} path={path} />
+  <Header active={active} locale={locale} t={t} path={path} portalUserName={portalUserName} />
   <slot />
   <Footer locale={locale} t={t} />
   {showWhatsApp && <WhatsAppFloat t={t} />}

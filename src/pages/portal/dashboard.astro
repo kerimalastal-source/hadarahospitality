@@ -23,7 +23,7 @@ const latestQuotes = latestOrderIds.length
   ? await db.select().from(quotes).where(inArray(quotes.orderId, latestOrderIds)).orderBy(desc(quotes.sentAt)).limit(3)
   : [];
 ---
-<BaseLayout title="Dashboard | HADARA Partner Portal" description="Your HADARA Hospitality partner portal dashboard." path="/portal/dashboard" noindex>
+<BaseLayout title="Dashboard | HADARA Partner Portal" description="Your HADARA Hospitality partner portal dashboard." path="/portal/dashboard" noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="dashboard">
     <div class="portal-page-head">
       <h1>Welcome back, {identity.fullName.split(' ')[0]}</h1>

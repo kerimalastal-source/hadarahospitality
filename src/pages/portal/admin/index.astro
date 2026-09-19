@@ -27,7 +27,7 @@ const [[{ pendingCount }], [{ activeOrderCount }], [{ companyCount }], recentOrd
     .limit(6),
 ]);
 ---
-<BaseLayout title="Staff overview | HADARA Partner Portal" description="Partner portal staff overview." path="/portal/admin" noindex>
+<BaseLayout title="Staff overview | HADARA Partner Portal" description="Partner portal staff overview." path="/portal/admin" noindex portalUserName={identity.fullName}>
   <PortalShell identity={identity} active="admin-overview">
     <div class="portal-page-head"><h1>Staff overview</h1></div>
 
