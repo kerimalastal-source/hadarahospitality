@@ -112,6 +112,7 @@ export interface Dictionary {
     leadTime: string;
     moqNote: string;
     requestQuoteFor: string;
+    requestSample: string;
     specifications: string;
     technicalDetails1: string;
     technicalDetails2: string;
@@ -229,6 +230,14 @@ export interface Dictionary {
     description: string;
     hero: { label: string; eyebrow: string; heading1: string; heading2: string; body: string; cta: string };
     contents: { eyebrow: string; heading1: string; heading2: string; body: string; comingSoon: string };
+    benefits: { eyebrow: string; heading1: string; heading2: string; body: string; cta: string; items: { title: string; body: string }[] };
+    process: { eyebrow: string; heading1: string; heading2: string; body: string; steps: { title: string; body: string }[] };
+    cta: { eyebrow: string; heading1: string; heading2: string; button: string };
+  };
+  requestSample: {
+    title: string;
+    description: string;
+    hero: { label: string; eyebrow: string; heading1: string; heading2: string; body: string; cta: string };
     benefits: { eyebrow: string; heading1: string; heading2: string; body: string; cta: string; items: { title: string; body: string }[] };
     process: { eyebrow: string; heading1: string; heading2: string; body: string; steps: { title: string; body: string }[] };
     cta: { eyebrow: string; heading1: string; heading2: string; button: string };

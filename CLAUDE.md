@@ -945,9 +945,8 @@ list above since they're smaller/structural rather than new content
 categories: a dedicated downloadable-documents hub (certifications, spec
 sheets, company profile PDF, all in one place — useful for a buyer's own
 internal vendor-approval filing) once there's real certification content
-to put in it, and making the RFQ form's existing "sample required" field
-a more prominent, standalone "Request a sample" path rather than one
-checkbox buried in the form.
+to put in it. (The standalone "Request a Sample" path also raised here is
+now resolved — see its own section below.)
 
 - **"شركاء النجاح" (Partners of Success) homepage section** — 10 hotel-chain
   logos. Explicitly deferred by the owner ("خلص سيبك منه بنعمله بعدين").
@@ -1440,6 +1439,57 @@ OEKO-TEX, BSCI/Sedex) remain a separate, still-unconfirmed pending item
   name of a recycled packaging material) — update `about.sustainability`
   directly, same "don't fabricate, only what's actually confirmed"
   discipline applies to any addition here as it did to this one.
+
+## Request a Sample (`/request-a-sample`) (2026-09-19)
+
+The RFQ form's existing "Sample Required" radio (buried as one field in
+section 3 of a 4-section form) now also has its own dedicated, prominent
+path — a full landing page explaining the sample-first process (why one,
+how it works), plus "Request a Sample" entry points from the places a
+visitor would actually want one. Deliberately reuses the existing RFQ
+form/backend entirely rather than building a second submission path —
+same validation, same email notifications, same portal-order linking —
+only the *entry point* into that one form changed.
+
+- **New static page, all 4 locales** (`src/views/RequestSampleView.astro`
+  + `src/pages/request-a-sample.astro` / `src/pages/[locale]/request-a-
+  sample.astro`), built from the same `pdp-hero` + `.approach`/`.benefits`
+  + `.process`/`.steps-4` + `.products-cta` components every other
+  landing page here already uses (`HotelOpeningPackageView.astro` was the
+  direct template) — no new CSS needed at all. Registered in both
+  `scripts/build-sitemap.ts` and `scripts/build-search-index.ts`'s
+  hardcoded static-page lists, same by-hand step every new static
+  marketing page needs (see Hotel Opening Package's own section above).
+- **The hand-off mechanism**: every entry point links to
+  `/get-a-quote?sampleRequired=Yes&projectType=Sample%20%2F%20Product%20
+  Evaluation` (`'Sample / Product Evaluation'` is an existing
+  `getAQuote.form.projectTypeOptions` value, already there before this
+  feature). `src/scripts/rfq-form.ts` gained a small standalone
+  `applySampleRequiredFromUrl()`, the same pattern as the existing
+  `applyProjectTypeFromUrl()`/`applyProductFromUrl()` — it just checks
+  the matching `sampleRequired` radio. All three URL-param hand-offs
+  compose cleanly together: arriving from a product page's new sample
+  button pre-fills the product *and* checks "Sample Required: Yes" *and*
+  sets "Project Type: Sample / Product Evaluation" simultaneously,
+  verified via Playwright.
+- **Entry points**: a new secondary "Request a Sample" button
+  (`.button-dark`, sits between the existing gold "Request a quote" and
+  "Download Technical Sheet" buttons — `.pdp-actions` already
+  `flex-wrap`s, so a third button needed no CSS changes) on every product
+  page, carrying that exact product's own `quoteParams` (name, slug,
+  category, material, GSM) alongside the sample params — the most
+  natural place someone deciding on a specific item would want to try it
+  first. Also linked from the footer's Explore column (same `t.
+  requestSample.hero.label` convention `Footer.astro` already uses for
+  Hotel Opening Package / Fabric Quality Guide, no new footer dictionary
+  key needed) and the page's own hero/benefits/final CTAs.
+- Translated into ar/fr/ru at the same time it was added (no
+  English-first gap). Verified: all 4 locale pages build and render with
+  no console errors and no horizontal overflow at 390px including `/ar`
+  (RTL); the product-page button's link, the standalone page's own CTA,
+  and the footer link were all clicked through end-to-end in Playwright
+  to confirm the RFQ form actually arrives with the right radio/dropdown
+  pre-set in every case.
 
 ## Sandbox quirks
 

@@ -45,6 +45,10 @@ const { base: heroBase, suffix: heroSuffix } = splitName(name);
 const quoteParams = new URLSearchParams({ product: product.name, category: category.formCategory, slug: product.slug, material: product.material });
 if (product.specLabel === 'GSM' && product.specValues.length) quoteParams.set('gsm', product.specValues.join(' / '));
 const quoteLink = `${p('/get-a-quote')}?${quoteParams.toString()}`;
+const sampleParams = new URLSearchParams(quoteParams);
+sampleParams.set('sampleRequired', 'Yes');
+sampleParams.set('projectType', 'Sample / Product Evaluation');
+const sampleLink = `${p('/get-a-quote')}?${sampleParams.toString()}`;
 
 const description = `${overview} ${material}. Suitable for ${suitableFor}. Request hospitality supply specifications and a tailored quote from HADARA Hospitality.`;
 const metaDescription = description.length > 158 ? `${description.slice(0, 158).replace(/\s+\S*$/, '')}…` : description;
@@ -112,6 +116,7 @@ const relatedLocalized = related.map((pr) => ({
         <p class="pdp-tagline">{overview}</p>
         <div class="pdp-actions">
           <a class="button button-gold" href={quoteLink}>{pd.requestQuoteFor} <span>↗</span></a>
+          <a class="button button-dark" href={sampleLink}>{pd.requestSample} <span>↗</span></a>
           <a class="button button-gold technical-sheet-download" href={`/technical-sheets/${product.slug}.pdf`} download={`${product.slug}-technical-sheet.pdf`}>{pd.downloadSheet}</a>
         </div>
       </div>

@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getDictionary, localizePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const s = t.requestSample;
+const p = (path: string) => localizePath(locale, path);
+
+const quoteLink = `${p('/get-a-quote')}?${new URLSearchParams({ sampleRequired: 'Yes', projectType: 'Sample / Product Evaluation' }).toString()}`;
+---
+<BaseLayout title={s.title} description={s.description} path="/request-a-sample" locale={locale}>
+  <main>
+    <section class="pdp-hero">
+      <div class="wrap">
+        <p class="breadcrumb"><a href={p('/')}>{t.common.home}</a><span>/</span>{s.hero.label}</p>
+        <p class="eyebrow light">{s.hero.eyebrow}</p>
+        <h1>{s.hero.heading1} <em>{s.hero.heading2}</em></h1>
+        <p class="pdp-tagline">{s.hero.body}</p>
+        <a class="button button-gold" href={quoteLink}>{s.hero.cta} <span>→</span></a>
+      </div>
+    </section>
+
+    <section class="approach wrap">
+      <div class="approach-heading">
+        <p class="eyebrow">{s.benefits.eyebrow}</p>
+        <h2>{s.benefits.heading1}<br /><em>{s.benefits.heading2}</em></h2>
+        <p>{s.benefits.body}</p>
+        <a class="button button-dark" href={quoteLink}>{s.benefits.cta} <span>↗</span></a>
+      </div>
+      <div class="benefits">
+        {s.benefits.items.map((item, i) => (
+          <article><span>{String(i + 1).padStart(2, '0')}</span><div><h3>{item.title}</h3><p>{item.body}</p></div></article>
+        ))}
+      </div>
+    </section>
+
+    <section class="process">
+      <div class="wrap">
+        <p class="eyebrow light">{s.process.eyebrow}</p>
+        <div class="process-heading">
+          <h2>{s.process.heading1}<br /><em>{s.process.heading2}</em></h2>
+          <p>{s.process.body}</p>
+        </div>
+        <div class="steps steps-4">
+          {s.process.steps.map((step, i) => (
+            <article><span>{String(i + 1).padStart(2, '0')}</span><h3>{step.title}</h3><p>{step.body}</p></article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="products-cta">
+      <div class="wrap">
+        <div>
+          <p class="eyebrow light">{s.cta.eyebrow}</p>
+          <h2>{s.cta.heading1}<br /><em>{s.cta.heading2}</em></h2>
+        </div>
+        <a class="button button-gold" href={quoteLink}>{s.cta.button} <span>↗</span></a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

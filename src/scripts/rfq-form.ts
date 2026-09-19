@@ -150,6 +150,17 @@ if (form) {
   }
   applyProjectTypeFromUrl();
 
+  // Lets /request-a-sample (and any product page's "Request a sample"
+  // button) pre-select the "Sample Required" radio, independent of the
+  // other hand-offs above.
+  function applySampleRequiredFromUrl() {
+    const value = new URLSearchParams(window.location.search).get('sampleRequired');
+    if (!value) return;
+    const radio = form?.querySelector<HTMLInputElement>(`input[name="sampleRequired"][value="${CSS.escape(value)}"]`);
+    if (radio) radio.checked = true;
+  }
+  applySampleRequiredFromUrl();
+
   removeProductButton?.addEventListener('click', () => {
     if (selectedProductBanner) selectedProductBanner.hidden = true;
     if (productMetaField) productMetaField.value = '';
