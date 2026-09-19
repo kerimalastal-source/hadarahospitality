@@ -226,6 +226,21 @@ than breaking anything, so translation work can always ship incrementally.
   for the exact script if regenerating) now use it too, replacing what
   had been an unrelated generic serif "H" placeholder never derived from
   either mark.
+- **Favicon logo was nearly invisible at real tab size, fixed 2026-09-19**:
+  the first compositing pass (above) scaled the gold mark down way more
+  than necessary before placing it on the navy square, leaving so much
+  navy padding around it that at the sizes browsers actually render
+  (16×16/32×32 tab icons) it was an illegible smudge — only obvious once
+  actually viewed at those pixel dimensions rather than the source PNG's
+  full size. Owner flagged it as "doesn't look nice" in the tab. Fixed by
+  auto-cropping `hadara-logo-gold.png` to its real (alpha-channel) bounding
+  box first, then scaling *that* to fill ~82% of each target canvas before
+  centering on navy (`#1e2a38`) — regenerated `favicon-16/32/48/192/512.png`
+  and `apple-touch-icon.png` this way (all still under `public/assets/`).
+  **Lesson**: always verify a favicon by viewing it (or a nearest-neighbor
+  upscale of it) at its actual 16px/32px output size, not just the source
+  artwork at full resolution — padding that looks fine large enough
+  disappears the logo entirely once shrunk to a real tab icon.
 
 ## Git workflow for this repo
 
