@@ -1596,6 +1596,37 @@ eyeball-guess a fix — measure both elements' actual rendered ink
 extents (a pixel scan of a zoomed screenshot is a reliable, cheap way
 to do this) and compute the real correction needed.
 
+**That fix was wrong for real Safari — corrected the same day, with a
+harder lesson about *where* you measure.** The `-1px` value above was
+derived entirely from a Chromium/Playwright screenshot and looked
+correctly aligned there, but the owner sent a screenshot from their own
+iPhone (Safari) showing the icons still sitting well above the numbers —
+essentially unchanged from before the first fix. Re-ran the identical
+pixel-scan technique, but this time against the owner's actual Safari
+screenshot instead of a sandbox-rendered one, and found the icon sitting
+**4–5.5px too high** — a much larger gap than Chromium ever showed, and
+not a caching/deployment issue (confirmed the live deployed CSS already
+had the `-1px` value the owner was seeing). Root cause: WebKit and
+Chromium render Playfair Display's numeral glyphs with different
+line-box/baseline metrics, so a value tuned against one engine's
+screenshot doesn't transfer to the other. The gap also wasn't uniform
+across steps — 03/04/05 needed ~5.5px versus 01/02's ~4px, consistent
+with Playfair Display's old-style figures (3/4/5 carry a descender
+below the baseline, 0/1/2 don't), which shifts each row's numeral ink
+center by a different amount. Fixed with per-row `margin-top` values
+instead of one blanket number: `.step-icon{margin-top:4px}` (steps
+01/02), overridden to `5.5px` on the existing `:nth-child(3)`/`(4)`/`(5)`
+selectors (already there for the animation-delay stagger). **Lesson,
+sharper than the one above**: a pixel-scan measurement is only as good
+as the renderer that produced the screenshot it's measured against —
+Chromium/Playwright verification of a cross-browser CSS value (anything
+mixing a text glyph with a geometric element, where the correction
+depends on font-rendering metrics) is not sufficient on its own. When a
+fix like this ships and the owner reports it "still looks the same,"
+don't re-verify in the same renderer that already said it was fine —
+get a real screenshot from the actual device/browser the owner is using
+and measure against *that*.
+
 ## Product-category dropdown in the header nav (2026-09-19)
 
 Owner asked for the header's "Products" nav link to show a dropdown of
