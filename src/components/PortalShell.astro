@@ -1,5 +1,5 @@
 ---
-import { UserButton } from '@clerk/astro/components';
+import { UserButton, SignOutButton } from '@clerk/astro/components';
 import type { PortalIdentity } from '../lib/portal-auth';
 
 interface Props {
@@ -48,7 +48,10 @@ const isStaff = identity.role === 'staff';
     )}
     <p class="portal-sidebar-heading">Signed in as</p>
     <p style="font-size:13px;color:#d3d9df;margin:0 0 14px">{identity.fullName}</p>
-    <UserButton />
+    <div class="portal-account-row">
+      <UserButton />
+      <SignOutButton redirectUrl="/portal/sign-in"><span class="portal-sign-out">Sign out</span></SignOutButton>
+    </div>
   </aside>
   <div class="portal-main">
     <slot />
