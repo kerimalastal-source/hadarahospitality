@@ -132,11 +132,11 @@
 @media(max-width:700px){.back-to-top{left:16px;bottom:16px;width:44px;height:44px}}
 @media(prefers-reduced-motion:reduce){.back-to-top svg{animation:none}}
 .step-top{display:flex;align-items:center;gap:10px}
-.step-icon{display:inline-flex;margin-top:-1px;color:var(--gold);animation:step-icon-float 2.6s ease-in-out infinite}
+.step-icon{display:inline-flex;margin-top:4px;color:var(--gold);animation:step-icon-float 2.6s ease-in-out infinite}
 .steps article:nth-child(2) .step-icon{animation-delay:.15s}
-.steps article:nth-child(3) .step-icon{animation-delay:.3s}
-.steps article:nth-child(4) .step-icon{animation-delay:.45s}
-.steps article:nth-child(5) .step-icon{animation-delay:.6s}
+.steps article:nth-child(3) .step-icon{margin-top:5.5px;animation-delay:.3s}
+.steps article:nth-child(4) .step-icon{margin-top:5.5px;animation-delay:.45s}
+.steps article:nth-child(5) .step-icon{margin-top:5.5px;animation-delay:.6s}
 @keyframes step-icon-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @media(prefers-reduced-motion:reduce){.step-icon{animation:none}}
 .selection-bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--navy);box-shadow:0 -6px 24px rgba(0,0,0,.15)}
