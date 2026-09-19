@@ -910,6 +910,16 @@ gets touched, rather than living with it indefinitely.
 
 ## Pending / deferred (owner-blocked, don't guess)
 
+**Priority order agreed with the owner 2026-09-19** (they're gathering the
+material and will come back item by item — pick up whichever one they
+bring first, out of order is fine): (1) real product photography / fixing
+the Wix single-point-of-failure risk — the biggest visible trust gap for
+an international buyer; (2) any real quality certifications the
+manufacturing partners hold (ISO, OEKO-TEX, etc.) — cheap to add once
+confirmed, high trust impact; (3) real MOQ/lead-time figures per category;
+(4) "شركاء النجاح" partner logos; (5) testimonials; (6) Google Analytics —
+lowest priority, doesn't affect visitor experience.
+
 - **"شركاء النجاح" (Partners of Success) homepage section** — 10 hotel-chain
   logos. Explicitly deferred by the owner ("خلص سيبك منه بنعمله بعدين").
   Blocked on: (a) the exact names of the specific hotel properties they
