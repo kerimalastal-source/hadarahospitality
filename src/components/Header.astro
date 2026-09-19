@@ -2,6 +2,7 @@
 import SearchIcon from './icons/SearchIcon.astro';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { localizePath, type Locale, type Dictionary } from '../i18n';
+import { CATEGORY_ORDER } from '../data/products';
 
 export type NavKey = 'home' | 'products' | 'about' | 'blog' | 'contact';
 
@@ -30,7 +31,17 @@ const home = (p: string) => localizePath(locale, p);
   <nav id="navigation" aria-label="Main navigation">
     <div class="nav-links">
       <a href={home('/')} aria-current={active === 'home' ? 'page' : undefined}>{t.common.home}</a>
-      <a href={home('/products')} aria-current={active === 'products' ? 'page' : undefined}>{nav.products}</a>
+      <div class="nav-products-item">
+        <a href={home('/products')} aria-current={active === 'products' ? 'page' : undefined}>
+          {nav.products}
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+        </a>
+        <div class="nav-products-menu">
+          {CATEGORY_ORDER.map((key) => (
+            <a href={`${home('/products')}#${key}`}>{t.common.categoryLabels[key]}</a>
+          ))}
+        </div>
+      </div>
       <a href={`${home('/')}#approach`}>{nav.approach}</a>
       <a href={`${home('/')}#process`}>{nav.process}</a>
       <a href={home('/about')} aria-current={active === 'about' ? 'page' : undefined}>{nav.about}</a>
