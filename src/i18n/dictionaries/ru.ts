@@ -5,6 +5,7 @@ export const ru: DeepPartial<Dictionary> = {
     announcement: { location: 'СТАМБУЛ, ТУРЦИЯ', tagline: 'ПОСТАВКА ГОСТИНИЧНОГО ТЕКСТИЛЯ' },
     nav: {
       products: 'Продукция',
+      aboutMenu: 'О нас',
       approach: 'Наш подход',
       process: 'Как это работает',
       about: 'О нас',
