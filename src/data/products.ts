@@ -581,3 +581,12 @@ export function getRelatedProducts(product: Product, count = 3): Product[] {
   }
   return related.slice(0, count);
 }
+
+/** Top products to preview for a category in the header's Products
+ * mega-menu, photographed-first so the flyout doesn't lead with a
+ * placeholder-gallery entry, then falling back to catalog order. */
+export function getCategoryPreviewProducts(key: CategoryKey, count = 6): Product[] {
+  return PRODUCTS.filter((p) => p.category === key)
+    .sort((a, b) => (b.main ? 1 : 0) - (a.main ? 1 : 0))
+    .slice(0, count);
+}

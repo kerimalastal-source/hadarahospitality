@@ -2,7 +2,8 @@
 import SearchIcon from './icons/SearchIcon.astro';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { localizePath, type Locale, type Dictionary } from '../i18n';
-import { CATEGORY_ORDER } from '../data/products';
+import { CATEGORY_ORDER, getCategoryPreviewProducts } from '../data/products';
+import { getProductTranslation } from '../data/products.i18n';
 
 export type NavKey = 'home' | 'products' | 'about' | 'blog' | 'contact';
 
@@ -38,7 +39,18 @@ const home = (p: string) => localizePath(locale, p);
         </a>
         <div class="nav-products-menu">
           {CATEGORY_ORDER.map((key) => (
-            <a href={`${home('/products')}#${key}`}>{t.common.categoryLabels[key]}</a>
+            <div class="nav-products-cat-item">
+              <a href={`${home('/products')}#${key}`} class="nav-products-cat">
+                {t.common.categoryLabels[key]}
+                <svg class="nav-products-cat-caret" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+              </a>
+              <div class="nav-products-panel">
+                {getCategoryPreviewProducts(key).map((product) => (
+                  <a href={home(`/products/${product.slug}`)}>{getProductTranslation(locale, product.slug)?.name ?? product.name}</a>
+                ))}
+                <a class="nav-products-viewall" href={`${home('/products')}#${key}`}>{nav.viewAllProducts} <span>↗</span></a>
+              </div>
+            </div>
           ))}
         </div>
       </div>

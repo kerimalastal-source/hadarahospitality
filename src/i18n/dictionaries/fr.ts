@@ -14,6 +14,7 @@ export const fr: DeepPartial<Dictionary> = {
       requestQuote: 'Demander un devis',
       openMenu: 'Ouvrir le menu',
       closeMenu: 'Fermer le menu',
+      viewAllProducts: 'Voir tous les produits',
     },
     footer: {
       tagline: "Solutions d'approvisionnement hôtelier depuis la Turquie.",

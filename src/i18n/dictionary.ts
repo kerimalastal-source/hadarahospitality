@@ -22,6 +22,7 @@ export interface Dictionary {
       requestQuote: string;
       openMenu: string;
       closeMenu: string;
+      viewAllProducts: string;
     };
     footer: {
       tagline: string;
