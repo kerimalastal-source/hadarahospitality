@@ -410,11 +410,11 @@ export const en: Dictionary = {
     sections: [
       {
         heading: 'The short version',
-        body: "This website does not run a server-side database and does not use cookies or analytics scripts. Every form on this site — the quote request and the contact form — simply prepares an email and opens it in your own email application when you press submit. Nothing you type is transmitted to, or stored on, any server we operate.",
+        body: "The Request a Quote form is processed on our own server, so we can save your submission, generate a reference number, and notify our team and you by email — see \"What information is involved\" below. The Contact form still works the simple way: it just prepares an email and opens it in your own email application when you press submit, and nothing you type there touches our server. We don't use advertising or analytics cookies, but we do collect anonymous, non-identifying visit activity (see \"Cookies and tracking\" below), and we run a members-only Partner Portal with its own account system for approved trade customers.",
       },
       {
         heading: 'What information is involved',
-        body: 'When you submit the quote or contact form, the details you enter (name, email, company, country, and your message) are used only to compose an email addressed to partnerships@hadarahospitality.com. That email is sent from your own device through your own email provider, the same as if you had written it yourself. We only see the information you choose to send us that way, or when you contact us directly by phone, WhatsApp or email.',
+        body: "When you submit the Request a Quote form, the details you enter (your contact information, property details and product requirements, plus an optional attached file) are saved on our server long enough to process your request, and used to email an internal notification to our team and a confirmation to you. The Contact form works differently: it opens your own email application with your message pre-filled and is sent from your own device through your own email provider — we only see it once you send that email yourself. If you create a Partner Portal account, we store your name, work email, company details and order history so you can track your orders; that account is protected by our authentication provider (Clerk) and is only accessible to you and our team.",
       },
       {
         heading: 'How we use it',
@@ -422,7 +422,7 @@ export const en: Dictionary = {
       },
       {
         heading: 'Cookies and tracking',
-        body: 'This website does not currently use cookies, analytics, or third-party tracking scripts. If that changes in the future, this page will be updated to reflect it.',
+        body: "We don't use advertising cookies or third-party analytics scripts (for example, Google Analytics). We do collect anonymous visit activity — which pages a visit includes, in what order, and a rough country/city derived from your connection — to understand how the site is used and let our team see real-time site activity. This is tied only to a random code generated in your own browser and kept in temporary session storage, which clears itself when you close your browser tab rather than persisting like a cookie; we never store your IP address itself, and none of this can be linked back to you unless you separately submit a form or sign in to the Partner Portal. If that changes further, this page will be updated to reflect it.",
       },
       {
         heading: 'Third-party links and embeds',
@@ -430,7 +430,7 @@ export const en: Dictionary = {
       },
       {
         heading: 'Your choices',
-        body: "Since we don't store form submissions ourselves, there's no account or stored profile to access, correct, or delete. If you've previously emailed us and would like that correspondence handled a particular way, just let us know at partnerships@hadarahospitality.com.",
+        body: "For anonymous visit activity, there's no account or profile involved to access, correct or delete, since it was never linked to you in the first place. If you have a Partner Portal account, you can review and update your company details from your profile page at any time, or ask us to close your account. For anything you've sent us by form or email, just let us know at partnerships@hadarahospitality.com and we'll handle it the way you'd like.",
       },
       {
         heading: 'Contact',
