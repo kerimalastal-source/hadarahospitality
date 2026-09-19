@@ -1700,6 +1700,47 @@ decided sensibly.
   overflow at 1280px or 390px on any locale including `/ar` (RTL);
   spot-checked the live built HTML on the production domain after merge.
 
+## Products mega-menu flyout wouldn't close on mobile (2026-09-19)
+
+Owner reported (with screenshots) that tapping an open category in the
+Products mega menu on mobile to close it left the product flyout
+visibly open — only the caret rotated back to its closed position; the
+panel and the category row's highlight stayed exactly as they were.
+
+**Root cause**: the desktop hover/`:focus-within` rules that reveal a
+category's flyout panel (`.nav-products-cat-item:hover/:focus-within
+.nav-products-panel{display:flex}`, and the matching background-
+highlight rule) were never scoped to desktop — they applied at every
+viewport width. On mobile, a tapped link keeps CSS `:focus` (and so
+`:focus-within` on its ancestor) until something else is tapped, so
+even after `site.ts` correctly removed the mobile-only `.open` class on
+the second tap, this unscoped rule kept forcing the panel open anyway —
+the caret (driven purely by `.open`) was the only part of the UI that
+correctly reflected the toggle state.
+
+**Fix**: wrapped both rules in `@media(min-width:901px)`, matching the
+site's existing desktop breakpoint (see the Products dropdown's own
+section above) — the mobile accordion is already fully controlled by
+`.open`/`site.ts` and never needed a hover/focus-within fallback.
+
+**Verification method worth noting**: reproduced the exact bug first —
+Playwright with a real touch-capable mobile context
+(`hasTouch:true, isMobile:true`, `page.tap()`) against the pre-fix
+build confirmed the second tap correctly cleared the `.open` class
+(`open:false`) but left `panelDisplay:flex` — matching the owner's
+screenshots exactly — before touching any CSS. Re-ran the identical
+script against the fix and confirmed `panelDisplay:none` after the
+second tap, across all 4 locales, with desktop hover unaffected and no
+horizontal overflow at 390px. **Lesson**: a `:hover`/`:focus-within`
+rule that's supposed to be a desktop-only enhancement needs an explicit
+`@media(min-width:...)` (or `@media(hover:hover)`) guard — CSS applies
+`:focus-within` on tap-and-hold-focus mobile browsers too, and it will
+silently override a same-specificity, later-declared `.open`-gated
+rule the moment the two disagree, which a desktop-only click-through
+test would never catch. `page.click()` in Playwright doesn't reproduce
+this (no real touch, focus behaves differently) — this class of bug
+needs an actual touch-emulated tap to catch.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
