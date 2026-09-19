@@ -923,12 +923,19 @@ materials, water usage in production, responsible cotton sourcing) —
 added 2026-09-19 after discussing what a luxury-chain procurement director
 actually screens for; increasingly a real purchasing requirement for
 large chains, not just a nice-to-have; (4) real MOQ/lead-time figures per
-category; (5) "شركاء النجاح" partner logos (or, if specific named
-properties/logos stay blocked, a lighter-weight alternative the owner
-could greenlight sooner — a general, non-named scale statement like "we
-supply 4–5 star hotels across N countries," which needs no third-party
-logo permission at all); (6) testimonials; (7) Google Analytics — lowest
-priority, doesn't affect visitor experience.
+category; (5) multi-property scalability proof — added 2026-09-19, the
+owner explicitly called this out as its own point separate from #4: a
+chain-level buyer isn't just asking "can you fill one order," they're
+asking "can you supply the same quality, on schedule, across 5 properties
+in 3 countries next year." Needs real content from the owner (production
+capacity figures, how many concurrent properties/countries they've
+actually fulfilled for, multi-country logistics/export experience) — see
+"Multi-property scalability" below; (6) "شركاء النجاح" partner logos (or,
+if specific named properties/logos stay blocked, a lighter-weight
+alternative the owner could greenlight sooner — a general, non-named
+scale statement like "we supply 4–5 star hotels across N countries,"
+which needs no third-party logo permission at all); (7) testimonials;
+(8) Google Analytics — lowest priority, doesn't affect visitor experience.
 
 Also raised in that same discussion, not yet prioritized into the numbered
 list above since they're smaller/structural rather than new content
@@ -982,6 +989,19 @@ checkbox buried in the form.
 - **Real MOQ / lead-time figures per category** — see "MOQ & lead time on
   product pages" above; every product page currently shows placeholder
   numbers the owner hasn't confirmed yet.
+- **Multi-property scalability** — added 2026-09-19, called out by the
+  owner as its own pending item, distinct from the MOQ/lead-time figures
+  above: proof that HADARA can supply consistent quality, on schedule,
+  across *multiple* properties and countries for a chain-level buyer doing
+  an ongoing rollout — not just a one-off single-property order. No real
+  content exists yet; do not fabricate specific numbers or claims. Needs
+  from the owner: actual production capacity (e.g. units/month across
+  categories), how many concurrent properties/countries they've genuinely
+  fulfilled for, and any real multi-country export/logistics experience
+  worth naming. Once confirmed, likely lands as its own trust-building
+  section or expands `/hotel-opening-package` — see that page's own
+  section above, which already pitches a single-property opening bundle
+  but doesn't yet address a multi-property rollout.
 
 ## Full-site audit (2026-09-19)
 
