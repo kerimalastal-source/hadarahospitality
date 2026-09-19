@@ -1574,6 +1574,28 @@ precedent, and a `prefers-reduced-motion` guard.
   the live built HTML on the production domain after merge and confirmed
   the 5 SVGs render with the right paths in the right order.
 
+**Icon vertical alignment fixed the same day**: owner flagged that each
+icon sat visibly higher than its number instead of level with it.
+`align-items:center` on `.step-top` was centering the icon against the
+number span's full line-box height, but a serif numeral's visible ink
+sits lower within that line box than a plain SVG icon does — box-
+centering isn't optical alignment. Rather than guess a value, measured
+the actual pixel ink centers of the numeral vs. the icon via a zoomed
+screenshot + pixel scan (Python/PIL, scanning for gold pixels per row
+to find each glyph's real vertical extent) across a couple of
+iterations, landing on `.step-icon{margin-top:-1px}`. The float
+animation is untouched — margin-top sets the icon's rest position, the
+animation's own `translateY()` keyframes still layer on top of it
+exactly as before. **Lesson**: `align-items:center` in a flex row only
+guarantees the *boxes* line up, not the *visible ink* inside them —
+mixing a text glyph (whose ink position within its line box depends on
+font ascent/descent metrics) with a geometric SVG icon (whose ink
+roughly fills its box) will look "close but off" even though the CSS
+is centering correctly by its own definition. When this happens, don't
+eyeball-guess a fix — measure both elements' actual rendered ink
+extents (a pixel scan of a zoomed screenshot is a reliable, cheap way
+to do this) and compute the real correction needed.
+
 ## Product-category dropdown in the header nav (2026-09-19)
 
 Owner asked for the header's "Products" nav link to show a dropdown of
