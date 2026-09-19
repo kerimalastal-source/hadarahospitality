@@ -208,10 +208,15 @@ body.has-selection-bar .products-cta{padding-bottom:90px}
 .nav-products-cat-item{position:relative}
 .nav-products-cat{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 20px;font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap}
 .nav-products-cat-caret{flex:none;transition:transform .2s}
-.nav-products-cat:hover,.nav-products-cat-item:focus-within>.nav-products-cat{background:var(--cream);color:#987342}
 .nav-products-panel{display:none;flex-direction:column;position:absolute;left:100%;top:0;min-width:260px;background:#fff;border:1px solid #e3dfd6;box-shadow:0 15px 30px #0002;padding:8px 0;margin-left:1px}
 [dir="rtl"] .nav-products-panel{left:auto;right:100%;margin-left:0;margin-right:1px}
-.nav-products-cat-item:hover .nav-products-panel,.nav-products-cat-item:focus-within .nav-products-panel{display:flex}
+@media(min-width:901px){
+  /* Hover/focus-within must stay desktop-only: on mobile a tapped link keeps
+     :focus (and so :focus-within) until something else is tapped, which would
+     otherwise override the .open toggle below and make the flyout un-closeable. */
+  .nav-products-cat:hover,.nav-products-cat-item:focus-within>.nav-products-cat{background:var(--cream);color:#987342}
+  .nav-products-cat-item:hover .nav-products-panel,.nav-products-cat-item:focus-within .nav-products-panel{display:flex}
+}
 .nav-products-panel a{display:block;padding:9px 20px;font-size:12px;font-weight:500;color:var(--ink);white-space:nowrap}
 .nav-products-panel a:hover{background:var(--cream);color:#987342}
 .nav-products-panel a.nav-products-viewall{border-top:1px solid #eee6da;margin-top:6px;padding-top:12px;font-weight:700;color:#987342}
