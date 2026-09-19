@@ -914,11 +914,30 @@ gets touched, rather than living with it indefinitely.
 material and will come back item by item — pick up whichever one they
 bring first, out of order is fine): (1) real product photography / fixing
 the Wix single-point-of-failure risk — the biggest visible trust gap for
-an international buyer; (2) any real quality certifications the
-manufacturing partners hold (ISO, OEKO-TEX, etc.) — cheap to add once
-confirmed, high trust impact; (3) real MOQ/lead-time figures per category;
-(4) "شركاء النجاح" partner logos; (5) testimonials; (6) Google Analytics —
-lowest priority, doesn't affect visitor experience.
+an international buyer; (2) real quality certifications the manufacturing
+partners hold (ISO, OEKO-TEX, BSCI/Sedex ethical-audit, etc.) — cheap to
+add once confirmed, high trust impact, and for some large hotel-chain
+procurement/vendor-compliance departments effectively a gate before
+they'll even open a negotiation; (3) sustainability credentials (recycled
+materials, water usage in production, responsible cotton sourcing) —
+added 2026-09-19 after discussing what a luxury-chain procurement director
+actually screens for; increasingly a real purchasing requirement for
+large chains, not just a nice-to-have; (4) real MOQ/lead-time figures per
+category; (5) "شركاء النجاح" partner logos (or, if specific named
+properties/logos stay blocked, a lighter-weight alternative the owner
+could greenlight sooner — a general, non-named scale statement like "we
+supply 4–5 star hotels across N countries," which needs no third-party
+logo permission at all); (6) testimonials; (7) Google Analytics — lowest
+priority, doesn't affect visitor experience.
+
+Also raised in that same discussion, not yet prioritized into the numbered
+list above since they're smaller/structural rather than new content
+categories: a dedicated downloadable-documents hub (certifications, spec
+sheets, company profile PDF, all in one place — useful for a buyer's own
+internal vendor-approval filing) once there's real certification content
+to put in it, and making the RFQ form's existing "sample required" field
+a more prominent, standalone "Request a sample" path rather than one
+checkbox buried in the form.
 
 - **"شركاء النجاح" (Partners of Success) homepage section** — 10 hotel-chain
   logos. Explicitly deferred by the owner ("خلص سيبك منه بنعمله بعدين").
@@ -926,8 +945,20 @@ lowest priority, doesn't affect visitor experience.
   have real documented relationships with, (b) the actual approved logo
   files. Do not fabricate trademarked logos or invent partnership claims.
 - **Google Analytics** — deferred ("خليها مرحلة اخرى"), no GA4 ID yet.
-- **Certifications / testimonials sections** — owner confirmed no real
-  content exists yet; do not fabricate.
+- **Certifications** (ISO, OEKO-TEX, BSCI/Sedex ethical-audit, or whatever
+  the manufacturing partners actually hold) — owner confirmed no real
+  content exists yet; do not fabricate. Once confirmed, surface these
+  prominently (product pages and/or a dedicated section) — this is the
+  single highest-trust-impact item on the whole pending list per the
+  2026-09-19 "procurement director" discussion below.
+- **Sustainability credentials** (recycled/organic materials, water usage
+  in production, responsible cotton sourcing, etc.) — added 2026-09-19,
+  same status as Certifications: no real content confirmed yet, don't
+  fabricate. Increasingly a real purchasing requirement for large luxury
+  hotel chains, not just marketing fluff — see the priority-order note
+  above for the full context of why this was added.
+- **Testimonials section** — owner confirmed no real content exists yet;
+  do not fabricate.
 - **Self-hosting product/blog images off the Wix account** — flagged as a
   real business risk (single point of failure), not yet resolved; this
   sandbox can't fetch `static.wixstatic.com` to re-host the files locally,
