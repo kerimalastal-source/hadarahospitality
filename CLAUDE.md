@@ -1536,6 +1536,44 @@ as first child — the legend ignores both regardless of the legend's own
 for this anywhere else a `<fieldset>`+`<legend>` pair gets spacing via
 padding rather than margin.
 
+## Homepage "Our Process" step icons (2026-09-19)
+
+Owner asked for a small icon next to each of the 5 numbered steps in the
+homepage's "OUR PROCESS" section, with a nice bit of movement. Each step
+(Inquiry/Sampling/Approval/Production/Delivery) now shows a gold line
+icon — message bubble, box, checkmark-in-circle, gear/sun-spoke, truck —
+next to its number, with a gentle continuous floating animation
+(`translateY` bob, staggered slightly per step so they don't all move in
+perfect unison), mirroring the existing `.back-to-top` bounce-animation
+precedent, and a `prefers-reduced-motion` guard.
+
+- Icons are 5 raw SVG strings in a `STEP_ICONS` array in `HomeView.astro`'s
+  frontmatter (indexed by position, matched to `home.process.steps`,
+  which is confirmed the same 5-item order in all 4 locale dictionaries),
+  inlined via `set:html` rather than new `src/components/icons/*.astro`
+  files — same "single-use SVG stays inline" precedent as the upload/
+  success icons in `GetAQuoteView.astro`, since these 5 are each used
+  exactly once and only on this one page.
+- New markup: each `<article>` wraps its number `<span>` and a new
+  `<span class="step-icon">` in a `.step-top` flex row. New CSS:
+  `.step-top`, `.step-icon` (+ `@keyframes step-icon-float`,
+  `:nth-child()` `animation-delay` stagger, reduced-motion override) in
+  `global.css`.
+- **The existing `.steps article span{color:var(--gold);font:24px
+  'Playfair Display',...}` rule is shared by 3 different `.steps`
+  sections site-wide** (homepage's 5-step process, Hotel Opening
+  Package's 4-step `.steps-4`, Request a Sample's 4-step `.steps-4`) —
+  deliberately left untouched, and confirmed via Playwright that both of
+  the other two pages render identically to before (no icon, same
+  number styling) since only `HomeView.astro`'s own markup changed.
+- Verified: `npm run build`/`npm run check` clean; Playwright across all
+  4 locales confirms the icon renders, is gold, and has
+  `animationName: step-icon-float`; no horizontal overflow at 1280px or
+  390px on any locale including `/ar` (RTL, where the icon/number flex
+  row correctly mirrors to the visual start of the row); spot-checked
+  the live built HTML on the production domain after merge and confirmed
+  the 5 SVGs render with the right paths in the right order.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
