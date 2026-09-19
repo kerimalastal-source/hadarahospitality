@@ -533,6 +533,24 @@ member approves it.
   company name/country and `POST /api/portal/complete-onboarding` creates
   the `companies` + `portal_users` (`status: 'pending'`) rows — a signed-in
   user with no `portal_users` row yet always lands here first.
+- **A real OAuth-redirect bug found by the owner's own first sign-up, fixed
+  2026-09-19**: a brand-new Google account created via the **`/portal/sign-in`**
+  page's "Continue with Google" button landed on the plain homepage (`/`)
+  instead of onboarding, forcing the visitor to click "Partner Portal" a
+  second time to actually reach the hotel-name/country form. Root cause:
+  Clerk's `<SignIn/>` component supports "transferable" sign-ins — an OAuth
+  attempt with an unrecognized account silently becomes a sign-**up** under
+  the hood — but that path is governed by its own separate
+  `signUpForceRedirectUrl` prop, entirely distinct from the `forceRedirectUrl`
+  used for an *existing* user's normal sign-in; we'd only set the latter.
+  With `signUpForceRedirectUrl` unset, Clerk falls back to its documented
+  default of `'/'`. Fixed by adding `signUpForceRedirectUrl="/portal/onboarding"`
+  to `<SignIn/>` in `sign-in.astro` (and, symmetrically,
+  `signInForceRedirectUrl="/portal/dashboard"` to `<SignUp/>` in
+  `sign-up.astro`, for the mirror case of an existing account ending up on
+  the sign-up page). **Watch for this same pattern anywhere else `<SignIn/>`
+  or `<SignUp/>` is used**: always set both the plain redirect prop *and*
+  its cross-flow counterpart, never just the one matching the page's name.
 - **Database**: Postgres via Neon (`@neondatabase/serverless` +
   `drizzle-orm/neon-http`, schema in `src/db/schema.ts`, client in
   `src/db/client.ts`). Deliberately **not** `@vercel/postgres` — that
