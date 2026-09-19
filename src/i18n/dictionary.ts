@@ -3,6 +3,11 @@ export interface FaqItem {
   a: string;
 }
 
+export interface FaqSection {
+  heading: string;
+  items: FaqItem[];
+}
+
 export interface Dictionary {
   common: {
     announcement: { location: string; tagline: string };
@@ -215,7 +220,7 @@ export interface Dictionary {
     form: { eyebrow: string; heading1: string; heading2: string; body: string; title: string; name: string; email: string; subject: string; message: string; submit: string; note: string };
     findUs: { eyebrow: string; heading1: string; heading2: string };
   };
-  faq: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; items: FaqItem[]; ctaEyebrow: string; ctaHeading1: string; ctaHeading2: string; contactUs: string };
+  faq: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; sections: FaqSection[]; ctaEyebrow: string; ctaHeading1: string; ctaHeading2: string; contactUs: string };
   privacyPolicy: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; sections: { heading: string; body: string }[]; ctaEyebrow: string; ctaHeading1: string; ctaHeading2: string };
   search: { title: string; description: string; hero: { eyebrow: string; heading1: string; heading2: string; body: string }; placeholder: string; searchButton: string };
   hotelOpening: {

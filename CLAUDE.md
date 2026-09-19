@@ -1318,6 +1318,42 @@ change how the page appears in Google search results — but the markup
 itself is still correct, free to add, and other engines/consumers of
 structured data can still use it, so there's no downside to having it.
 
+**Expanded and organized into 3 sections, same day**: owner asked for
+new questions and for the flat 9-question list to be grouped. `faq.items:
+FaqItem[]` became `faq.sections: FaqSection[]` (`FaqSection = {heading,
+items}`, both in `src/i18n/dictionary.ts`) — `FaqView.astro` now maps
+over sections (rendering a `.faq-section-heading` divider before each
+group) and flattens all sections' items back into one list for the
+`FAQPage` JSON-LD (`mainEntity`), since schema.org's FAQPage has no
+first-class concept of sections — grouping is a page-layout/UX concern
+only, not a structured-data one. Grew from 9 to 18 questions across:
+- **About HADARA & Shipping** — who HADARA is, shipping countries/
+  methods, production/delivery timelines, samples.
+- **Products & Specifications** — MOQ, custom branding, matching
+  existing specs, commercial laundry suitability, what GSM/thread count
+  mean (cross-links to Fabric Quality Guide by name), technical spec
+  sheets, custom sizing.
+- **Ordering, Payment & Business** — payment terms, getting started,
+  what a quote request needs, order tracking (Partner Portal),
+  ongoing/replenishment supply, minimum star rating/property size.
+- **Every new question is grounded in something that actually exists on
+  the site already** (the About page's own "3 to 5-star hotels... Gulf
+  region and Europe" copy, the real per-product technical-sheet
+  download, the real live Partner Portal, the RFQ form's own
+  "Replenishment" project-type option, the "Custom Size Request"
+  customization value already in the catalog) — deliberately avoided
+  anything touching the still-unconfirmed pending items (certifications,
+  sustainability, multi-property track record/capacity, testimonials);
+  see "Pending / deferred" above for why those specifically stay
+  hands-off until the owner provides real content.
+- Verified: 18 questions parse correctly out of the built JSON-LD in all
+  4 locales, matching the 18 rendered `.faq-item` accordions; Playwright
+  pass found no console errors and no horizontal overflow at 390px on
+  any locale, including `/ar` (RTL).
+- New CSS: `.faq-section+.faq-section` (divider + spacing between
+  groups), `.faq-section-heading` (small gold kicker, same visual
+  language as `.eyebrow` elsewhere on the site).
+
 ## "Recently viewed" strip on product pages (2026-09-19)
 
 A purely client-side browsing-history strip — `src/scripts/recently-
