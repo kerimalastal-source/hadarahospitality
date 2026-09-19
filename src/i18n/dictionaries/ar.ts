@@ -147,6 +147,7 @@ export const ar: DeepPartial<Dictionary> = {
     downloadSheet: 'تحميل الورقة التقنية ↓',
     youMayAlsoLike: 'قد يعجبك أيضاً',
     moreFrom: 'المزيد من',
+    completeTheRoom: 'أكمل تجهيز الغرفة.',
     lookingFor1: 'تبحث عن',
     lookingFor2: 'مواصفة معينة؟',
     moq: 'الحد الأدنى لكمية الطلب',

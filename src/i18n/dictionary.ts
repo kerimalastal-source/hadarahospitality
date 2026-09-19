@@ -108,6 +108,7 @@ export interface Dictionary {
     downloadSheet: string;
     youMayAlsoLike: string;
     moreFrom: string;
+    completeTheRoom: string;
     lookingFor1: string;
     lookingFor2: string;
   };

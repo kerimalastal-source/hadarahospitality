@@ -1197,6 +1197,48 @@ deeply-nested page sections it's easy for one small addition (a single
 new banner, a single new label) to go untranslated for a while without
 any tooling ever flagging it.
 
+## Smarter "You may also like" on product pages (2026-09-19)
+
+Owner asked for smarter related-product suggestions. The old logic
+(`PRODUCTS.filter(category match).slice(0, 3)`) had two real weaknesses:
+it always returned the *same* 3 products in catalog order regardless of
+which product in the category you were viewing (so browsing between two
+towels showed identical, order-independent suggestions instead of
+anything personalized), and for `pillows`/`protectors` — only 2 products
+each — it could show as few as 1 suggestion, or none.
+
+- **`getRelatedProducts(product, count)` in `src/data/products.ts`**
+  ranks same-category products by closeness of "quality tier" first —
+  `specTier()` averages every number found in a product's `specValues`
+  (e.g. `['500 GSM','600 GSM','700 GSM']` → 600), so a 700 GSM spa towel
+  surfaces other high-GSM towels before an entry-level one, and each
+  product naturally gets its own personalized neighbors (no separate
+  rotation logic needed — verified: the 700 GSM spa towel and 700 GSM
+  bath mat surface each other + the 600 GSM bath towel, while the
+  ~500 GSM hand towel surfaces a completely different, lower-tier trio).
+  `specTier()` returns `null` for non-numeric spec types (Model, Style,
+  Format, Comfort Level, ...), which just falls back to catalog order —
+  a safe no-op for `robes`/`amenities`/etc.
+- **Thin categories fill from `COMPLEMENTARY_CATEGORIES`** — a small
+  bedroom/bathroom pairing map (`bed-linen`↔`pillows`↔`protectors`,
+  `towels`↔`robes`↔`amenities`) — when a product's own category doesn't
+  have enough others (today, only `pillows` and `protectors` actually
+  need this). Filler products are sorted photographed-first so the grid
+  doesn't lead with an empty placeholder card.
+- **`ProductView.astro`** swaps the heading to `pd.completeTheRoom`
+  ("Complete the room.") instead of "More from `<category>`" whenever
+  the related set mixes categories, and tags each cross-category card
+  with a small gold kicker label (its own category name, localized) —
+  `.related-card span small` in `global.css` — so it reads as an
+  intentional "goes well with this" pairing rather than a mistake.
+  Verified end-to-end on the live/built site: `waterproof-mattress-
+  protector` (2-product `protectors` category) now shows 3 items — the
+  other protector plus 2 photographed Bed Linen products, correctly
+  labeled — instead of the 1 item it showed before.
+- New dictionary key `productDetail.completeTheRoom`, translated into
+  ar/fr/ru at the same time it was added (no English-first gap this
+  time). RTL-verified at 390px on `/ar` — no horizontal overflow.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,

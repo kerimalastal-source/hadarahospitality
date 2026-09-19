@@ -203,6 +203,7 @@ export const en: Dictionary = {
     downloadSheet: 'Download Technical Sheet ↓',
     youMayAlsoLike: 'YOU MAY ALSO LIKE',
     moreFrom: 'More from',
+    completeTheRoom: 'Complete the room.',
     lookingFor1: 'Looking for a particular',
     lookingFor2: 'specification?',
   },

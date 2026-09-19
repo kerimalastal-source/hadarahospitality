@@ -61,11 +61,13 @@
 .related-card:hover:before{transform:scale(1.05)}
 .related-card:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.12),transparent 40%,rgba(20,32,45,.85))}
 .related-card span{position:absolute;z-index:1;left:20px;right:20px;bottom:18px;color:#fff;font:20px 'Playfair Display','Markazi Text',serif}
+.related-card span small{display:block;font:600 11px/1.4 'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#e2c795;margin-bottom:4px}
+.related-card-placeholder span small{color:#8b6634}
 .pdp-gallery-placeholder{display:flex;align-items:center;justify-content:center;border:1px dashed #d8d5cd}
 .pdp-gallery-placeholder span{font-size:11px;letter-spacing:.1em;color:#9aa1a8;text-transform:uppercase}
 .related-card-placeholder{background:var(--cream);border:1px dashed #d8d5cd}
 .related-card-placeholder:before,.related-card-placeholder:after{content:none}
-.related-card-placeholder span{position:static;display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink);text-align:center;padding:0 20px}
+.related-card-placeholder span{position:static;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--ink);text-align:center;padding:0 20px}
 @media(max-width:900px){.pdp-main{grid-template-columns:1fr;gap:40px}}
 @media(max-width:700px){.pdp-hero{padding:55px 0 70px}.pdp-main{padding-top:60px}.pdp-gallery-main{height:340px}.pdp-specs,.pdp-related{padding:60px 0}.spec-row{grid-template-columns:1fr;gap:6px}.related-grid{grid-template-columns:1fr;gap:14px}}
 

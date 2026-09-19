@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { PRODUCTS, CATEGORIES, type Product } from '../data/products';
+import { CATEGORIES, getRelatedProducts, type Product } from '../data/products';
 import { getProductTranslation } from '../data/products.i18n';
 import { SITE_URL } from '../config';
 import { getDictionary, localizePath, type Locale } from '../i18n';
@@ -52,7 +52,8 @@ const ogImage = product.main || undefined;
 
 const galleryExtras = product.gallery.filter((url) => url !== product.main).slice(0, 4);
 
-const related = PRODUCTS.filter((pr) => pr.category === product.category && pr.slug !== product.slug).slice(0, 3);
+const related = getRelatedProducts(product, 3);
+const relatedAllSameCategory = related.every((pr) => pr.category === product.category);
 
 const productSchema = {
   '@context': 'https://schema.org',
@@ -83,7 +84,11 @@ const breadcrumbSchema = {
   ],
 };
 
-const relatedLocalized = related.map((pr) => ({ ...pr, name: getProductTranslation(locale, pr.slug)?.name ?? pr.name }));
+const relatedLocalized = related.map((pr) => ({
+  ...pr,
+  name: getProductTranslation(locale, pr.slug)?.name ?? pr.name,
+  categoryLabel: t.common.categoryLabels[pr.category] ?? CATEGORIES[pr.category].label,
+}));
 ---
 <BaseLayout
   title={`${name} | HADARA Hospitality`}
@@ -158,13 +163,15 @@ const relatedLocalized = related.map((pr) => ({ ...pr, name: getProductTranslati
     {relatedLocalized.length > 0 && (
       <section class="pdp-related wrap">
         <p class="eyebrow">{pd.youMayAlsoLike}</p>
-        <h2>{pd.moreFrom} <em>{categoryLabel}.</em></h2>
+        {relatedAllSameCategory
+          ? <h2>{pd.moreFrom} <em>{categoryLabel}.</em></h2>
+          : <h2>{pd.completeTheRoom}</h2>}
         <div class="related-grid">
           {relatedLocalized.map((pr) =>
             pr.main ? (
-              <a class="related-card" href={p(`/products/${pr.slug}`)} data-bg={pr.main}><span>{pr.name}</span></a>
+              <a class="related-card" href={p(`/products/${pr.slug}`)} data-bg={pr.main}><span>{pr.category !== product.category && <small>{pr.categoryLabel}</small>}{pr.name}</span></a>
             ) : (
-              <a class="related-card related-card-placeholder" href={p(`/products/${pr.slug}`)}><span>{pr.name}</span></a>
+              <a class="related-card related-card-placeholder" href={p(`/products/${pr.slug}`)}><span>{pr.category !== product.category && <small>{pr.categoryLabel}</small>}{pr.name}</span></a>
             ),
           )}
         </div>
