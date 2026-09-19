@@ -14,6 +14,7 @@ export const ru: DeepPartial<Dictionary> = {
       requestQuote: 'Запросить предложение',
       openMenu: 'Открыть меню',
       closeMenu: 'Закрыть меню',
+      viewAllProducts: 'Смотреть все продукты',
     },
     footer: {
       tagline: 'Решения по снабжению отелей из Турции.',

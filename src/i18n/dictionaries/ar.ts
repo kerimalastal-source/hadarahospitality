@@ -14,6 +14,7 @@ export const ar: DeepPartial<Dictionary> = {
       requestQuote: 'اطلب عرض سعر',
       openMenu: 'افتح القائمة',
       closeMenu: 'أغلق القائمة',
+      viewAllProducts: 'عرض جميع المنتجات',
     },
     footer: {
       tagline: 'حلول توريد وتزويد المستلزمات الفندقية من تركيا.',

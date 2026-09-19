@@ -14,6 +14,7 @@ export const en: Dictionary = {
       requestQuote: 'Request a quote',
       openMenu: 'Open menu',
       closeMenu: 'Close menu',
+      viewAllProducts: 'View all products',
     },
     footer: {
       tagline: 'Hospitality procurement & supply solutions from Türkiye.',

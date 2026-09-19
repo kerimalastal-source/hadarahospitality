@@ -9,14 +9,35 @@ if (menuButton && navigation) {
     menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     navigation.classList.toggle('open', open);
   });
-  navigation.querySelectorAll('a').forEach((link) =>
+  navigation.querySelectorAll('a').forEach((link) => {
+    // .nav-products-cat toggles its own preview panel on mobile instead of
+    // navigating away (see the .nav-products-cat-item block below) — closing
+    // the whole mobile nav on that same click would defeat the toggle.
+    if (link.classList.contains('nav-products-cat')) return;
     link.addEventListener('click', () => {
       navigation.classList.remove('open');
       menuButton.setAttribute('aria-expanded', 'false');
       menuButton.setAttribute('aria-label', 'Open menu');
-    }),
-  );
+    });
+  });
 }
+
+// Products nav dropdown: on desktop this is a pure-CSS hover/focus flyout
+// (see .nav-products-cat-item in global.css), but touch devices have no
+// hover, so on mobile tapping a category toggles its own preview panel open
+// instead of following the link straight to /products#<category>.
+document.querySelectorAll<HTMLElement>('.nav-products-cat-item').forEach((item) => {
+  const toggle = item.querySelector<HTMLAnchorElement>('.nav-products-cat');
+  toggle?.addEventListener('click', (event) => {
+    if (!window.matchMedia('(max-width: 900px)').matches) return;
+    event.preventDefault();
+    const willOpen = !item.classList.contains('open');
+    item.parentElement?.querySelectorAll('.nav-products-cat-item.open').forEach((other) => {
+      if (other !== item) other.classList.remove('open');
+    });
+    item.classList.toggle('open', willOpen);
+  });
+});
 
 document.querySelectorAll<HTMLElement>('.lang-switcher').forEach((switcher) => {
   const toggle = switcher.querySelector<HTMLButtonElement>('[data-lang-toggle]');
