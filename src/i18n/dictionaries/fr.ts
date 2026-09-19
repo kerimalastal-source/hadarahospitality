@@ -52,6 +52,12 @@ export const fr: DeepPartial<Dictionary> = {
       explore: 'Découvrir les collections',
       requestQuote: 'Demander un devis personnalisé',
     },
+    openingBanner: {
+      eyebrow: 'VOUS OUVREZ UN NOUVEL ÉTABLISSEMENT ?',
+      heading1: 'Une seule demande équipe',
+      heading2: 'toutes les chambres de votre hôtel.',
+      cta: "Découvrir la formule d'ouverture",
+    },
     catalogs: {
       eyebrow: 'TÉLÉCHARGER',
       heading1: 'Découvrez nos',
@@ -143,6 +149,9 @@ export const fr: DeepPartial<Dictionary> = {
     moreFrom: 'Plus de',
     lookingFor1: 'Vous cherchez une',
     lookingFor2: 'spécification particulière ?',
+    moq: 'Quantité minimale de commande',
+    leadTime: 'Délai de livraison estimé',
+    moqNote: 'Valeurs indicatives — confirmées dans votre devis selon votre spécification exacte et la destination.',
   },
   articleDetail: {
     by: "L'équipe HADARA Hospitality",
@@ -292,6 +301,7 @@ export const fr: DeepPartial<Dictionary> = {
       errorEmail: 'Veuillez saisir une adresse e-mail professionnelle valide.',
       errorProducts: 'Veuillez sélectionner au moins une catégorie de produits.',
       errorGeneric: "Une erreur s'est produite lors de l'envoi de votre demande. Veuillez réessayer ou nous écrire directement par e-mail.",
+      specificProductsLabel: 'Sélectionner des produits spécifiques (facultatif)',
 
       successHeading: 'Demande de devis reçue',
       successMessage: "Merci d'avoir contacté HADARA Hospitality. Notre équipe examinera vos besoins et vous contactera prochainement.",
@@ -383,6 +393,56 @@ export const fr: DeepPartial<Dictionary> = {
     ctaEyebrow: 'DES QUESTIONS ?',
     ctaHeading1: 'Contactez',
     ctaHeading2: 'notre équipe.',
+  },
+  hotelOpening: {
+    title: "Formule d'ouverture d'hôtel | HADARA Hospitality",
+    description: "Vous ouvrez un nouvel hôtel ? Obtenez chaque catégorie de textile pour les chambres — linge de lit, serviettes, peignoirs, oreillers, protection de matelas et articles d'accueil — en une seule demande, calée sur votre date d'ouverture.",
+    hero: {
+      label: "Formule d'ouverture d'hôtel",
+      eyebrow: "POUR LES OUVERTURES D'HÔTEL",
+      heading1: 'Vous ouvrez un nouvel hôtel ?',
+      heading2: 'Nous équipons chaque chambre.',
+      body: "Une seule demande couvre chaque catégorie textile dont votre établissement a besoin pour ouvrir — linge de lit, serviettes, peignoirs, oreillers, protection de matelas et articles d'accueil — planifiée autour de votre date d'ouverture.",
+      cta: "Demander un devis pour votre formule d'ouverture",
+    },
+    contents: {
+      eyebrow: 'CE QUI EST INCLUS',
+      heading1: 'Chaque catégorie,',
+      heading2: 'une seule formule.',
+      body: 'Votre formule d\'ouverture peut puiser dans toutes nos collections — indiquez-nous votre nombre de chambres et votre classification, et nous vous proposerons des quantités pour les six catégories.',
+      comingSoon: 'Photo à venir',
+    },
+    benefits: {
+      eyebrow: 'POURQUOI OUVRIR AVEC NOUS',
+      heading1: 'Pensé pour le',
+      heading2: "rythme d'une ouverture.",
+      body: "Une ouverture d'hôtel a une seule échéance et une dizaine d'éléments à coordonner. Nous retirons entièrement le textile et les articles d'accueil de cette liste.",
+      cta: 'Démarrer votre formule d\'ouverture',
+      items: [
+        { title: 'Une demande, chaque catégorie', body: "Linge de lit, serviettes, peignoirs, protection de matelas et articles d'accueil auprès d'un seul interlocuteur — au lieu de coordonner six fournisseurs distincts." },
+        { title: "Planifiée selon votre date d'ouverture", body: "La production et la livraison sont planifiées autour de la date que vous nous donnez, pas d'un délai générique." },
+        { title: "Tarification à l'échelle de l'ouverture", body: 'Des quantités dimensionnées pour un établissement complet, à des tarifs de volume, confirmés dans votre devis.' },
+        { title: 'Un interlocuteur unique', body: "Une seule personne gère votre commande, du devis jusqu'à la livraison — pour que rien ne passe entre les mailles du filet avant le jour J." },
+      ],
+    },
+    process: {
+      eyebrow: 'COMMENT ÇA MARCHE',
+      heading1: "De la date d'ouverture",
+      heading2: 'à un établissement entièrement équipé.',
+      body: 'Un processus simple, construit autour de votre calendrier.',
+      steps: [
+        { title: 'Partagez vos informations', body: "Votre date d'ouverture, votre nombre de chambres et votre classification — les bases nécessaires pour vous proposer une formule." },
+        { title: 'Nous proposons votre formule', body: 'Une quantité et une spécification recommandées pour chaque catégorie, adaptées à votre établissement.' },
+        { title: 'Vous confirmez et testez des échantillons', body: 'Validez les quantités et les finitions, et examinez des échantillons physiques avant le début de la production.' },
+        { title: 'Nous livrons dans les délais', body: "Production et expédition planifiées pour arriver avant votre date d'ouverture, pas après." },
+      ],
+    },
+    cta: {
+      eyebrow: 'PRÊT À COMMENCER ?',
+      heading1: 'Équipons',
+      heading2: 'votre établissement.',
+      button: "Demander un devis pour votre formule d'ouverture",
+    },
   },
   fabricGuide: {
     title: 'Guide du grammage (GSM) et du nombre de fils | HADARA Hospitality',

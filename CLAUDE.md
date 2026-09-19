@@ -392,8 +392,8 @@ form. Added 2026-09-18.
   owner's internal notification email and a linked portal Order's notes
   (see the RFQ→Order linking note under "Partner Portal" below) both read
   a plain human name, never a slug. New dictionary key:
-  `getAQuote.form.specificProductsLabel` (English only so far, same
-  fallback-to-English pattern as everything else).
+  `getAQuote.form.specificProductsLabel` — translated into ar/fr/ru
+  2026-09-19 as part of the full-site i18n-gap audit below.
 - **What's fully functional now**: end-to-end client + server validation,
   file type/size checks, honeypot + minimum-time-on-form anti-spam gate (a
   submission that trips either one gets a fake-success response so a bot
@@ -788,9 +788,11 @@ product categories as one bundled request for a hotel that's opening —
 bed linen, towels, robes, pillows, mattress protection, amenities — instead
 of a visitor having to discover each collection separately. Fully static
 (prerendered in all 4 locales like every other marketing page, unlike the
-Partner Portal) and fully translated-with-fallback from day one — only
-`en.ts` has real copy so far, same "ships English-first, ar/fr/ru degrade
-to English until translated" pattern as everything else.
+Partner Portal). Shipped English-first, then fully translated into
+ar/fr/ru on 2026-09-19 (`hotelOpening.*` in each of
+`src/i18n/dictionaries/{ar,fr,ru}.ts`) as part of the full-site i18n-gap
+audit below — same fallback-to-English convention as everything else
+still applies to anything added later.
 
 - **Content stays in sync with the catalog automatically**:
   `src/views/HotelOpeningPackageView.astro` picks one photographed product
@@ -838,8 +840,9 @@ underneath reading "Indicative — confirmed as part of your quotation...".
   a contract on them.** Update `CATEGORIES` directly once confirmed — no
   other wiring needed, every product in that category picks it up
   automatically.
-- Dictionary keys: `productDetail.moq`, `.leadTime`, `.moqNote` (English
-  only so far — same fallback-to-English pattern as everything else).
+- Dictionary keys: `productDetail.moq`, `.leadTime`, `.moqNote` —
+  translated into ar/fr/ru 2026-09-19 as part of the full-site i18n-gap
+  audit below.
 
 ## Fabric Quality Guide (`/fabric-quality-guide`)
 
@@ -1148,6 +1151,51 @@ email), the `getAQuote.form.productCategories` checkbox value
 category-matching logic and would change what's recorded in a
 customer's own submitted-order history for no user-facing benefit,
 since they're never shown to a visitor as-is.
+
+## i18n gap audit (2026-09-19)
+
+Owner spotted leftover English text while browsing a non-English locale
+and asked for a full check. Wrote a one-off script (not committed —
+imports all 4 dictionaries and diffs every leaf-key path in `en.ts`
+against `ar.ts`/`fr.ts`/`ru.ts` via `mergeDictionary`'s own key shape, so
+it catches a missing key at any depth, including inside arrays of
+objects like `benefits.items`) rather than eyeballing pages — this is
+the same class of gap `mergeDictionary()` is deliberately designed to
+paper over silently (falls back to English rather than breaking the
+build), so it doesn't show up as a build error or `astro check` warning
+and has to be actively audited for.
+
+**Found and fixed, all 3 locales (ar/fr/ru) were missing the identical
+set of keys, so nothing had partially drifted between locales** — just
+translation debt as pages shipped English-first (documented at the time
+in each feature's own CLAUDE.md section) and never circled back:
+- `home.openingBanner.*` (4 keys) — the navy "Opening a new property?"
+  CTA banner under the homepage hero, linking to Hotel Opening Package.
+- `productDetail.moq`, `.leadTime`, `.moqNote` (3 keys) — the MOQ/lead
+  time row on every product page's spec table.
+- `getAQuote.form.specificProductsLabel` (1 key) — the RFQ form's
+  category→specific-products panel heading.
+- `hotelOpening.*` (33 keys) — the entire Hotel Opening Package page
+  (hero, contents, benefits incl. its 4 `items`, process incl. its 4
+  `steps`, cta) — see that page's own section above, now updated.
+
+All translated and verified: `npm run build` and `npm run check` clean,
+and a Playwright pass at 390px on `/ar`, `/fr`, `/ru` versions of
+`/hotel-opening-package` confirmed `document.documentElement.scrollWidth`
+matches `innerWidth` (no horizontal overflow — the same RTL/long-word
+risk class documented in the full-site audit above) and no literal
+`"undefined"`/`"[object Object]"` leaked into rendered text.
+
+**The only remaining gap after this pass is `notFound.*` (9 keys)** —
+that's `404.astro`, the one page this file already documents as
+*intentionally* kept English-only by design, not a translation gap.
+
+**If new English-only copy shows up again**, re-run the same kind of
+key-diff check rather than trusting a visual skim of a few pages — a
+missing key degrades silently by design, and with 4 dictionaries and
+deeply-nested page sections it's easy for one small addition (a single
+new banner, a single new label) to go untranslated for a while without
+any tooling ever flagging it.
 
 ## Sandbox quirks
 
