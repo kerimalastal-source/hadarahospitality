@@ -225,8 +225,8 @@ body.has-selection-bar .products-cta{padding-bottom:90px}
 .rfq-selected-product-remove{background:none;border:1px solid #cfc9bb;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:.03em;color:var(--muted)}
 .rfq-selected-product-remove:hover{border-color:var(--gold);color:#8b6634}
 
-.rfq-section{border:0;padding:52px 0 0;margin:0}
-.rfq-section:first-of-type{padding-top:36px}
+.rfq-section{border:0;padding:0;margin:52px 0 0}
+.rfq-section:first-of-type{margin-top:36px}
 .rfq-section legend{display:flex;align-items:baseline;gap:12px;font:22px 'Playfair Display','Markazi Text',serif;color:var(--ink);padding:0;margin-bottom:26px;width:100%}
 .rfq-step{font:13px 'DM Sans','Cairo',sans-serif;font-weight:700;letter-spacing:.08em;color:var(--gold)}
 
@@ -298,7 +298,7 @@ body.has-selection-bar .products-cta{padding-bottom:90px}
 .rfq-success-actions{display:flex;align-items:center;justify-content:center;gap:26px;margin-top:30px}
 
 @media(max-width:900px){.rfq-grid,.rfq-field-row-2{grid-template-columns:1fr}}
-@media(max-width:700px){.rfq-page{padding:40px 0 80px}.rfq-section{padding-top:32px}.rfq-section:first-of-type{padding-top:24px}.rfq-dropzone{padding:26px 14px}.rfq-success-actions{flex-direction:column;gap:16px}.rfq-selected-product{padding:14px 16px}}
+@media(max-width:700px){.rfq-page{padding:40px 0 80px}.rfq-section{margin-top:32px}.rfq-section:first-of-type{margin-top:24px}.rfq-dropzone{padding:26px 14px}.rfq-success-actions{flex-direction:column;gap:16px}.rfq-selected-product{padding:14px 16px}}
 
 /* RTL layout adjustments */
 [dir="rtl"] .nav-quote span,[dir="rtl"] .button span,[dir="rtl"] .text-link span{margin-left:0;margin-right:15px}
