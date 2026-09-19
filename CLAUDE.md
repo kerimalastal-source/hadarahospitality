@@ -1851,17 +1851,25 @@ can slide into something that needs a cookie-consent banner or worse.
   submission (`api/submit-quote.ts`, alongside the existing email
   notification — same `Promise.allSettled` task list, so a failed
   Telegram send can't block the email or the submission itself).
-- **Setup still needed before this is fully live**: (1) run
-  `drizzle/0002_green_vindicator.sql` via Neon's SQL Editor; (2) create
-  a Telegram bot via [@BotFather](https://t.me/BotFather), message it
-  once, then read the chat id from
-  `https://api.telegram.org/bot<TOKEN>/getUpdates`; (3) set
-  `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` in Vercel's env vars. Until
-  all three are done, page views simply aren't recorded (the client
-  beacon's `fetch` fails silently — verified this degrades cleanly with
-  no console/page error, since `portal-actions/track-visit.ts` can't
-  insert into a table that doesn't exist yet) and no Telegram messages
-  send, but nothing else on the site is affected either way.
+- **Setup — 2 of 3 steps done as of 2026-09-19**: (1) run
+  `drizzle/0002_green_vindicator.sql` via Neon's SQL Editor — **still
+  not done**, no CLI/DB access from this sandbox to do it directly; (2)
+  create a Telegram bot via [@BotFather](https://t.me/BotFather), message
+  it once, then read the chat id from
+  `https://api.telegram.org/bot<TOKEN>/getUpdates` — **done**, owner
+  walked through this themselves (`api.telegram.org` is also blocked from
+  this sandbox, so this step had to be done from the owner's own device
+  too); (3) set `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` in Vercel's env
+  vars — **done**, set via the Vercel MCP tools and a redeploy triggered
+  so the running deployment actually picks them up (an env var change
+  alone doesn't affect an already-built deployment). **Net effect**: the
+  RFQ-submission Telegram alert (`api/submit-quote.ts`) is live now — it
+  has no dependency on the `visitor_events` table. The new-visitor alert
+  (`track-visit.ts`) still won't fire until step (1)'s migration is run,
+  since inserting the first event for a session (the check this trigger
+  is based on) needs that table to exist — until then, `track-visit.ts`'s
+  insert 500s silently (the client beacon's `fetch` swallows the
+  failure, same as before) and no visitor row is ever recorded.
 - **Privacy Policy updated in all 4 locales** to describe this
   accurately — and, in the process, to fix two claims that were already
   false and predate this feature: "this website does not run a
