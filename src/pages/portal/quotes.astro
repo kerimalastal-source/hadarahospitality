@@ -35,7 +35,7 @@ const rows = identity.companyId
             {rows.map(({ quote, order }) => (
               <tr>
                 <td><a class="text-link" href={`/portal/orders/${order.id}`}>{order.reference}</a></td>
-                <td>{new Date(quote.sentAt).toLocaleDateString()}</td>
+                <td>{new Date(quote.sentAt).toLocaleString()}</td>
                 <td>{quote.amount ? `${quote.amount} ${quote.currency ?? ''}` : '—'}</td>
                 <td><a class="text-link" href={quote.fileUrl} target="_blank" rel="noopener">Download</a></td>
               </tr>

@@ -32,8 +32,8 @@ const companyOrders = identity.companyId
               <tr>
                 <td><a class="text-link" href={`/portal/orders/${o.id}`}>{o.reference}</a></td>
                 <td><span class="portal-status" class:list={{ 'portal-status-delivered': o.status === 'delivered' }}>{ORDER_STATUS_LABELS[o.status]}</span></td>
-                <td>{new Date(o.createdAt).toLocaleDateString()}</td>
-                <td>{new Date(o.updatedAt).toLocaleDateString()}</td>
+                <td>{new Date(o.createdAt).toLocaleString()}</td>
+                <td>{new Date(o.updatedAt).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
