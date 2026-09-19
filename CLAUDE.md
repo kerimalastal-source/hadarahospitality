@@ -1574,6 +1574,44 @@ precedent, and a `prefers-reduced-motion` guard.
   the live built HTML on the production domain after merge and confirmed
   the 5 SVGs render with the right paths in the right order.
 
+## Product-category dropdown in the header nav (2026-09-19)
+
+Owner asked for the header's "Products" nav link to show a dropdown of
+product categories on hover, so a visitor can jump straight to the
+category they want instead of always landing on the top of `/products`.
+
+- `Header.astro` wraps the existing "Products" `<a>` in a new
+  `.nav-products-item` div alongside a `.nav-products-menu` list, built
+  from `CATEGORY_ORDER`/`common.categoryLabels` (`src/data/products.ts`
+  / already-translated dictionary values — no new dictionary keys
+  needed). Each entry links to `/products#<categoryKey>`, the same
+  section anchors `ProductsListView.astro` already renders (`id={key}`
+  on each `.product-category` section) — this is the identical pattern
+  the homepage's own collection cards/tags already use to jump into a
+  category, just newly available from the header too.
+- **Desktop is a pure-CSS hover/`:focus-within` dropdown** (`.nav-
+  products-menu{display:none}`, shown via `.nav-products-item:hover
+  .nav-products-menu,.nav-products-item:focus-within .nav-products-menu
+  {display:flex}`) — deliberately no JS, unlike the click-toggle
+  `.lang-switcher` pattern already in the header, since a hover-only
+  interaction needs no open/close/outside-click state to manage.
+  `:focus-within` covers keyboard users tabbing onto the "Products"
+  link, who can't hover.
+- **Mobile has no hover**, so `@media(max-width:900px)` forces
+  `.nav-products-menu{display:flex;position:static;...}` unconditionally
+  — the category list just renders inline and indented under "Products"
+  in the slide-down mobile nav, no extra tap needed. Same visual nesting
+  treatment (`padding:0 0 0 16px`, RTL-mirrored) as the language
+  switcher's own mobile view.
+- Verified: `npm run build`/`npm run check` clean; Playwright confirms
+  the dropdown opens on hover and each of the 6 categories has the
+  correct locale-translated label and correct `/products#<key>` link,
+  across all 4 locales; mobile-nav-open view shows the same list inline
+  with no interaction; no horizontal overflow at 1280px or 390px on any
+  locale including `/ar` (RTL, where the dropdown/mobile sublist both
+  mirror correctly); spot-checked the live built HTML on the production
+  domain after merge.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
