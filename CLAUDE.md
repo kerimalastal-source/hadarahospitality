@@ -1127,14 +1127,27 @@ placeholder-gallery treatment as the `amenities` category (`main`/
   distinct everyday item rather than a smaller face towel.
 
 **The remaining three are not yet added** — waiting on the owner to
-confirm which ones to do next. Also worth a future look: the
-`protectors` category is still labeled "Mattress Protectors"
-(`CATEGORIES.protectors.label` and `common.categoryLabels.protectors`
-in all 4 dictionaries) even though it now also holds a pillow
-protector — a rename (e.g. "Mattress & Pillow Protectors") would need
-updating in `src/data/products.ts` and all 4 locale files; deliberately
-left as-is for this pass since it wasn't asked for and touches
-translated strings.
+confirm which ones to do next.
+
+**`protectors` category renamed to "Mattress & Pillow Protectors",
+2026-09-19**: was still labeled "Mattress Protectors" even though it
+now also holds a pillow protector — the owner agreed the rename was
+warranted ("إذا شايف انها لازمة وضرورية اعمل الها"). Updated the
+display label only: `CATEGORIES.protectors.label` in
+`src/data/products.ts`, plus `common.categoryLabels.protectors`,
+`home.collections.tags.protectors` (the homepage collection-tag chip)
+and `productsList.categoryBodies.protectors` (the products-list intro
+copy) in all 4 locale dictionaries. Deliberately did **not** touch any
+of the RFQ system's stable English values for this category —
+`CATEGORIES.protectors.formCategory` ('Mattress protectors', used in
+the plain mailto quote form and the owner's internal notification
+email), the `getAQuote.form.productCategories` checkbox value
+('Mattress Protectors', matched against in
+`RFQ_CATEGORY_PRODUCTS`/`LEGACY_CATEGORY_TO_RFQ_CATEGORY` in
+`src/lib/rfq.ts`) — renaming those would risk breaking existing
+category-matching logic and would change what's recorded in a
+customer's own submitted-order history for no user-facing benefit,
+since they're never shown to a visitor as-is.
 
 ## Sandbox quirks
 

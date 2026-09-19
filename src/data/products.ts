@@ -22,7 +22,7 @@ export const CATEGORIES: Record<CategoryKey, Category> = {
   robes: { label: 'Robes & Slippers', formCategory: 'Robes & slippers', moq: '50 pieces per style', leadTime: '4–5 weeks' },
   'bed-linen': { label: 'Bed Linen', formCategory: 'Bed linen & bedding', moq: '100 sets per style', leadTime: '4–5 weeks' },
   pillows: { label: 'Pillows & Duvets', formCategory: 'Pillows & duvets', moq: '100 pieces per style', leadTime: '3–4 weeks' },
-  protectors: { label: 'Mattress Protectors', formCategory: 'Mattress protectors', moq: '100 pieces per style', leadTime: '3–4 weeks' },
+  protectors: { label: 'Mattress & Pillow Protectors', formCategory: 'Mattress protectors', moq: '100 pieces per style', leadTime: '3–4 weeks' },
   amenities: { label: 'Hotel Amenities', formCategory: 'Other hospitality essentials', moq: '500 pieces per style', leadTime: '3–5 weeks' },
 };
 
