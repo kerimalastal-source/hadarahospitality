@@ -19,6 +19,7 @@ const staticPages = [
   { type: 'Page', title: 'Get a Quote', url: '/get-a-quote', excerpt: 'Request a tailored quote for hotel textiles and guest essentials.' },
   { type: 'Page', title: 'Hotel Opening Package', url: '/hotel-opening-package', excerpt: 'Every guest textile category for a new hotel opening — bed linen, towels, robes, pillows, mattress protection and amenities — through one request.' },
   { type: 'Page', title: 'GSM & Thread Count Guide', url: '/fabric-quality-guide', excerpt: 'What GSM means for hotel towels and what thread count means for hotel bed linen — a visual guide to fabric quality tiers.' },
+  { type: 'Page', title: 'Request a Sample', url: '/request-a-sample', excerpt: 'Request a physical sample of any HADARA Hospitality product before placing a bulk order.' },
   { type: 'Page', title: 'Contact', url: '/contact', excerpt: 'Contact HADARA Hospitality in Beylikdüzü, Istanbul, Türkiye.' },
   { type: 'Page', title: 'FAQ', url: '/faq', excerpt: 'Common questions about minimum order quantities, samples, customization, shipping and payment.' },
 ];
