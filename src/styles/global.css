@@ -16,6 +16,13 @@
 @media(max-width:700px){.about-hero{padding:85px 0 95px}.about-intro,.about-outro{padding-top:70px;padding-bottom:70px}.about-focus{padding:70px 0}.about-focus-grid{grid-template-columns:1fr}.about-focus-grid article{min-height:0}}
 .about-story{display:grid;grid-template-columns:1fr 1fr;gap:10%}.about-story p:not(.eyebrow){font-size:16px;line-height:1.95;color:#626a72;margin:0 0 22px}
 @media(max-width:1024px){.about-story{grid-template-columns:1fr;gap:20px}}
+.about-sustainability{padding:95px 0}
+.sustainability-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.sustainability-grid article{background:var(--cream);padding:32px;border-top:3px solid var(--gold)}
+.sustainability-grid article span{color:#795b32;font:20px 'Playfair Display','Markazi Text',serif}
+.sustainability-grid h3{font:22px 'Playfair Display','Markazi Text',serif;margin:16px 0 10px}
+.sustainability-grid p{color:#626a72;font-size:14px;line-height:1.8;margin:0}
+@media(max-width:700px){.about-sustainability{padding:70px 0}.sustainability-grid{grid-template-columns:1fr}}
 .products-hero{background:var(--navy);color:white;padding:95px 0 105px}.products-hero h1{margin-bottom:25px}.products-hero p:last-child{max-width:590px;color:#dce2e7;font-size:17px;line-height:1.85}
 .product-jump{display:flex;gap:10px;flex-wrap:wrap;padding-top:30px;padding-bottom:30px;border-bottom:1px solid #e3dfd6}.product-jump a{border:1px solid #d8d5cd;padding:10px 15px;font-size:12px;font-weight:600}.product-jump a:hover{background:var(--navy);color:white;border-color:var(--navy)}
 .product-list{padding-top:45px;padding-bottom:110px}.product-category{display:grid;grid-template-columns:1fr 1fr;gap:9%;align-items:center;padding:65px 0;border-bottom:1px solid #e3dfd6;scroll-margin-top:25px}.product-category:nth-child(even) .product-image{order:2}.product-image{height:405px;background-color:var(--cream);background-size:cover;background-position:center}.product-number{color:#795b32;font-size:11px;font-weight:700;letter-spacing:.18em}.product-copy h2{font-size:clamp(39px,4vw,58px);line-height:1.17;margin:20px 0}.product-copy p{color:#626a72;line-height:1.85;font-size:15px}.product-copy ul{padding-left:20px;margin:22px 0 28px;line-height:2;color:var(--ink);font-size:14px}.product-copy li::marker{color:var(--gold)}.product-copy li a:hover{color:#987342;text-decoration:underline}.product-select-checkbox{margin-inline-end:9px;vertical-align:middle;accent-color:var(--gold);cursor:pointer}

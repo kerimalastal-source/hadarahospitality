@@ -185,6 +185,18 @@ export const fr: DeepPartial<Dictionary> = {
         "Nous sommes fiers de bâtir des partenariats de confiance avec des hôtels et des entreprises hôtelières dans la région du Golfe et en Europe, soutenant une coopération durable et des solutions hôtelières fiables.",
       ],
     },
+    sustainability: {
+      eyebrow: 'DURABILITÉ',
+      heading1: 'Construit pour durer,',
+      heading2: 'de façon responsable.',
+      intro: "La durabilité fait partie intégrante de notre façon de fabriquer et de fournir — des matériaux que nous choisissons à la manière dont fonctionnent nos sites partenaires.",
+      items: [
+        { title: 'Énergie renouvelable et solaire', body: 'Nos partenaires de fabrication utilisent des sources d\'énergie renouvelable et solaire dans le cadre de leurs opérations de production.' },
+        { title: "Préservation de l'eau", body: "Nous maintenons un plan actif de réduction de la consommation d'eau tout au long du processus de fabrication." },
+        { title: 'Emballage recyclable', body: 'Les produits sont emballés et expédiés dans des matériaux d\'emballage recyclables et écologiques.' },
+        { title: 'Coton premium et durable', body: 'Nous utilisons un coton de très haute qualité, sélectionné pour sa performance et sa durabilité à long terme.' },
+      ],
+    },
     outro: {
       eyebrow: 'HADARA HOSPITALITY',
       heading1: 'Des solutions hôtelières',

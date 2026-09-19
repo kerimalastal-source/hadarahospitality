@@ -81,6 +81,7 @@ export interface Dictionary {
     hero: { eyebrow: string; headingLead: string; headingEmphasis: string };
     intro: { eyebrow: string; heading1: string; heading2: string; paragraphs: string[] };
     partnerships: { eyebrow: string; heading1: string; heading2: string; paragraphs: string[] };
+    sustainability: { eyebrow: string; heading1: string; heading2: string; intro: string; items: { title: string; body: string }[] };
     outro: { eyebrow: string; heading1: string; heading2: string; paragraph: string; cta: string };
   };
   productsPage: {

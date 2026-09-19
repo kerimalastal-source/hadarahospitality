@@ -961,12 +961,11 @@ checkbox buried in the form.
   prominently (product pages and/or a dedicated section) — this is the
   single highest-trust-impact item on the whole pending list per the
   2026-09-19 "procurement director" discussion below.
-- **Sustainability credentials** (recycled/organic materials, water usage
-  in production, responsible cotton sourcing, etc.) — added 2026-09-19,
-  same status as Certifications: no real content confirmed yet, don't
-  fabricate. Increasingly a real purchasing requirement for large luxury
-  hotel chains, not just marketing fluff — see the priority-order note
-  above for the full context of why this was added.
+- **Sustainability credentials — resolved 2026-09-19**: owner confirmed
+  these are real and asked for them to be published; see "Sustainability
+  section on the About page" below. (Certifications, item #2 on the
+  priority list above, is a separate, still-unconfirmed item — don't
+  conflate the two.)
 - **Testimonials section** — owner confirmed no real content exists yet;
   do not fabricate.
 - **Self-hosting product/blog images off the Wix account** — flagged as a
@@ -1404,6 +1403,43 @@ yet — expected).
   languages mid-session can show a strip with mixed-language names.
   Acceptable for a browser-local convenience feature — not worth adding
   a locale-aware re-translation lookup for.
+
+## Sustainability section on the About page (2026-09-19)
+
+The "Sustainability credentials" pending item is resolved — the owner
+explicitly confirmed these facts are real for HADARA and asked for them
+to be published ("نعم طبعا كلها موجودة" — "yes of course, all of it is
+real"), after being asked directly to confirm before anything was
+written, given how much of this file's own pending-list guidance warns
+against fabricating exactly this kind of claim. **Certifications (ISO,
+OEKO-TEX, BSCI/Sedex) remain a separate, still-unconfirmed pending item
+— this resolution does not extend to those.**
+
+- New `about.sustainability` section in `src/i18n/dictionary.ts`
+  (`eyebrow`/`heading1`/`heading2`/`intro`/`items: {title, body}[]`),
+  rendered by `AboutView.astro` between the existing "Our partnerships"
+  and "Complete hospitality solutions" sections, as a `.section-head`
+  (reused from the homepage's collections section — eyebrow + heading +
+  short intro paragraph) followed by a 4-card `.sustainability-grid`.
+  Four claims, each stated as directly confirmed by the owner, nothing
+  embellished beyond what they said: renewable & solar energy at
+  manufacturing partner facilities, an active water-consumption
+  reduction plan, recyclable/eco-friendly packaging, and very
+  high-quality, durable cotton.
+- New CSS: `.about-sustainability` (section padding) and
+  `.sustainability-grid` (a 2×2 card grid, gold-top-border cards —
+  deliberately its own class rather than reusing the pre-existing but
+  currently-unused `.about-focus-grid` 3-column grid CSS, since 4 items
+  don't split evenly into 3 columns).
+- Translated into ar/fr/ru at the same time it was added (no
+  English-first gap). Verified in the built output across all 4
+  locales: correct heading/card text per locale, no console errors, no
+  horizontal overflow at 390px including `/ar` (RTL).
+- **If the owner ever wants to expand on any of these four points later**
+  (e.g. a specific cotton certification, actual water-usage numbers, the
+  name of a recycled packaging material) — update `about.sustainability`
+  directly, same "don't fabricate, only what's actually confirmed"
+  discipline applies to any addition here as it did to this one.
 
 ## Sandbox quirks
 

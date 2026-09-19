@@ -152,6 +152,18 @@ export const en: Dictionary = {
         'We take pride in building trusted partnerships with hotels and hospitality businesses across the Gulf region and Europe, supporting long-term cooperation and dependable hospitality solutions.',
       ],
     },
+    sustainability: {
+      eyebrow: 'SUSTAINABILITY',
+      heading1: 'Built to last,',
+      heading2: 'responsibly.',
+      intro: 'Sustainability is built into how we manufacture and supply — from the materials we choose to the way our partner facilities operate.',
+      items: [
+        { title: 'Renewable & Solar Energy', body: 'Our manufacturing partners draw on renewable and solar energy sources as part of their production operations.' },
+        { title: 'Water Conservation', body: 'We maintain an active plan to reduce water consumption throughout the manufacturing process.' },
+        { title: 'Recyclable Packaging', body: 'Products are packed and shipped using recyclable, eco-friendly packaging materials.' },
+        { title: 'Premium, Durable Cotton', body: 'We use very high-quality cotton, selected for both performance and long-term durability.' },
+      ],
+    },
     outro: {
       eyebrow: 'HADARA HOSPITALITY',
       heading1: 'Complete hospitality',
