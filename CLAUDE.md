@@ -1657,6 +1657,49 @@ for the rest.
 - New dictionary key `common.nav.viewAllProducts`, translated into
   ar/fr/ru at the same time it was added (no English-first gap).
 
+## Main nav decluttered into an "About" dropdown (2026-09-19)
+
+Owner felt the main nav was getting crowded — especially once the
+Products mega menu above landed right next to 6 other top-level links
+(Home, Products, Our approach, How it works, About us, Blog, Contact).
+Asked for a recommendation; agreed with grouping "Our approach" and
+"How it works" (previously standalone links to homepage anchors) plus
+"About us" under one dropdown, and left the exact name/contents to be
+decided sensibly.
+
+- New `.nav-about-item`/`.nav-about-menu` in `Header.astro`, right next
+  to the existing `.nav-products-item` — a flat, single-level dropdown
+  (no flyout, unlike Products), so it reuses the exact CSS shape the
+  Products dropdown had in its own first iteration before it became a
+  mega menu: pure `:hover`/`:focus-within` on desktop, no JS; forced
+  `display:flex;position:static` at `max-width:900px` so mobile just
+  shows the same 4 links inline under "About" in the slide-down nav —
+  no accordion/JS needed here since there's no second level to manage.
+- **Contents**: About us, Our approach, How it works, and a new FAQ
+  link (FAQ wasn't in the main nav before at all, only the footer) —
+  added since it's the same "learn about HADARA" category as the other
+  three. The FAQ link's text is the plain unlocalized "FAQ" string,
+  matching the footer's own existing precedent for that link (an
+  internationally-recognized abbreviation, not worth a translation key).
+- **Nav goes from 7 top-level items to 5**: Home, Products, About, Blog,
+  Contact. Search, language switcher, Partner Portal and "Request a
+  quote" in `.nav-utils` are unchanged.
+- New dictionary key `common.nav.aboutMenu` — the dropdown toggle's own
+  label ("About" in English, distinct from `nav.about`'s "About us" used
+  for the item inside it). Translated into ar/fr/ru at the same time it
+  was added; ar/fr/ru all reuse the same string for both `aboutMenu` and
+  `about` (e.g. Arabic's `من نحن` for both), since none of the three
+  naturally distinguish a short umbrella label from the full page-link
+  phrase the way English's "About" vs. "About us" do — reusing the exact
+  same translated phrase for both reads naturally there, rather than
+  inventing an artificial distinction that doesn't exist in the language.
+- Verified: `npm run build`/`npm run check` clean; Playwright confirms
+  all 4 dropdown items render with correct locale-translated
+  labels/links on all 4 locales, clicking FAQ navigates correctly, and
+  the mobile slide-down nav shows the same 4 links inline; no horizontal
+  overflow at 1280px or 390px on any locale including `/ar` (RTL);
+  spot-checked the live built HTML on the production domain after merge.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
