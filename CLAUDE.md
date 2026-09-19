@@ -1888,6 +1888,19 @@ can slide into something that needs a cookie-consent banner or worse.
   emulated locally" caveat as Edge Middleware and other Vercel-platform
   behavior documented elsewhere in this file.
 
+## Contact page icons (2026-09-19)
+
+Owner asked for a small icon next to each line (email, phone, location) in
+the "Get in touch" block on `/contact`, one fitting each field. Added inline
+gold SVG icons (envelope, phone handset, map pin — same stroke-based 24px-
+viewBox style used elsewhere on the site, e.g. `src/components/icons/`)
+directly in `ContactView.astro`, since each is single-use on this one page.
+`.contact-details` (`global.css`) got a small flex tweak
+(`display:flex;align-items:center;gap:12px` on each row, icon colored
+`var(--gold)`) — that class is only used on this one page, so no other page
+was affected. RTL-verified on `/ar/contact` — icons mirror to the visual
+start correctly, no horizontal overflow at 390px.
+
 ## Sandbox quirks
 
 - Outbound HTTPS to `static.wixstatic.com`, `unsplash.com`, `usrfiles.com`,
