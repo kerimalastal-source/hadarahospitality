@@ -147,6 +147,7 @@ export const ru: DeepPartial<Dictionary> = {
     downloadSheet: 'Скачать техническое описание ↓',
     youMayAlsoLike: 'ВАМ ТАКЖЕ МОЖЕТ ПОНРАВИТЬСЯ',
     moreFrom: 'Больше из категории',
+    completeTheRoom: 'Дополните оформление номера.',
     lookingFor1: 'Ищете определённую',
     lookingFor2: 'характеристику?',
     moq: 'Минимальный объём заказа',

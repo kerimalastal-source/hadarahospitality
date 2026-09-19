@@ -504,3 +504,64 @@ export const RFQ_CATEGORY_PRODUCTS: Record<string, string[]> = {
   'Guest Room Accessories': slugsFor('amenities'),
   Other: [],
 };
+
+// Categories to pull from when a product's own category doesn't have enough
+// other products to fill "You may also like" (see getRelatedProducts below)
+// — pairs the natural "guest room" groupings (bedroom vs. bathroom) rather
+// than falling back to an arbitrary/unrelated category. `pillows` and
+// `protectors` are the ones that actually need this today (2 products
+// each), but every category has a sensible fallback in case the catalog
+// changes.
+const COMPLEMENTARY_CATEGORIES: Record<CategoryKey, CategoryKey[]> = {
+  'bed-linen': ['pillows', 'protectors'],
+  pillows: ['bed-linen', 'protectors'],
+  protectors: ['bed-linen', 'pillows'],
+  towels: ['robes', 'amenities'],
+  robes: ['towels', 'amenities'],
+  amenities: ['towels', 'robes'],
+};
+
+/** First number found across a product's specValues (e.g. "600 GSM" -> 600),
+ * averaged when there are several (a product's specValues is the range it's
+ * offered in, e.g. ['500 GSM','600 GSM','700 GSM']) — a rough but useful
+ * stand-in for "quality tier" so related products can be ranked by how
+ * close a match they are, not just catalog order. Returns null for
+ * non-numeric spec types (Model, Style, Format, ...), which just falls
+ * back to catalog order below. */
+function specTier(product: Product): number | null {
+  const numbers = product.specValues.join(' ').match(/\d+/g);
+  if (!numbers || numbers.length === 0) return null;
+  return numbers.reduce((sum, n) => sum + Number(n), 0) / numbers.length;
+}
+
+/** "You may also like" for a product page — same-category products ranked
+ * by closest quality tier first (so a 600 GSM towel surfaces other
+ * mid-to-high GSM towels before an entry-level one), topped up from
+ * complementary categories when the product's own category doesn't have
+ * enough others on its own (e.g. pillows/protectors only have 2 products
+ * each today). */
+export function getRelatedProducts(product: Product, count = 3): Product[] {
+  const targetTier = specTier(product);
+  const sameCategory = PRODUCTS.filter((p) => p.category === product.category && p.slug !== product.slug);
+  const ranked = targetTier === null
+    ? sameCategory
+    : [...sameCategory].sort((a, b) => {
+        const tierA = specTier(a);
+        const tierB = specTier(b);
+        if (tierA === null && tierB === null) return 0;
+        if (tierA === null) return 1;
+        if (tierB === null) return -1;
+        return Math.abs(tierA - targetTier) - Math.abs(tierB - targetTier);
+      });
+
+  const related = [...ranked];
+  if (related.length < count) {
+    for (const category of COMPLEMENTARY_CATEGORIES[product.category] ?? []) {
+      if (related.length >= count) break;
+      const fromCategory = PRODUCTS.filter((p) => p.category === category && !related.includes(p))
+        .sort((a, b) => (b.main ? 1 : 0) - (a.main ? 1 : 0)); // photographed products first
+      related.push(...fromCategory.slice(0, count - related.length));
+    }
+  }
+  return related.slice(0, count);
+}

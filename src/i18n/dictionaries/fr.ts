@@ -147,6 +147,7 @@ export const fr: DeepPartial<Dictionary> = {
     downloadSheet: 'Télécharger la fiche technique ↓',
     youMayAlsoLike: 'VOUS AIMEREZ AUSSI',
     moreFrom: 'Plus de',
+    completeTheRoom: 'Complétez la chambre.',
     lookingFor1: 'Vous cherchez une',
     lookingFor2: 'spécification particulière ?',
     moq: 'Quantité minimale de commande',
