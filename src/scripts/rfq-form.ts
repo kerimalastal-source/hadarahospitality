@@ -99,6 +99,44 @@ if (form) {
   }
   applyProductFromUrl();
 
+  // Multi-product hand-off from the /products listing page's "Request a
+  // quote for selected products" (src/scripts/product-selection.ts) —
+  // gated on ?fromSelection=1 so stray sessionStorage data from earlier
+  // browsing never silently pre-checks anything on an unrelated visit to
+  // this page. Reuses the same category-chip + specific-product-checkbox
+  // mechanism as applyProductFromUrl() above, just for several products
+  // at once instead of one.
+  function applySelectionFromSession() {
+    if (new URLSearchParams(window.location.search).get('fromSelection') !== '1') return;
+    let items: { slug: string; name: string; category: string }[] = [];
+    try {
+      const raw = sessionStorage.getItem('hadara_rfq_selection');
+      items = raw ? JSON.parse(raw) : [];
+    } catch {
+      items = [];
+    }
+    if (items.length === 0) return;
+
+    for (const item of items) {
+      const categoryCheckbox = form?.querySelector<HTMLInputElement>(`input[name="categories"][value="${CSS.escape(item.category)}"]`);
+      if (!categoryCheckbox) continue;
+      if (!categoryCheckbox.checked) {
+        categoryCheckbox.checked = true;
+        syncCategoryProductsPanel(categoryCheckbox);
+      }
+      const productCheckbox = form?.querySelector<HTMLInputElement>(`input[name="products"][data-slug="${CSS.escape(item.slug)}"]`);
+      if (productCheckbox) productCheckbox.checked = true;
+    }
+
+    try {
+      sessionStorage.removeItem('hadara_rfq_selection');
+    } catch {
+      // Private browsing / storage disabled — harmless, nothing to clean up.
+    }
+    track('product_selected', { count: items.length, source: 'multi-select' });
+  }
+  applySelectionFromSession();
+
   // Lets a page like /hotel-opening-package pre-select "Project Type"
   // without going through the product hand-off above — independent of
   // whether a `product` param is also present.

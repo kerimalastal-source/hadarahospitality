@@ -87,6 +87,12 @@ export interface Dictionary {
     sourcingHeading1: string;
     sourcingHeading2: string;
     tailoredQuote: string;
+    selection: {
+      addLabel: string;
+      selectedCount: string;
+      clear: string;
+      requestQuote: string;
+    };
   };
   productDetail: {
     overview: string;

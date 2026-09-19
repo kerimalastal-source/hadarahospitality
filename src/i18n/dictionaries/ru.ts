@@ -213,6 +213,12 @@ export const ru: DeepPartial<Dictionary> = {
     sourcingHeading1: 'Ищете определённую',
     sourcingHeading2: 'характеристику?',
     tailoredQuote: 'Запросить индивидуальное предложение',
+    selection: {
+      addLabel: 'Добавить к запросу предложения',
+      selectedCount: 'выбрано для запроса предложения',
+      clear: 'Очистить',
+      requestQuote: 'Запросить предложение по выбранным товарам',
+    },
   },
   blogPage: {
     title: 'Блог | HADARA Hospitality',

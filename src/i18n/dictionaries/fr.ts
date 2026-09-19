@@ -213,6 +213,12 @@ export const fr: DeepPartial<Dictionary> = {
     sourcingHeading1: 'Vous cherchez une',
     sourcingHeading2: 'spécification particulière ?',
     tailoredQuote: 'Demander un devis personnalisé',
+    selection: {
+      addLabel: 'Ajouter à la demande de devis',
+      selectedCount: 'sélectionné(s) pour votre demande de devis',
+      clear: 'Effacer',
+      requestQuote: 'Demander un devis pour les produits sélectionnés',
+    },
   },
   blogPage: {
     title: 'Blog | HADARA Hospitality',

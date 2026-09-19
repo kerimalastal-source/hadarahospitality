@@ -505,6 +505,22 @@ export const RFQ_CATEGORY_PRODUCTS: Record<string, string[]> = {
   Other: [],
 };
 
+const SLUG_TO_RFQ_CATEGORY: Record<string, string> = Object.fromEntries(
+  Object.entries(RFQ_CATEGORY_PRODUCTS).flatMap(([category, slugs]) => slugs.map((slug) => [slug, category])),
+);
+
+/** The RFQ form's product-category chip a given product slug actually falls
+ * under — precise for the categories RFQ_CATEGORY_PRODUCTS splits finer
+ * than CategoryKey (towels -> "Towels & Bath Linen" / "Pool & Beach
+ * Towels", robes -> "Bathrobes" / "Hotel Slippers"), unlike the coarser
+ * CATEGORIES[key].formCategory -> LEGACY_CATEGORY_TO_RFQ_CATEGORY mapping
+ * (src/lib/rfq.ts) used for a single product page's `?category=` hand-off.
+ * Used by the products listing page's multi-select ("Request a quote for
+ * selected products") to pre-check the exact right chip and panel. */
+export function getRfqCategoryForSlug(slug: string): string | undefined {
+  return SLUG_TO_RFQ_CATEGORY[slug];
+}
+
 // Categories to pull from when a product's own category doesn't have enough
 // other products to fill "You may also like" (see getRelatedProducts below)
 // — pairs the natural "guest room" groupings (bedroom vs. bathroom) rather
