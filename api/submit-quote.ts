@@ -66,6 +66,7 @@ function renderInternalEmail(s: RfqSubmission): string {
       ${row('Country', s.property.country)}
       ${row('City', s.property.city)}
       ${row('Product categories', s.products.categories.join(', '))}
+      ${row('Specific products', s.products.specificProducts?.join(', '))}
       ${row('Selected product', selectedProductLine)}
       ${row('Estimated quantity', s.products.estimatedQuantity)}
       ${row('Project type', s.project.projectType)}
@@ -165,6 +166,7 @@ export default async function handler(request: Request): Promise<Response> {
   const country = str(formData, 'country');
   const deliveryCountry = str(formData, 'deliveryCountry');
   const categories = formData.getAll('categories').filter((v): v is string => typeof v === 'string' && v.length > 0);
+  const specificProducts = formData.getAll('products').filter((v): v is string => typeof v === 'string' && v.length > 0);
 
   const missing: string[] = [];
   if (!fullName) missing.push('fullName');
@@ -225,6 +227,7 @@ export default async function handler(request: Request): Promise<Response> {
     },
     products: {
       categories,
+      specificProducts: specificProducts.length > 0 ? specificProducts : undefined,
       selectedProduct,
       estimatedQuantity: str(formData, 'estimatedQuantity', 300) || undefined,
     },

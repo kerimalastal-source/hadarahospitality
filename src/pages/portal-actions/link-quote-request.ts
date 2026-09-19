@@ -33,8 +33,10 @@ export const POST: APIRoute = async (context) => {
   if (!reference) return json({ ok: false, error: 'missing_reference' }, 400);
 
   const categories = form.getAll('categories').filter((v): v is string => typeof v === 'string' && v.length > 0);
+  const specificProducts = form.getAll('products').filter((v): v is string => typeof v === 'string' && v.length > 0);
   const summaryLines = [
     categories.length ? `Categories: ${categories.join(', ')}` : '',
+    specificProducts.length ? `Specific products: ${specificProducts.join(', ')}` : '',
     str(form, 'estimatedQuantity', 300) && `Estimated quantity: ${str(form, 'estimatedQuantity', 300)}`,
     str(form, 'projectType', 200) && `Project type: ${str(form, 'projectType', 200)}`,
     str(form, 'deliveryCountry', 200) &&
