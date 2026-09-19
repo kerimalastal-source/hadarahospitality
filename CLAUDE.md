@@ -656,6 +656,20 @@ member approves it.
   `role: 'staff'` identity there, since staff have no `companyId` and
   those pages are company-scoped. `PortalShell.astro` shows either the
   staff nav or the customer nav, never both.
+- **Explicit "Sign out" link, added 2026-09-19**: Clerk's `<UserButton/>`
+  in the sidebar already had sign-out inside its avatar dropdown, but the
+  owner tried the portal and didn't realize that dropdown was there —
+  fair, a bare circular avatar with no label isn't an obvious affordance.
+  Added `<SignOutButton redirectUrl="/portal/sign-in">` (also from
+  `@clerk/astro/components`) right next to it in `PortalShell.astro`, as
+  a plain visible "Sign out" text link (`.portal-sign-out` in
+  `global.css`). `SignOutButton` is Clerk's *unstyled* button primitive —
+  it renders a bare `<button>` wired to `window.Clerk.signOut()` client-side
+  and takes no `class`/style props of its own (its TS types don't allow
+  arbitrary HTML attributes, confirmed via `astro check` rejecting one), so
+  the actual visible styling lives on a `<span>` nested inside it instead,
+  with the reset for the outer unstyled `<button>` scoped via
+  `.portal-account-row button` rather than a class on the component itself.
 - **Bootstrapping the first staff account**: there's no UI for it by
   design (self-signup only ever creates `role: 'customer'` rows, and only
   an existing staff member can reach anything that would promote someone).
