@@ -35,6 +35,15 @@ const websiteSchema = {
     'query-input': 'required name=search_term_string',
   },
 };
+
+// Fixed order matching home.process.steps (Inquiry, Sampling, Approval, Production, Delivery) — same 5-step order in every locale.
+const STEP_ICONS = [
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>',
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>',
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>',
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16V6a1 1 0 0 1 1-1h9v11"/><path d="M13 9h4l4 4v3h-8"/><circle cx="7.5" cy="17.5" r="1.7"/><circle cx="17.5" cy="17.5" r="1.7"/></svg>',
+];
 ---
 <BaseLayout title={h.title} description={h.description} path="/" locale={locale} active="home">
   <Fragment slot="head">
@@ -169,7 +178,14 @@ const websiteSchema = {
         </div>
         <div class="steps">
           {h.process.steps.map((step, i) => (
-            <article><span>{String(i + 1).padStart(2, '0')}</span><h3>{step.title}</h3><p>{step.body}</p></article>
+            <article>
+              <div class="step-top">
+                <span>{String(i + 1).padStart(2, '0')}</span>
+                <span class="step-icon" set:html={STEP_ICONS[i]} />
+              </div>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </article>
           ))}
         </div>
       </div>
